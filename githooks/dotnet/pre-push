@@ -1,0 +1,19 @@
+#!/bin/sh
+
+branch="$(git rev-parse --abbrev-ref HEAD)"
+echo "Pre-push validation for branch $branch"
+
+if [[ $branch == release/* ]] || [[ $branch == hotfix/* ]]; then
+  regex='^((hotfix|release)\/v[0-9]+.[0-9]+.[0-9]+)$'
+  if [[ ! $branch =~ $regex ]]; then
+    echo "Release/Hotfix branch name doesn't match version pattern [v1.0.0]"
+    sleep 0.1
+    exit 1
+  else
+    echo "Valid Release/Hotfix branch name"
+    sleep 0.1
+  fi
+else
+  echo "No validation configured for branch"
+  sleep 0.1
+fi
