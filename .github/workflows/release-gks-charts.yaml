@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - '.charts/gks-shared/**'
+      - 'charts/gks-shared/**'
 jobs:
   publish-shared-chart:
     runs-on: ubuntu-latest
