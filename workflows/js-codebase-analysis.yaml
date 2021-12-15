@@ -1,0 +1,59 @@
+name: Codebase Analysis
+on:
+  workflow_call:
+    inputs:
+      git_ref:
+        required: true
+        description: 'Git reference'
+      version:
+        required: true
+        description: 'Version'
+      sonar_project:
+        required: true
+        description: 'SonarQube project name'
+      sonar_validate:
+        required: false
+        description: 'Determines whether to wait for SonarQube quality gate results. Fails build in case of negative results'
+        default: true
+    secrets:
+      gh_token:
+        required: true
+        description: 'GitHub token'
+      sq_token:
+        required: true
+        description: 'SonarQube token'
+      sq_address:
+        required: true
+        description: 'SonarQube address'
+jobs:
+  sonarqube-analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - 
+        name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          ref: '${{ inputs.git_ref }}'
+          fetch-depth: 0
+          token: '${{ secrets.gh_token }}'
+      -
+        name: Set SonarQube Project Properties
+        env:
+          SONAR_PROPERTIES_FILE: 'sonar-project.properties'
+        run: |
+          rm -f ${{ env.SONAR_PROPERTIES_FILE }}
+          echo "sonar.projectKey=${{ inputs.sonar_project }}" >> ${{ env.SONAR_PROPERTIES_FILE }}
+          echo "sonar.projectVersion=${{ inputs.version }}" >> ${{ env.SONAR_PROPERTIES_FILE }}
+      - 
+        name: Scan codebase
+        uses: sonarsource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.sq_token }}
+          SONAR_HOST_URL: ${{ secrets.sq_address }}
+      - 
+        name: Quality gate status check
+        if: inputs.sonar_validate
+        uses: sonarsource/sonarqube-quality-gate-action@master
+        timeout-minutes: 5
+        env:
+          SONAR_TOKEN: ${{ inputs.sq_token }}

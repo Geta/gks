@@ -1,0 +1,138 @@
+name: Deploy Environment
+on:
+  workflow_call:
+    inputs:
+      git_ref:
+        required: true
+        description: 'Git reference'
+      project_name:
+        required: true
+        description: 'Project name'
+      shared_project_name:
+        required: false
+        desciption: 'Shared project name'
+        default: 'gks'
+      app_name:
+        required: true
+        description: 'Application name'
+      version:
+        required: true
+        desciption: 'Release version'
+      environment:
+        required: true
+        description: 'Environment name'
+      docker_file:
+        required: true
+        desciption: 'Dockerfile path'
+      docker_context:
+        required: false
+        description: 'Docker build context'
+        default: '.'
+      docker_tags:
+        required: false
+        desciption: 'Additional docker image tags'
+        default: ''
+      docker_args:
+        required: false
+        description: 'Docker build args'
+        default: ''
+      helm_chart_dir:
+        required: false
+        description: 'Helm chart directory'
+        default: 'chart'
+      helm_chart_name:
+        required: true
+        description: 'Helm chart name'
+      helm_template_chart_name:
+        required: false
+        description: 'Template chart name'
+        default: 'gks-service-template'
+      helm_template_chart_version:
+        required: true
+        description: 'Template chart name'
+    secrets:
+      gh_token:
+        required: true
+        description: 'GitHub token'
+      harbor_address:
+        required: true
+        description: 'Harbor repository address'
+      harbor_user:
+        required: true
+        description: 'Harbor repository user name'
+      harbor_token:
+        required: true
+        description: 'Harbor repository user token'
+jobs:
+  deploy-environment:
+    runs-on: ubuntu-latest
+    steps:
+      - 
+        name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          ref: '${{ inputs.git_ref }}'
+          token: '${{ secrets.gh_token }}'
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - 
+        name: Log in to Harbor
+        uses: docker/login-action@v1
+        with:
+          registry: '${{ secrets.harbor_address }}/${{ inputs.project_name }}'
+          username: '${{ secrets.harbor_user }}'
+          password: '${{ secrets.harbor_token }}'
+      - 
+        name: Build and push Docker image
+        uses: docker/build-push-action@v2
+        env:
+          cache_image: '${{ secrets.harbor_address }}/${{ inputs.project_name }}/${{ inputs.app_name }}:cache'
+        with:
+          push: true
+          #cache-from: type=registry,ref=${{ env.cache_image }}
+          #cache-to: type=registry,mode=max,ref=${{ env.cache_image }}
+          context: '${{ inputs.docker_context }}'
+          file: '${{ inputs.docker_file }}'
+          tags: |
+            ${{ secrets.harbor_address }}/${{ inputs.project_name }}/${{ inputs.app_name }}/${{ inputs.environment }}:${{ inputs.version }}
+            ${{ secrets.harbor_address }}/${{ inputs.project_name }}/${{ inputs.app_name }}/${{ inputs.environment }}:latest
+            ${{ inputs.docker_tags }}
+          build-args: '${{ inputs.docker_args }}'
+      -
+        name: Set up Helm
+        uses: Geta/gks/actions/setup-helm@actions/v1
+        env:
+          HELM_REPO_URL: 'https://${{ secrets.harbor_address }}/chartrepo'
+        with:
+          helm_repository_url: '${{ env.HELM_REPO_URL }}'
+          helm_repository_user: '${{ secrets.harbor_user }}'
+          helm_repository_token: '${{ secrets.harbor_token }}'
+          helm_repository_project: '${{ inputs.project_name }}'
+          helm_repository_project2: '${{ inputs.shared_project_name }}'
+      -
+        name: Pull template chart
+        uses: Geta/gks/actions/pull-chart@actions/v1
+        with:
+          chart_dir: '${{ inputs.helm_chart_dir }}/${{ inputs.helm_chart_name }}-${{ inputs.environment }}'
+          chart_name: '${{ inputs.helm_template_chart_name }}'
+          chart_version: '${{ inputs.helm_template_chart_version }}'
+          repo_project: '${{ inputs.shared_project_name }}'
+      -
+        name: Set chart info
+        uses: Geta/gks/actions/set-chart-info@actions/v1
+        with:
+          chart_dir: '${{ inputs.helm_chart_dir }}'
+          chart_name: '${{ inputs.helm_chart_name }}-${{ inputs.environment }}'
+          chart_description: '${{ inputs.app_name }} chart'
+          chart_version: '${{ inputs.version }}'
+          docker_image_url: '${{ secrets.harbor_address }}/${{ inputs.project_name }}/${{ inputs.app_name }}/${{ inputs.environment }}'
+      -
+        name: Push service Helm chart
+        uses: Geta/gks/actions/package-helm-chart@actions/v1
+        with:
+          chart_dir: '${{ inputs.helm_chart_dir }}'
+          chart_name: '${{ inputs.helm_chart_name }}-${{ inputs.environment }}'
+          chart_version: '${{ inputs.version }}'
+          helm_repository_project: '${{ inputs.project_name }}'
+          push: true

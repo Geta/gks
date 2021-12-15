@@ -1,0 +1,69 @@
+name: Codebase Analysis
+on:
+  workflow_call:
+    inputs:
+      git_ref:
+        required: true
+        description: 'Git reference'
+      version:
+        required: true
+        description: 'Version'
+      dotnet_version:
+        required: true
+        description: '.NET SDK version to install'
+      java_version:
+        required: false
+        description: 'Java SDK version to install (required for SonarQube)'
+        default: '1.11'
+      sonar_exclusions:
+        required: false
+        description: 'SonarQube exclusions'
+        default: ''
+      sonar_project:
+        required: true
+        description: 'SonarQube project name'
+      sonar_validate:
+        required: false
+        description: 'Determines whether to wait for SonarQube quality gate results. Fails build in case of negative results'
+        default: true
+    secrets:
+      gh_token:
+        required: true
+        description: 'GitHub token'
+      sq_token:
+        required: true
+        description: 'SonarQube token'
+      sq_address:
+        required: true
+        description: 'SonarQube address'
+jobs:
+  sonarqube-analysis:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ inputs.java_version }}
+      -
+        uses: actions/checkout@v2
+        with:
+          ref: '${{ inputs.git_ref }}'
+          fetch-depth: 0
+          token: '${{ secrets.gh_token }}'
+      -
+        name: Set up .NET SDK
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '${{ inputs.dotnet_version }}'
+      -
+        name: Install SonarQube scanner
+        run: dotnet tool install dotnet-sonarscanner --global
+      -
+        name: Build and analyze
+        env:
+          GITHUB_TOKEN: ${{ secrets.gh_token }}
+        run: |
+          dotnet sonarscanner begin /v:"${{ inputs.version }}" /d:sonar.exclusions="${{ inputs.exclusions }}" /k:"${{ inputs.sonar_project }}" /d:sonar.login="${{ secrets.sq_token }}" /d:sonar.host.url="${{ secrets.sq_address }}" /d:sonar.qualitygate.wait=${{ inputs.sonar_validate }}
+          dotnet build
+          dotnet sonarscanner end /d:sonar.login="${{ secrets.sq_token }}"
