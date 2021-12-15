@@ -1,0 +1,34 @@
+name: 'Pull chart'
+inputs:
+  chart_dir:
+    required: true
+  chart_name:
+    required: true
+  chart_version:
+    required: false
+  repo_project:
+    required: false
+  allow_prerelease:
+    requred: false
+    default: false
+runs:
+  using: "composite"
+  steps:
+    -
+      name: Pull service helm chart template
+      shell: bash
+      run: |
+        rm -rf ${{ inputs.chart_dir }}
+        if [ -n "${{ inputs.chart_version }}" ]
+        then
+          helm pull '${{ inputs.repo_project }}/${{ inputs.chart_name }}' --version '${{ inputs.chart_version }}' --untar --untardir '${{ inputs.chart_dir }}'
+        else
+          if [ ${{ env.allow_prerelease }} ]
+          then
+            helm pull '${{ inputs.repo_project }}/${{ inputs.chart_name }}' --devel --untar --untardir '${{ inputs.chart_dir }}'
+          else
+            helm pull '${{ inputs.repo_project }}/${{ inputs.chart_name }}' --untar --untardir '${{ inputs.chart_dir }}'
+          fi
+        fi
+        mv ${{ inputs.chart_dir }}/${{ inputs.chart_name }}/* ${{ inputs.chart_dir }}
+        rm -rf ${{ inputs.chart_dir }}/${{ inputs.chart_name }}

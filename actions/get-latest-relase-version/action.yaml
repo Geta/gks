@@ -1,0 +1,32 @@
+name: 'Get latest GitHub release version'
+inputs:
+  repository:
+    required: true
+  tag:
+    required: false
+    default: ''
+  excludes:
+    required: false
+    default: 'prerelease, draft'
+outputs:
+  SEMVER_VERSION:
+    value: ${{ steps.version.outputs.SEMVER_VERSION }}
+  ASSEMBLY_VERSION:
+    value: ${{ steps.version.outputs.ASSEMBLY_VERSION }}
+runs:
+  using: "composite"
+  steps:
+      - 
+        name: Get latest release
+        id: release
+        uses: pozetroninc/github-action-get-latest-release@master
+        with:
+          repository: ${{ inputs.repository }}
+          excludes: ${{ inputs.excludes }}
+      -
+        name: Parse release versions
+        id: version
+        uses: ./.github/actions/get-release-branch-version
+        with:
+          branch: '${{ steps.release.outputs.release }}'
+          tag: '${{ inputs.tag }}'

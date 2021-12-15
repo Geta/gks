@@ -1,0 +1,27 @@
+name: 'Parse release version'
+inputs:
+  ref:  # v1.0.0
+    required: true
+  tag:
+    required: false
+    default: ''
+  prefix:
+    required: false
+    default: 'release'
+outputs:
+  SEMVER_VERSION: # v1.0.0-${{tag}}
+    value: ${{ steps.version.outputs.SEMVER_VERSION }}
+  ASSEMBLY_VERSION: # 1.0.0
+    value: ${{ steps.version.outputs.ASSEMBLY_VERSION }}
+runs:
+  using: "composite"
+  steps:
+      - 
+        name: Parse release version
+        id: version
+        run: |
+          REF_VERSION=$(echo '${{ inputs.ref }}' | sed 's/${{ inputs.prefix }}\///g')
+          SEMVER_VERSION="$REF_VERSION${{ inputs.tag }}"
+          ASSEMBLY_VERSION=$(echo $BRANCH_VERSION | sed 's/v//g')
+          echo ::set-output name=ASSEMBLY_VERSION::$ASSEMBLY_VERSION
+          echo ::set-output name=SEMVER_VERSION::$SEMVER_VERSION
