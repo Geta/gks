@@ -1,0 +1,59 @@
+name: Push Tigera-Operator (Calico) chart
+on:
+  workflow_dispatch:
+    inputs:
+      tigera:
+        description: 'Tigera release version'
+        required: true
+      revision:
+        description: 'Tigera version revision'
+        required: false
+env:
+  HARBOR_PROJECT_NAME: gks
+  HELM_CHART_NAME: tigera-operator
+  HELM_CHART_PATH: ${{ github.workspace }}
+  HELM_REPO_URL: https://${{ secrets.GKS_HARBOR_ADDRESS }}/chartrepo
+  HELM_REPO_ALIAS: harbor
+  OUT_DIR: output
+  VERSION: ${{ github.event.inputs.tigera }}
+  REVISION: ${{ github.event.inputs.revision }}
+jobs:
+  build-test-artifacts:
+    runs-on: ubuntu-latest
+    steps:
+      - 
+        name: Download Tigera release ${{ env.VERSION }}
+        run: |
+          curl -L https://github.com/projectcalico/calico/releases/download/${{ env.VERSION }}/tigera-operator-${{ env.VERSION}}${{ env.REVISION }}.tgz > tigera.tgz
+          tar -xf tigera.tgz
+          rm ./tigera-operator/templates/tigera-operator/00-namespace-tigera-operator.yaml
+      -
+        name: Install Helm
+        uses: azure/setup-helm@v1
+      -
+        name: Install Helm Push plugin
+        run: helm plugin install https://github.com/chartmuseum/helm-push.git
+      -
+        name: Add Helm repository
+        run: |
+          REPO_URL=${{ env.HELM_REPO_URL }}/${{ env.HARBOR_PROJECT_NAME }}
+          helm repo add --username '${{ secrets.GKS_HARBOR_USER }}' --password '${{ secrets.GKS_HARBOR_PASSWORD }}' ${{ env.HELM_REPO_ALIAS }} $REPO_URL
+          helm repo update
+      -
+        name: Package Helm chart
+        id: helm-create
+        run: |
+          CHART_PATH=${{ env.HELM_CHART_PATH }}/${{ env.HELM_CHART_NAME }}
+          PACKAGE_PATH=$(helm package $CHART_PATH --dependency-update --version '${{ env.VERSION }}' --destination $CHART_PATH/${{ env.OUT_DIR }})
+          echo ::set-output name=CHART_PACKAGE::$PACKAGE_PATH
+      -
+        name: Get package path
+        uses: jungwinter/split@v1
+        id: split
+        with:
+          msg: ${{ steps.helm-create.outputs.CHART_PACKAGE }}
+          seperator: ':'
+      -
+        name: Push Helm chart to Harbor
+        run: |
+          helm cm-push ${{ steps.split.outputs._1 }} ${{ env.HELM_REPO_ALIAS }}

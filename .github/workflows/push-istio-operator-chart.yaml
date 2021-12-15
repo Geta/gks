@@ -1,0 +1,55 @@
+name: Push Istio-Operator chart
+on:
+  workflow_dispatch:
+    inputs:
+      istio:
+        description: 'Istio release version'
+        required: true
+env:
+  HARBOR_PROJECT_NAME: gks
+  HELM_CHART_NAME: istio-operator
+  HELM_CHART_PATH: ${{ github.workspace }}/istio-${{ github.event.inputs.istio }}/manifests/charts
+  HELM_REPO_URL: https://${{ secrets.GKS_HARBOR_ADDRESS }}/chartrepo
+  HELM_REPO_ALIAS: harbor
+  OUT_DIR: output
+  VERSION: ${{ github.event.inputs.istio }}
+jobs:
+  build-test-artifacts:
+    runs-on: ubuntu-latest
+    steps:
+      - 
+        name: Download Istio release ${{ env.VERSION }}
+        run: |
+          curl -L https://github.com/istio/istio/releases/download/${{ env.VERSION }}/istio-${{ env.VERSION }}-linux-amd64.tar.gz > istio.tar.gz
+          tar -xf istio.tar.gz
+         # rm ./istio-${{ env.VERSION }}/manifests/charts/istio-operator/templates/namespace.yaml
+      -
+        name: Install Helm
+        uses: azure/setup-helm@v1
+      -
+        name: Install Helm Push plugin
+        run: helm plugin install https://github.com/chartmuseum/helm-push.git
+      -
+        name: Add Helm repository
+        run: |
+          REPO_URL=${{ env.HELM_REPO_URL }}/${{ env.HARBOR_PROJECT_NAME }}
+          helm repo add --username '${{ secrets.GKS_HARBOR_USER }}' --password '${{ secrets.GKS_HARBOR_PASSWORD }}' ${{ env.HELM_REPO_ALIAS }} $REPO_URL
+          helm repo update
+      -
+        name: Package Helm chart
+        id: helm-create
+        run: |
+          CHART_PATH=${{ env.HELM_CHART_PATH }}/${{ env.HELM_CHART_NAME }}
+          PACKAGE_PATH=$(helm package $CHART_PATH --dependency-update --destination $CHART_PATH/${{ env.OUT_DIR }})
+          echo ::set-output name=CHART_PACKAGE::$PACKAGE_PATH
+      -
+        name: Get package path
+        uses: jungwinter/split@v1
+        id: split
+        with:
+          msg: ${{ steps.helm-create.outputs.CHART_PACKAGE }}
+          seperator: ':'
+      -
+        name: Push Helm chart to Harbor
+        run: |
+          helm cm-push ${{ steps.split.outputs._1 }} ${{ env.HELM_REPO_ALIAS }}
