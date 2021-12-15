@@ -1,0 +1,10 @@
+apiVersion: v2
+appVersion: "1"
+dependencies:
+  - name: gks-shared
+    repository: https://harbor.teamgeta.net/chartrepo/gks
+    version: ~0.0.1
+description: gks website deployment chart
+name: gks-web
+type: application
+version: 0.0.1

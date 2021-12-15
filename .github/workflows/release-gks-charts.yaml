@@ -1,0 +1,84 @@
+name: Release GKS Charts
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - '.charts/gks-shared/**'
+jobs:
+  publish-shared-chart:
+    runs-on: ubuntu-latest
+    env:
+      HARBOR_PROJECT_NAME: gks
+      HELM_CHART_NAME: gks-shared
+      HELM_CHART_PATH: charts
+      VERSION: '1.0.${{ github.run_number }}'
+    outputs:
+      HARBOR_PROJECT_NAME: ${{ env.HARBOR_PROJECT_NAME }}
+      HELM_CHART_NAME: ${{ env.HELM_CHART_NAME }}
+      HELM_CHART_PATH: ${{ env.HELM_CHART_PATH }}
+      VERSION: ${{ env.VERSION }}
+    steps:
+      - 
+        name: Checkout develop branch
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.ref }}
+          token: ${{ secrets.GKS_GH_ACCESS_TOKEN }}
+      -
+        name: Set up Helm
+        uses: Geta/gks/actions/setup-helm@actions/v1
+        with:
+          helm_repository_url: 'https://${{ secrets.GKS_HARBOR_ADDRESS }}/chartrepo'
+          helm_repository_user: ${{ secrets.GKS_HARBOR_USER }}
+          helm_repository_token: ${{ secrets.GKS_HARBOR_PASSWORD }}
+          helm_repository_project: ${{ env.HARBOR_PROJECT_NAME }}
+      -
+        name: Set shared Helm chart info
+        uses: Geta/gks/actions/set-chart-info@actions/v1
+        with:
+          chart_dir: ${{ env.HELM_CHART_PATH }}
+          chart_name: ${{ env.HELM_CHART_NAME }}
+          chart_description: 'Shared chart'
+          chart_version: ${{ env.VERSION }}
+      -
+        name: Push shared Helm chart
+        id: package
+        uses: Geta/gks/actions/package-helm-chart@actions/v1
+        with:
+          chart_dir: ${{ env.HELM_CHART_PATH }}
+          chart_name: ${{ env.HELM_CHART_NAME }}
+          chart_version: ${{ env.VERSION }}
+          helm_repository_project: ${{ env.HARBOR_PROJECT_NAME }}
+          push: true
+
+  publish-website-template-chart:
+    needs: publish-shared-chart
+    uses: Geta/gks/workflows/release-gks-template-chart@workflows/v1
+    with:
+      template_chart_name: 'gks-website-template'
+      shared_chart_version: ${{ needs.publish-shared-chart.outputs.VERSION }}
+      shared_chart_name: ${{ needs.publish-shared-chart.outputs.HELM_CHART_NAME }}
+      chart_path: ${{ needs.publish-shared-chart.outputs.HELM_CHART_PATH }}
+      repo_project: ${{ needs.publish-shared-chart.outputs.HARBOR_PROJECT_NAME }}
+    secrets:
+      GKS_HARBOR_ADDRESS: ${{ secrets.GKS_HARBOR_ADDRESS }}
+      GKS_GH_ACCESS_TOKEN: ${{ secrets.GKS_GH_ACCESS_TOKEN }}
+      GKS_HARBOR_USER: ${{ secrets.GKS_HARBOR_USER }}
+      GKS_HARBOR_PASSWORD: ${{ secrets.GKS_HARBOR_PASSWORD }}
+
+  publish-service-template-chart:
+    needs: publish-shared-chart
+    uses: Geta/gks/workflows/release-gks-template-chart@workflows/v1
+    with:
+      template_chart_name: 'gks-service-template'
+      shared_chart_version: ${{ needs.publish-shared-chart.outputs.VERSION }}
+      shared_chart_name: ${{ needs.publish-shared-chart.outputs.HELM_CHART_NAME }}
+      chart_path: ${{ needs.publish-shared-chart.outputs.HELM_CHART_PATH }}
+      repo_project: ${{ needs.publish-shared-chart.outputs.HARBOR_PROJECT_NAME }}
+    secrets:
+      GKS_HARBOR_ADDRESS: ${{ secrets.GKS_HARBOR_ADDRESS }}
+      GKS_GH_ACCESS_TOKEN: ${{ secrets.GKS_GH_ACCESS_TOKEN }}
+      GKS_HARBOR_USER: ${{ secrets.GKS_HARBOR_USER }}
+      GKS_HARBOR_PASSWORD: ${{ secrets.GKS_HARBOR_PASSWORD }}
