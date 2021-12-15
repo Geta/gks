@@ -55,7 +55,7 @@ jobs:
 
   publish-website-template-chart:
     needs: publish-shared-chart
-    uses: Geta/gks/workflows/release-gks-template-chart@workflows/v1
+    uses: Geta/gks/.github/workflows/_release-gks-template-chart@workflows/v1
     with:
       template_chart_name: 'gks-website-template'
       shared_chart_version: ${{ needs.publish-shared-chart.outputs.VERSION }}
@@ -70,7 +70,7 @@ jobs:
 
   publish-service-template-chart:
     needs: publish-shared-chart
-    uses: Geta/gks/workflows/release-gks-template-chart@workflows/v1
+    uses: Geta/gks/.github/workflows/_release-gks-template-chart@workflows/v1
     with:
       template_chart_name: 'gks-service-template'
       shared_chart_version: ${{ needs.publish-shared-chart.outputs.VERSION }}
