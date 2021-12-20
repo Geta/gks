@@ -1,124 +1,158 @@
 name: Create Release
 on:
-  workflow_dispatch:
-  # executed when pull request to main/master is merged and closed
-  pull_request:
-    types: [closed]
-    branches: [master, main]
-env:
-  ENVIRONMENT_NAME: 'production'
-  PULL_ENVIRONMENT_NAME: 'staging'
-  HARBOR_PROJECT_NAME: 'cervera'
-  DOCKER_IMAGE_NAME: '${{ secrets.SERVICE_NAME }}'
-  DOCKER_REPO_URL: '${{ secrets.GKS_HARBOR_ADDRESS }}'
-  HELM_CHART_NAME: 'cervera-${{ secrets.SERVICE_NAME }}'
-  HELM_CHART_DIR: 'chart'
-  HELM_REPO_URL: 'https://${{ secrets.GKS_HARBOR_ADDRESS }}/chartrepo'
+  workflow_call:
+    inputs:
+      git_ref:
+        required: true
+        description: 'Git reference'
+      with_submodules:
+        required: false
+        description: 'Checkout submodules'
+        default: false
+      tag_title:
+        required: true
+        description: 'Tag commit title'
+      project_name:
+        required: true
+        description: 'Project name'
+      app_name:
+        required: true
+        description: 'Application name'
+      version:
+        required: true
+        desciption: 'Release version'
+      env_from:
+        required: true
+        description: 'Source environment'
+      env_to:
+        required: true
+        description: 'Destination environment'
+      helm_chart_dir:
+        required: false
+        description: 'Helm chart directory'
+        default: 'chart'
+      helm_chart_name:
+        required: true
+        description: 'Helm chart name'
+      branch_ref:
+        required: false
+        description: 'Source branch reference'
+        default: ''
+    secrets:
+      gh_token:
+        required: true
+        description: 'GitHub token'
+      harbor_address:
+        required: true
+        description: 'Harbor repository address'
+      harbor_user:
+        required: true
+        description: 'Harbor repository user name'
+      harbor_token:
+        required: true
+        description: 'Harbor repository user token'
 jobs:
-  publish-production:
+  create-release:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Parse release version
-        id: version
-        uses: Geta/gks/actions/parse-release-version@actions/v1
-        with:
-          ref: '${{ github.head_ref }}'
       - 
         name: Check if tag allready created
         uses: mukunku/tag-exists-action@v1.0.0
         id: tag
         with: 
-          tag: '${{ steps.version.outputs.SEMVER_VERSION }}'
+          tag: '${{ inputs.version }}'
         env:
-          GITHUB_TOKEN: ${{ secrets.GKS_GH_ACCESS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.gh_token }}
       -
         # fail workflow in case tag with such release version already created
         name: Validate release
         if: steps.tag.outputs.exists
         run: |
+          echo "Release with tag '${{ inputs.version }}' already exists"
           exit 1
       - 
         name: Checkout code
         uses: actions/checkout@v2
         with:
-          ref: '${{ github.ref }}'
-          token: '${{ secrets.GKS_GH_ACCESS_TOKEN }}'
+          ref: '${{ inputs.git_ref }}'
+          token: '${{ secrets.gh_token }}'
+          submodules: '${{ inputs.with_submodules }}'
       -
         name: Log in to Harbor
         uses: docker/login-action@v1
         with:
-          registry: '${{ env.DOCKER_REPO_URL }}/${{ env.HARBOR_PROJECT_NAME }}'
-          username: '${{ secrets.GKS_HARBOR_USER }}'
-          password: '${{ secrets.GKS_HARBOR_PASSWORD }}'
+          registry: '${{ secrets.harbor_address }}/${{ inputs.project_name }}'
+          username: '${{ secrets.harbor_user }}'
+          password: '${{ secrets.harbor_token }}'
       -
         name: Promote Docker Image
         id: promote
         uses: Geta/gks/actions/promote-image@actions/v1
         with:
-          repo_address: '${{ secrets.GKS_HARBOR_ADDRESS }}'
-          repo_user: '${{ secrets.GKS_HARBOR_USER }}'
-          repo_token: '${{ secrets.GKS_HARBOR_PASSWORD }}'
-          repo_project: '${{ env.HARBOR_PROJECT_NAME }}'
-          repo_name: '${{ env.DOCKER_IMAGE_NAME }}'
-          env_from: '${{ env.PULL_ENVIRONMENT_NAME }}'
-          env_to: '${{ env.ENVIRONMENT_NAME }}'
-          version: '${{ steps.version.outputs.SEMVER_VERSION }}'
+          repo_address: '${{ secrets.harbor_address }}'
+          repo_user: '${{ secrets.harbor_user }}'
+          repo_token: '${{ secrets.harbor_token }}'
+          repo_project: '${{ inputs.project_name }}'
+          repo_name: '${{ inputs.app_name }}'
+          env_from: '${{ inputs.env_from }}'
+          env_to: '${{ inputs.env_to }}'
+          version: '${{ inputs.version }}'
       -
         name: Set up Helm
         uses: Geta/gks/actions/setup-helm@actions/v1
         with:
-          helm_repository_url: '${{ env.HELM_REPO_URL }}'
-          helm_repository_user: '${{ secrets.GKS_HARBOR_USER }}'
-          helm_repository_token: '${{ secrets.GKS_HARBOR_PASSWORD }}'
-          helm_repository_project: '${{ env.HARBOR_PROJECT_NAME }}'
+          helm_repository_url: '${{ secrets.harbor_address }}'
+          helm_repository_user: '${{ secrets.harbor_user }}'
+          helm_repository_token: '${{ secrets.harbor_token }}'
+          helm_repository_project: '${{ inputs.app_name }}'
       -
         name: Pull chart
         uses: Geta/gks/actions/pull-chart@actions/v1
         with:
-          chart_dir: '${{ env.HELM_CHART_DIR }}/${{ env.HELM_CHART_NAME }}-${{ env.ENVIRONMENT_NAME }}'
-          chart_name: '${{ env.HELM_CHART_NAME }}-${{ env.PULL_ENVIRONMENT_NAME }}'
-          chart_version: '^${{ steps.version.outputs.SEMVER_VERSION }}-${{ env.PULL_ENVIRONMENT_NAME }}'
-          repo_project: '${{ env.HARBOR_PROJECT_NAME }}'
+          chart_dir: '${{ inputs.helm_chart_dir }}/${{ inputs.helm_chart_name }}-${{ inputs.env_to }}'
+          chart_name: '${{ inputs.helm_chart_name }}-${{ inputs.env_from }}'
+          chart_version: '^${{ inputs.version }}-${{ inputs.env_from }}'
+          repo_project: '${{ inputs.project_name }}'
       -
         name: Set chart info
         uses: Geta/gks/actions/set-chart-info@actions/v1
         with:
-          chart_dir: '${{ env.HELM_CHART_DIR }}'
-          chart_name: '${{ env.HELM_CHART_NAME }}-${{ env.ENVIRONMENT_NAME }}'
-          chart_description: '${{ secrets.SERVICE_NAME }} service chart'
-          chart_version: '${{ steps.version.outputs.SEMVER_VERSION }}'
+          chart_dir: '${{ inputs.helm_chart_dir }}'
+          chart_name: '${{ inputs.helm_chart_name }}-${{ inputs.env_to }}'
+          chart_description: '${{ inputs.app_name }} service chart'
+          chart_version: '${{ inputs.version }}'
           docker_image_url: '${{ steps.promote.outputs.IMAGE }}'
       -
         name: Push service Helm chart
         uses: Geta/gks/actions/package-helm-chart@actions/v1
         with:
-          chart_dir: '${{ env.HELM_CHART_DIR }}'
-          chart_name: '${{ env.HELM_CHART_NAME }}-${{ env.ENVIRONMENT_NAME }}'
-          chart_version: '${{ steps.version.outputs.SEMVER_VERSION }}'
-          helm_repository_project: '${{ env.HARBOR_PROJECT_NAME }}'
+          chart_dir: '${{ inputs.helm_chart_dir }}'
+          chart_name: '${{ inputs.helm_chart_name }}-${{ inputs.env_to }}'
+          chart_version: '${{ inputs.version }}'
+          helm_repository_project: '${{ inputs.project_name }}'
           push: true
       -
         name: Create and push tag
         uses: actions-ecosystem/action-push-tag@v1
         with:
-          tag: '${{ steps.version.outputs.SEMVER_VERSION }}'
-          message: '${{ github.event.pull_request.title }}'
+          tag: '${{ inputs.version }}'
+          message: '${{ inputs.tag_title }}'
       -
         name: Create Github Release
         uses: ncipollo/release-action@v1
         with:
-          tag: '${{ steps.version.outputs.SEMVER_VERSION }}'
-          github_token: '${{ secrets.GKS_GH_ACCESS_TOKEN }}'
+          tag: '${{ inputs.version }}'
+          github_token: '${{ secrets.gh_token }}'
           draft: false
           generateReleaseNotes: true
       -
+        if: inputs.branch_ref != ''
         name: Delete release branch
         uses: dawidd6/action-delete-branch@v3
         with:
-          github_token: '${{ secrets.GKS_GH_ACCESS_TOKEN }}'
-          branches: '${{ github.head_ref }}'
+          github_token: '${{ secrets.gh_token }}'
+          branches: '${{ inputs.branch_ref }}'
 
       # TODO: Notify on failure
       # TODO: Merge main into develop or create PR

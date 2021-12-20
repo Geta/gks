@@ -5,6 +5,10 @@ on:
       git_ref:
         required: true
         description: 'Git reference'
+      with_submodules:
+        required: false
+        description: 'Checkout submodules'
+        default: false
       project_name:
         required: true
         description: 'Project name'
@@ -46,7 +50,7 @@ on:
       helm_template_chart_name:
         required: false
         description: 'Template chart name'
-        default: 'gks-service-template'
+        default: 'gks-template'
       helm_template_chart_version:
         required: true
         description: 'Template chart name'
@@ -73,6 +77,7 @@ jobs:
         with:
           ref: '${{ inputs.git_ref }}'
           token: '${{ secrets.gh_token }}'
+          submodules: '${{ inputs.with_submodules }}'
       -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
