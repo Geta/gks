@@ -21,6 +21,9 @@ jobs:
       - 
         name: Sync assets
         uses: varunsridharan/action-github-workflow-sync@89079da42f314fe368ef09d4ab0223c8612213ab
+        env:
+          SRC_WORKFLOW_DIR: '.github/worfklows'
+          DST_WORKFLOW_DIR: '.github/workflows/templates/partial'
         with:
           DRY_RUN: false
           SKIP_CI: false
@@ -29,9 +32,9 @@ jobs:
           WORKFLOW_FILES: |
             githooks=.githooks
             actions=.github/actions
-            .github/workflows/_create-release.yaml=.github/workflows/templates/create-release.yaml
-            .github/workflows/_deploy-environment.yaml=.github/workflows/templates/deploy-environment.yaml
-            .github/workflows/_dotnet-codebase-analysis.yaml=.github/workflows/templates/dotnet-codebase-analysis.yaml
-            .github/workflows/_js-codebase-analysis.yaml=.github/workflows/templates/js-codebase-analysis.yaml
+            ${{ env.SRC_WORKFLOW_DIR }}/_create-release.yaml=${{ env.DST_WORKFLOW_DIR }}/create-release.yaml
+            ${{ env.SRC_WORKFLOW_DIR }}/_deploy-environment.yaml=${{ env.DST_WORKFLOW_DIR }}/deploy-environment.yaml
+            ${{ env.SRC_WORKFLOW_DIR }}/_dotnet-codebase-analysis.yaml=${{ env.DST_WORKFLOW_DIR }}/dotnet-codebase-analysis.yaml
+            ${{ env.SRC_WORKFLOW_DIR }}/_js-codebase-analysis.yaml=${{ env.DST_WORKFLOW_DIR }}/js-codebase-analysis.yaml
           GITHUB_TOKEN: ${{ secrets.GKS_GH_ACCESS_TOKEN }}
           COMMIT_MESSAGE: 'GKS Automated Asset Sync'
