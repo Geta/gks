@@ -1,0 +1,81 @@
+# -- Number of replicas to run.
+replicaCount: 1
+# -- Image configuration. [Documentation](https://kubernetes.io/docs/concepts/containers/images/).
+# @default -- `{}`
+image:
+  # -- Image repository.
+  repository: harbor.teamgeta.net/cervera/giftshop-web/test
+  # -- Image pull policy.
+  pullPolicy: IfNotPresent
+  # -- Image tag.
+  tag: ''
+# -- List of the secret names to use for image pulling.
+imagePullSecrets: []
+# -- Name override.
+nameOverride: ''
+# -- FullName override.
+fullnameOverride: ''
+# -- Service account configuration. [Documentation](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/).
+# @default -- `{}`
+serviceAccount:
+  # -- Whether to create service account or not.
+  create: false
+  # -- Service account annotations. Example: `{ foo/bar: "Some annotation" }`.
+  annotations: {}
+  # -- Service account name
+  name: ''
+# -- Pod security context. [Documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/).
+podSecurityContext: {}
+# -- Container security context. [Documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/).
+securityContext: {}
+# -- Service configuration. [Documentation](https://kubernetes.io/docs/concepts/services-networking/service/).
+# @default -- `{}`
+service:
+  # -- Service type
+  type: ClusterIP
+  # -- Service port
+  port: 80
+# -- Environment variables. [Documentation](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/).
+env: []
+# -- Environment variables mapping. [Documentation](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/).
+envFrom: []
+# -- Tenant name.
+tenant: ''
+# -- Pod level annotations.
+podAnnotations: {}
+# -- Deployment level annotations.
+deploymentAnnotations: []
+# -- Service level annotations.
+serviceAnnotations: []
+# -- Volumes configuration. [Documentation](https://kubernetes.io/docs/concepts/storage/volumes/).
+volumes: []
+# -- Volume mounts configuration. [Documentation](https://kubernetes.io/docs/concepts/storage/volumes/).
+volumeMounts: []
+# -- Probes configuration. [Documentation](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/).
+# @default -- `{}`
+probes:
+  # -- Liveness probe configuration.
+  liveness: {}
+  # -- Startup probe configuration.
+  startup: {}
+  # -- readiness probe configuration.
+  readiness: {}
+# -- Resources configuration. [Documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/).
+resources: {}
+# -- Autoscaling configuration. [Documentation](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/).
+# @default -- `{}`
+autoscaling:
+  # -- Whether to enable HPA or not
+  enabled: false
+  # -- Min amount of replicas
+  minReplicas: 1
+  # -- Max amount of replicas
+  maxReplicas: 100
+  # -- Target CPU utilization percentage
+  targetCPUUtilizationPercentage: 80
+# -- Node selector configuration. [Documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/).
+nodeSelector: {}
+# -- Tolerations configuration. [Documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/).
+tolerations: []
+# -- Affinity configuration. [Documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
+affinity: {}
