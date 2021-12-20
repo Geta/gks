@@ -4,6 +4,7 @@ on:
     inputs:
       file:
         required: false
+        type: string
         description: 'Configuration file path'
         default: '.github/config.yaml'
 jobs:
