@@ -1,0 +1,6 @@
+apiVersion: v2
+appVersion: 0.0.1
+description: GKS template chart
+name: gks-template
+type: library
+version: 0.0.1
