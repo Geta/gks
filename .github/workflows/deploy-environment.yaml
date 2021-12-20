@@ -16,6 +16,9 @@ on:
         required: false
         desciption: 'Shared project name'
         default: 'gks'
+      proxy_project_name:
+        required: true
+        description: 'Proxy cache project name'
       app_name:
         required: true
         description: 'Application name'
@@ -67,6 +70,10 @@ on:
       harbor_token:
         required: true
         description: 'Harbor repository user token'
+      docker_args:
+        required: false
+        description: 'Docker secret args'
+        default: ''
 jobs:
   deploy-environment:
     runs-on: ubuntu-latest
@@ -103,7 +110,10 @@ jobs:
             ${{ secrets.harbor_address }}/${{ inputs.project_name }}/${{ inputs.app_name }}/${{ inputs.environment }}:${{ inputs.version }}
             ${{ secrets.harbor_address }}/${{ inputs.project_name }}/${{ inputs.app_name }}/${{ inputs.environment }}:latest
             ${{ inputs.docker_tags }}
-          build-args: '${{ inputs.docker_args }}'
+          build-args: |
+            PROXY_REGISTRY_URL=${{ secrets.harbor_address }}/${{ inputs.proxy_project_name }}/
+            ${{ inputs.docker_args }}
+            ${{ secrets.docker_args }}
       -
         name: Set up Helm
         uses: Geta/gks/actions/setup-helm@actions/v1
