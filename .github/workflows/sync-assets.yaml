@@ -6,8 +6,6 @@ on:
       - main
     paths:
       - 'githooks/**'
-      - 'actions/**'
-      - '.github/workflows/*'
 jobs:
   sync-assets:
     runs-on: ubuntu-latest
@@ -21,9 +19,6 @@ jobs:
       - 
         name: Sync assets
         uses: varunsridharan/action-github-workflow-sync@89079da42f314fe368ef09d4ab0223c8612213ab
-        env:
-          SRC_WORKFLOW_DIR: '.github/workflows'
-          DST_WORKFLOW_DIR: '.github/workflows/templates/partial'
         with:
           DRY_RUN: false
           SKIP_CI: false
@@ -31,10 +26,5 @@ jobs:
             Geta/gks-tenant-gcc@main
           WORKFLOW_FILES: |
             githooks=.githooks
-            actions=.github/actions
-            ${{ env.SRC_WORKFLOW_DIR }}/_create-release.yaml=${{ env.DST_WORKFLOW_DIR }}/create-release.yaml
-            ${{ env.SRC_WORKFLOW_DIR }}/_deploy-environment.yaml=${{ env.DST_WORKFLOW_DIR }}/deploy-environment.yaml
-            ${{ env.SRC_WORKFLOW_DIR }}/_dotnet-codebase-analysis.yaml=${{ env.DST_WORKFLOW_DIR }}/dotnet-codebase-analysis.yaml
-            ${{ env.SRC_WORKFLOW_DIR }}/_js-codebase-analysis.yaml=${{ env.DST_WORKFLOW_DIR }}/js-codebase-analysis.yaml
           GITHUB_TOKEN: ${{ secrets.GKS_GH_ACCESS_TOKEN }}
           COMMIT_MESSAGE: 'GKS Automated Asset Sync'
