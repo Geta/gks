@@ -1,14 +1,8 @@
-# cervera-giftshop-web-test
+# gks-template
 
-![Version: v1.0.0-test.17](https://img.shields.io/badge/Version-v1.0.0--test.17-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.0.0-test.17](https://img.shields.io/badge/AppVersion-v1.0.0--test.17-informational?style=flat-square)
+![Version: 0.0.1](https://img.shields.io/badge/Version-0.0.1-informational?style=flat-square) ![Type: library](https://img.shields.io/badge/Type-library-informational?style=flat-square) ![AppVersion: 0.0.1](https://img.shields.io/badge/AppVersion-0.0.1-informational?style=flat-square)
 
-giftshop-web website chart
-
-## Requirements
-
-| Repository | Name | Version |
-|------------|------|---------|
-| https://harbor.teamgeta.net/chartrepo/gks | gks-shared | 1.0.16 |
+GKS template chart
 
 ## Values
 
