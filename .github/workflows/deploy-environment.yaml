@@ -18,7 +18,7 @@ on:
       shared_project_name:
         required: false
         type: string
-        desciption: 'Shared project name'
+        description: 'Shared project name'
         default: 'gks'
       proxy_project_name:
         required: true
@@ -31,7 +31,7 @@ on:
       version:
         required: true
         type: string
-        desciption: 'Release version'
+        description: 'Release version'
       environment:
         required: true
         type: string
@@ -39,7 +39,7 @@ on:
       docker_file:
         required: true
         type: string
-        desciption: 'Dockerfile path'
+        description: 'Dockerfile path'
       docker_context:
         required: false
         type: string
@@ -48,7 +48,7 @@ on:
       docker_tags:
         required: false
         type: string
-        desciption: 'Additional docker image tags'
+        description: 'Additional docker image tags'
         default: ''
       docker_args:
         required: false
