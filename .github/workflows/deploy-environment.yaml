@@ -89,7 +89,6 @@ on:
       docker_args:
         required: false
         description: 'Docker secret args'
-        default: ''
 jobs:
   deploy-environment:
     runs-on: ubuntu-latest
