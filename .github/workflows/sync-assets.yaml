@@ -5,9 +5,9 @@ on:
     branches:
       - main
     paths:
-      - '.githooks/**'
-      - '.github/actions/**'
-      - '.github/workflows/templates/**'
+      - 'githooks/**'
+      - 'actions/**'
+      - '.github/workflows/*'
 jobs:
   sync-assets:
     runs-on: ubuntu-latest
@@ -27,8 +27,8 @@ jobs:
           REPOSITORIES: |
             Geta/gks-tenant-gcc@main
           WORKFLOW_FILES: |
-            .githooks=.githooks
-            .github/actions=.github/actions
-            .github/workflows/templates=.github/workflows/shared
+            githooks=githooks
+            actions=.github/actions
+            .github/workflows=.github/workflows/templates
           GITHUB_TOKEN: ${{ secrets.GKS_GH_ACCESS_TOKEN }}
           COMMIT_MESSAGE: 'GKS Automated Asset Sync'
