@@ -27,8 +27,11 @@ jobs:
           REPOSITORIES: |
             Geta/gks-tenant-gcc@main
           WORKFLOW_FILES: |
-            githooks=githooks
+            githooks=.githooks
             actions=.github/actions
-            .github/workflows=.github/workflows/templates
+            .github/workflows/_create-release.yaml=.github/workflows/templates/create-release.yaml
+            .github/workflows/_deploy-environment.yaml=.github/workflows/templates/deploy-environment.yaml
+            .github/workflows/_dotnet-codebase-analysis.yaml=.github/workflows/templates/dotnet-codebase-analysis.yaml
+            .github/workflows/_js-codebase-analysis.yaml=.github/workflows/templates/js-codebase-analysis.yaml
           GITHUB_TOKEN: ${{ secrets.GKS_GH_ACCESS_TOKEN }}
           COMMIT_MESSAGE: 'GKS Automated Asset Sync'
