@@ -22,7 +22,7 @@ jobs:
         name: Sync assets
         uses: varunsridharan/action-github-workflow-sync@89079da42f314fe368ef09d4ab0223c8612213ab
         with:
-          DRY_RUN: true
+          DRY_RUN: false
           SKIP_CI: false
           REPOSITORIES: |
             Geta/gks-tenant-gcc@main
