@@ -22,7 +22,7 @@ jobs:
         name: Sync assets
         uses: varunsridharan/action-github-workflow-sync@89079da42f314fe368ef09d4ab0223c8612213ab
         env:
-          SRC_WORKFLOW_DIR: '.github/worfklows'
+          SRC_WORKFLOW_DIR: '.github/workflows'
           DST_WORKFLOW_DIR: '.github/workflows/templates/partial'
         with:
           DRY_RUN: false
