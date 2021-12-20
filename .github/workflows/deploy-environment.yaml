@@ -4,58 +4,74 @@ on:
     inputs:
       git_ref:
         required: true
+        type: string
         description: 'Git reference'
       with_submodules:
         required: false
+        type: boolean
         description: 'Checkout submodules'
         default: false
       project_name:
         required: true
+        type: string
         description: 'Project name'
       shared_project_name:
         required: false
+        type: string
         desciption: 'Shared project name'
         default: 'gks'
       proxy_project_name:
         required: true
+        type: string
         description: 'Proxy cache project name'
       app_name:
         required: true
+        type: string
         description: 'Application name'
       version:
         required: true
+        type: string
         desciption: 'Release version'
       environment:
         required: true
+        type: string
         description: 'Environment name'
       docker_file:
         required: true
+        type: string
         desciption: 'Dockerfile path'
       docker_context:
         required: false
+        type: string
         description: 'Docker build context'
         default: '.'
       docker_tags:
         required: false
+        type: string
         desciption: 'Additional docker image tags'
         default: ''
       docker_args:
         required: false
+        type: string
         description: 'Docker build args'
         default: ''
       helm_chart_dir:
         required: false
+        type: string
         description: 'Helm chart directory'
         default: 'chart'
       helm_chart_name:
         required: true
+        type: string
         description: 'Helm chart name'
       helm_template_chart_name:
         required: false
+        type: string
         description: 'Template chart name'
         default: 'gks-template'
       helm_template_chart_version:
         required: true
+        type: string
         description: 'Template chart name'
     secrets:
       gh_token:
