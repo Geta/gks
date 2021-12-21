@@ -145,7 +145,7 @@ jobs:
             ${{ inputs.docker_tags }}
 
   publish-helm:
-    needs: [publish-docker]
+    needs: publish-docker
     runs-on: ubuntu-latest
     steps:
       -
@@ -180,7 +180,7 @@ jobs:
         name: Lint Helm Chart
         uses: Geta/gks/actions/lint-helm-chart@actions/v1
         with:
-          chart_dir: '${{ inputs.helm_chart_dir }}'
+          chart_dir: '${{ inputs.helm_chart_dir }}/${{ inputs.project_name }}-${{ needs.publish-docker.outputs.app_name }}-${{ inputs.environment }}'
       -
         name: Push service Helm chart
         uses: Geta/gks/actions/package-helm-chart@actions/v1
@@ -192,7 +192,7 @@ jobs:
           push: true
   
   analyze:
-    needs: [publish-docker]
+    needs: publish-docker
     runs-on: ubuntu-latest
     steps:
       - 
