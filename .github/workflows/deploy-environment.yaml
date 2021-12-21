@@ -98,7 +98,6 @@ on:
         description: 'Docker secret args'
 jobs:
   publish-docker:
-    needs: preconfigure
     runs-on: ubuntu-latest
     outputs:
       app_name: '${{ steps.preconfigure.outputs.app_name }}'
