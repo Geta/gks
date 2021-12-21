@@ -78,7 +78,7 @@ on:
         required: false
         description: 'Docker secret args'
 jobs:
-  checkout:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - 
@@ -88,16 +88,10 @@ jobs:
           ref: '${{ inputs.git_ref }}'
           token: '${{ secrets.gh_token }}'
           submodules: '${{ inputs.with_submodules }}'
-
-  preconfigure:
-    needs: checkout
-    name: Get build metadata
-    uses: Geta/gks/.github/workflows/preconfigure.yaml@workflows/v1
-
-  deploy-environment:
-    needs: preconfigure
-    runs-on: ubuntu-latest
-    steps:
+      -
+        name: Run Preconfiguration
+        id: preconfigure
+        uses: Geta/gks/actions/preconfigure@actions/v1
       -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
@@ -112,16 +106,16 @@ jobs:
         name: Build and push Docker image
         uses: docker/build-push-action@v2
         env:
-          cache_image: '${{ secrets.harbor_address }}/${{ inputs.project_name }}/${{ needs.preconfigure.outputs.app_name }}:cache'
+          cache_image: '${{ secrets.harbor_address }}/${{ inputs.project_name }}/${{ steps.preconfigure.outputs.app_name }}:cache'
         with:
           push: true
           #cache-from: type=registry,ref=${{ env.cache_image }}
           #cache-to: type=registry,mode=max,ref=${{ env.cache_image }}
           context: '${{ inputs.docker_context }}'
-          file: '${{ needs.preconfigure.outputs.dockerfile }}'
+          file: '${{ steps.preconfigure.outputs.dockerfile }}'
           tags: |
-            ${{ secrets.harbor_address }}/${{ inputs.project_name }}/${{ needs.preconfigure.outputs.app_name }}/${{ inputs.environment }}:${{ inputs.version }}
-            ${{ secrets.harbor_address }}/${{ inputs.project_name }}/${{ needs.preconfigure.outputs.app_name }}/${{ inputs.environment }}:latest
+            ${{ secrets.harbor_address }}/${{ inputs.project_name }}/${{ steps.preconfigure.outputs.app_name }}/${{ inputs.environment }}:${{ inputs.version }}
+            ${{ secrets.harbor_address }}/${{ inputs.project_name }}/${{ steps.preconfigure.outputs.app_name }}/${{ inputs.environment }}:latest
             ${{ inputs.docker_tags }}
           build-args: |
             PROXY_REGISTRY_URL=${{ secrets.harbor_address }}/${{ inputs.proxy_project_name }}/
@@ -142,7 +136,7 @@ jobs:
         name: Pull template chart
         uses: Geta/gks/actions/pull-chart@actions/v1
         with:
-          chart_dir: '${{ inputs.helm_chart_dir }}/${{ inputs.project_name }}-${{ needs.preconfigure.outputs.app_name }}-${{ inputs.environment }}'
+          chart_dir: '${{ inputs.helm_chart_dir }}/${{ inputs.project_name }}-${{ steps.preconfigure.outputs.app_name }}-${{ inputs.environment }}'
           chart_name: '${{ inputs.helm_template_chart_name }}'
           chart_version: '${{ inputs.helm_template_chart_version }}'
           repo_project: '${{ inputs.shared_project_name }}'
@@ -151,16 +145,16 @@ jobs:
         uses: Geta/gks/actions/set-chart-info@actions/v1
         with:
           chart_dir: '${{ inputs.helm_chart_dir }}'
-          chart_name: '${{ inputs.project_name }}-${{ needs.preconfigure.outputs.app_name }}-${{ inputs.environment }}'
-          chart_description: '${{ needs.preconfigure.outputs.app_name }} chart'
+          chart_name: '${{ inputs.project_name }}-${{ steps.preconfigure.outputs.app_name }}-${{ inputs.environment }}'
+          chart_description: '${{ steps.preconfigure.outputs.app_name }} chart'
           chart_version: '${{ inputs.version }}'
-          docker_image_url: '${{ secrets.harbor_address }}/${{ inputs.project_name }}/${{ needs.preconfigure.outputs.app_name }}/${{ inputs.environment }}'
+          docker_image_url: '${{ secrets.harbor_address }}/${{ inputs.project_name }}/${{ steps.preconfigure.outputs.app_name }}/${{ inputs.environment }}'
       -
         name: Push service Helm chart
         uses: Geta/gks/actions/package-helm-chart@actions/v1
         with:
           chart_dir: '${{ inputs.helm_chart_dir }}'
-          chart_name: '${{ inputs.project_name }}-${{ needs.preconfigure.outputs.app_name }}-${{ inputs.environment }}'
+          chart_name: '${{ inputs.project_name }}-${{ steps.preconfigure.outputs.app_name }}-${{ inputs.environment }}'
           chart_version: '${{ inputs.version }}'
           helm_repository_project: '${{ inputs.project_name }}'
           push: true
