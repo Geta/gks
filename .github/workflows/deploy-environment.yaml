@@ -97,8 +97,10 @@ on:
         required: false
         description: 'Docker secret args'
 jobs:
-  publish:
+  publish-docker:
     runs-on: ubuntu-latest
+    outputs:
+      app_name: '${{ steps.preconfigure.outputs.app_name }}'
     steps:
       - 
         name: Checkout code
@@ -140,6 +142,11 @@ jobs:
             ${{ secrets.harbor_address }}/${{ inputs.project_name }}/${{ steps.preconfigure.outputs.app_name }}/${{ inputs.environment }}:${{ inputs.version }}-${{ inputs.environment }}.${{ inputs.build_number }}
             ${{ secrets.harbor_address }}/${{ inputs.project_name }}/${{ steps.preconfigure.outputs.app_name }}/${{ inputs.environment }}:latest
             ${{ inputs.docker_tags }}
+
+  publish-helm:
+    needs: publish-docker
+    runs-on: ubuntu-latest
+    steps:
       -
         name: Set up Helm
         uses: Geta/gks/actions/setup-helm@actions/v1
@@ -155,7 +162,7 @@ jobs:
         name: Pull template chart
         uses: Geta/gks/actions/pull-chart@actions/v1
         with:
-          chart_dir: '${{ inputs.helm_chart_dir }}/${{ inputs.project_name }}-${{ steps.preconfigure.outputs.app_name }}-${{ inputs.environment }}'
+          chart_dir: '${{ inputs.helm_chart_dir }}/${{ inputs.project_name }}-${{ needs.publish-docker.outputs.app_name }}-${{ inputs.environment }}'
           chart_name: '${{ inputs.helm_template_chart_name }}'
           chart_version: '${{ inputs.helm_template_chart_version }}'
           repo_project: '${{ inputs.shared_project_name }}'
@@ -164,21 +171,22 @@ jobs:
         uses: Geta/gks/actions/set-chart-info@actions/v1
         with:
           chart_dir: '${{ inputs.helm_chart_dir }}'
-          chart_name: '${{ inputs.project_name }}-${{ steps.preconfigure.outputs.app_name }}-${{ inputs.environment }}'
-          chart_description: '${{ steps.preconfigure.outputs.app_name }} chart'
+          chart_name: '${{ inputs.project_name }}-${{ needs.publish-docker.outputs.app_name }}-${{ inputs.environment }}'
+          chart_description: '${{ needs.publish-docker.outputs.app_name }} chart'
           chart_version: '${{ inputs.version }}-${{ inputs.environment }}.${{ inputs.build_number }}'
-          docker_image_url: '${{ secrets.harbor_address }}/${{ inputs.project_name }}/${{ steps.preconfigure.outputs.app_name }}/${{ inputs.environment }}'
+          docker_image_url: '${{ secrets.harbor_address }}/${{ inputs.project_name }}/${{ needs.publish-docker.outputs.app_name }}/${{ inputs.environment }}'
       -
         name: Push service Helm chart
         uses: Geta/gks/actions/package-helm-chart@actions/v1
         with:
           chart_dir: '${{ inputs.helm_chart_dir }}'
-          chart_name: '${{ inputs.project_name }}-${{ steps.preconfigure.outputs.app_name }}-${{ inputs.environment }}'
+          chart_name: '${{ inputs.project_name }}-${{ needs.publish-docker.outputs.app_name }}-${{ inputs.environment }}'
           chart_version: '${{ inputs.version }}-${{ inputs.environment }}.${{ inputs.build_number }}'
           helm_repository_project: '${{ inputs.project_name }}'
           push: true
   
   analyze:
+    needs: publish-docker
     runs-on: ubuntu-latest
     steps:
       - 
@@ -188,4 +196,4 @@ jobs:
         with:
           severity-threshold: '${{ inputs.scan_treshold }}'
           run-quality-checks: ${{ inputs.scan_quality }}
-          image-name: '${{ secrets.harbor_address }}/${{ inputs.project_name }}/${{ steps.preconfigure.outputs.app_name }}/${{ inputs.environment }}:${{ inputs.version }}-${{ inputs.environment}}.${{ inputs.build_number }}'
+          image-name: '${{ secrets.harbor_address }}/${{ inputs.project_name }}/${{ needs.publish-docker.outputs.app_name }}/${{ inputs.environment }}:${{ inputs.version }}-${{ inputs.environment}}.${{ inputs.build_number }}'
