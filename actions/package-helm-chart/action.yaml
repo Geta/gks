@@ -26,6 +26,7 @@ runs:
     -
       name: Get package path
       id: split
+      shell: bash
       run: |
         PACKAGE='${{ steps.package.outputs.CHART_PACKAGE }}'
         echo ::set-output name=NAME::$(echo "${PACKAGE:*:}")
