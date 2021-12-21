@@ -5,8 +5,10 @@ inputs:
     description: 'Configuration file path'
     default: '.github/config.yaml'
 outputs:
-  app_name: '${{ steps.appname.outputs.data }}'
-  dockerfile: '${{ steps.dockerfile.outputs.data }}'
+  app_name: 
+    value: '${{ steps.appname.outputs.data }}'
+  dockerfile:
+    value: '${{ steps.dockerfile.outputs.data }}'
 runs:
   using: "composite"
   steps:
