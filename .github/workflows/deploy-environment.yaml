@@ -118,13 +118,12 @@ jobs:
           username: '${{ secrets.harbor_user }}'
           password: '${{ secrets.harbor_token }}'
       - 
-        name: Build Docker image
-        id: build
+        name: Build and push Docker image
         uses: docker/build-push-action@v2
         env:
           cache_image: '${{ secrets.harbor_address }}/${{ inputs.project_name }}/${{ steps.preconfigure.outputs.app_name }}:cache'
         with:
-          push: false
+          push: true
           #cache-from: type=registry,ref=${{ env.cache_image }}
           #cache-to: type=registry,mode=max,ref=${{ env.cache_image }}
           context: '${{ inputs.docker_context }}'
@@ -133,6 +132,10 @@ jobs:
             DOCKER_REGISTRY=${{ secrets.harbor_address }}/${{ inputs.proxy_project_name }}/
             ${{ inputs.docker_args }}
             ${{ secrets.docker_args }}
+          tags: |
+            ${{ secrets.harbor_address }}/${{ inputs.project_name }}/${{ steps.preconfigure.outputs.app_name }}/${{ inputs.environment }}:${{ inputs.version }}
+            ${{ secrets.harbor_address }}/${{ inputs.project_name }}/${{ steps.preconfigure.outputs.app_name }}/${{ inputs.environment }}:latest
+            ${{ inputs.docker_tags }}
       - 
         if: inputs.scan_image == true
         name: Scan Docker image
@@ -140,16 +143,7 @@ jobs:
         with:
           severity-threshold: '${{ inputs.scan_treshold }}'
           run-quality-checks: ${{ inputs.scan_quality }}
-          image-name: '${{ steps.build.outputs.digest }}'
-      - 
-        name: Push Docker image
-        uses: docker/build-push-action@v2
-        with:
-          push: true
-          tags: |
-            ${{ secrets.harbor_address }}/${{ inputs.project_name }}/${{ steps.preconfigure.outputs.app_name }}/${{ inputs.environment }}:${{ inputs.version }}
-            ${{ secrets.harbor_address }}/${{ inputs.project_name }}/${{ steps.preconfigure.outputs.app_name }}/${{ inputs.environment }}:latest
-            ${{ inputs.docker_tags }}
+          image-name: '${{ secrets.harbor_address }}/${{ inputs.project_name }}/${{ steps.preconfigure.outputs.app_name }}/${{ inputs.environment }}:${{ inputs.version }}'
       -
         name: Set up Helm
         uses: Geta/gks/actions/setup-helm@actions/v1
