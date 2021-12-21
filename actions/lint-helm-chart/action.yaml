@@ -1,0 +1,14 @@
+name: 'Lint Helm Chart'
+inputs:
+  chart_dir:
+    required: true
+    description: 'Helm chart directory'
+runs:
+  using: "composite"
+  steps:
+    - 
+      name: Lint Helm chart
+      run: |
+        cd '${{ inputs.chart_dir }}'
+        helm lint . --strict
+        cd -
