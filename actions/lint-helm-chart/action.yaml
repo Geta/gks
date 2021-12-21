@@ -8,6 +8,7 @@ runs:
   steps:
     - 
       name: Lint Helm chart
+      shell: bash
       run: |
         cd '${{ inputs.chart_dir }}'
         helm lint . --strict
