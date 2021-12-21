@@ -101,6 +101,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       app_name: '${{ steps.preconfigure.outputs.app_name }}'
+      dockerfile: '${{ steps.preconfigure.outputs.dockerfile }}'
     steps:
       - 
         name: Checkout code
