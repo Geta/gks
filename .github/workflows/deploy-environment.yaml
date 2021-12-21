@@ -117,7 +117,6 @@ jobs:
           cache_image: '${{ secrets.harbor_address }}/${{ inputs.project_name }}/${{ steps.preconfigure.outputs.app_name }}:cache'
         with:
           push: false
-          load: true
           #cache-from: type=registry,ref=${{ env.cache_image }}
           #cache-to: type=registry,mode=max,ref=${{ env.cache_image }}
           context: '${{ inputs.docker_context }}'
@@ -130,6 +129,7 @@ jobs:
             DOCKER_REGISTRY=${{ secrets.harbor_address }}/${{ inputs.proxy_project_name }}/
             ${{ inputs.docker_args }}
             ${{ secrets.docker_args }}
+      - run: docker images
       - 
         if: inputs.scan_image == true
         name: Scan Docker image
