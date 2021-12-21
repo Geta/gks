@@ -119,6 +119,7 @@ jobs:
           password: '${{ secrets.harbor_token }}'
       - 
         name: Build Docker image
+        id: build
         uses: docker/build-push-action@v2
         env:
           cache_image: '${{ secrets.harbor_address }}/${{ inputs.project_name }}/${{ steps.preconfigure.outputs.app_name }}:cache'
@@ -128,7 +129,6 @@ jobs:
           #cache-to: type=registry,mode=max,ref=${{ env.cache_image }}
           context: '${{ inputs.docker_context }}'
           file: '${{ steps.preconfigure.outputs.dockerfile }}'
-          outputs: 'type=local,dest=.'
           tags: |
             ${{ secrets.harbor_address }}/${{ inputs.project_name }}/${{ steps.preconfigure.outputs.app_name }}/${{ inputs.environment }}:${{ inputs.version }}
             ${{ secrets.harbor_address }}/${{ inputs.project_name }}/${{ steps.preconfigure.outputs.app_name }}/${{ inputs.environment }}:latest
@@ -145,7 +145,7 @@ jobs:
         with:
           severity-threshold: '${{ inputs.scan_treshold }}'
           run-quality-checks: ${{ inputs.scan_quality }}
-          image-name: ${{ secrets.harbor_address }}/${{ inputs.project_name }}/${{ steps.preconfigure.outputs.app_name }}/${{ inputs.environment }}:latest
+          image-name: '${{ secrets.harbor_address }}/${{ inputs.project_name }}/${{ steps.preconfigure.outputs.app_name }}/${{ inputs.environment }}:${{ steps.build.outputs.digest }}'
       - 
         name: Push Docker image
         uses: docker/build-push-action@v2
