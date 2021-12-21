@@ -25,11 +25,10 @@ runs:
         echo ::set-output name=CHART_PACKAGE::$PACKAGE_PATH
     -
       name: Get package path
-      uses: jungwinter/split@v1
       id: split
-      with:
-        msg: ${{ steps.package.outputs.CHART_PACKAGE }}
-        seperator: ':'
+      run: |
+        PACKAGE='${{ steps.package.outputs.CHART_PACKAGE }}'
+        echo ::set-output name=NAME::$(echo "${PACKAGE:*:}")
     - 
       # conditionals workaround
       uses: ChristopherHX/conditional@b4a9649204f81002ec9a4ef7d4bf7d6b2ab7fa55
@@ -38,4 +37,4 @@ runs:
         step: |
           name: Push Helm chart to registry
           shell: bash
-          run: helm cm-push ${{ steps.split.outputs._1 }} ${{ inputs.helm_repository_project }}
+          run: helm cm-push ${{ steps.split.outputs.NAME }} ${{ inputs.helm_repository_project }}
