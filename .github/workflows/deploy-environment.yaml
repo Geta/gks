@@ -129,6 +129,9 @@ jobs:
           registry: '${{ secrets.harbor_address }}/${{ inputs.project_name }}'
           username: '${{ secrets.harbor_user }}'
           password: '${{ secrets.harbor_token }}'
+      - run: |
+          pwd
+          ls -la
       - 
         name: Build and push Docker image
         uses: docker/build-push-action@v2
