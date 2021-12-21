@@ -128,7 +128,7 @@ jobs:
           #cache-to: type=registry,mode=max,ref=${{ env.cache_image }}
           context: '${{ inputs.docker_context }}'
           file: '${{ steps.preconfigure.outputs.dockerfile }}'
-          outputs: 'type=docker .'
+          outputs: 'type=local,dest=.'
           tags: |
             ${{ secrets.harbor_address }}/${{ inputs.project_name }}/${{ steps.preconfigure.outputs.app_name }}/${{ inputs.environment }}:${{ inputs.version }}
             ${{ secrets.harbor_address }}/${{ inputs.project_name }}/${{ steps.preconfigure.outputs.app_name }}/${{ inputs.environment }}:latest
