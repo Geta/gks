@@ -61,6 +61,21 @@ on:
         required: true
         type: string
         description: 'Template chart name'
+      scan_image:
+        required: false
+        type: boolean
+        description: 'Whether to perform Docker image scan or not'
+        default: true
+      scan_treshold:
+        required: false
+        type: string
+        description: 'Scanning treshold level'
+        default: 'HIGH'
+      scan_quality:
+        required: false
+        type: boolean
+        description: 'Run image quality checks or not'
+        default: true
     secrets:
       gh_token:
         required: true
@@ -103,12 +118,12 @@ jobs:
           username: '${{ secrets.harbor_user }}'
           password: '${{ secrets.harbor_token }}'
       - 
-        name: Build and push Docker image
+        name: Build Docker image
         uses: docker/build-push-action@v2
         env:
           cache_image: '${{ secrets.harbor_address }}/${{ inputs.project_name }}/${{ steps.preconfigure.outputs.app_name }}:cache'
         with:
-          push: true
+          push: false
           #cache-from: type=registry,ref=${{ env.cache_image }}
           #cache-to: type=registry,mode=max,ref=${{ env.cache_image }}
           context: '${{ inputs.docker_context }}'
@@ -118,9 +133,26 @@ jobs:
             ${{ secrets.harbor_address }}/${{ inputs.project_name }}/${{ steps.preconfigure.outputs.app_name }}/${{ inputs.environment }}:latest
             ${{ inputs.docker_tags }}
           build-args: |
-            PROXY_REGISTRY_URL=${{ secrets.harbor_address }}/${{ inputs.proxy_project_name }}/
+            DOCKER_REGISTRY=${{ secrets.harbor_address }}/${{ inputs.proxy_project_name }}/
             ${{ inputs.docker_args }}
             ${{ secrets.docker_args }}
+      - 
+        if: inputs.scan_image == true
+        name: Scan Docker image
+        uses: azure/container-scan@v0
+        with:
+          severity-threshold: '${{ inputs.scan_treshold }}'
+          run-quality-checks: ${{ inputs.scan_quality }}
+          image-name: ${{ secrets.harbor_address }}/${{ inputs.project_name }}/${{ steps.preconfigure.outputs.app_name }}/${{ inputs.environment }}:latest
+      - 
+        name: Push Docker image
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: |
+            ${{ secrets.harbor_address }}/${{ inputs.project_name }}/${{ steps.preconfigure.outputs.app_name }}/${{ inputs.environment }}:${{ inputs.version }}
+            ${{ secrets.harbor_address }}/${{ inputs.project_name }}/${{ steps.preconfigure.outputs.app_name }}/${{ inputs.environment }}:latest
+            ${{ inputs.docker_tags }}
       -
         name: Set up Helm
         uses: Geta/gks/actions/setup-helm@actions/v1
