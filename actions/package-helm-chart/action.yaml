@@ -22,7 +22,7 @@ runs:
       run: |
         CHART_PATH=${{ inputs.chart_dir }}/${{ inputs.chart_name }}
         helm package $CHART_PATH --app-version '${{ inputs.chart_version }}' --version '${{ inputs.chart_version }}' --dependency-update --destination $CHART_PATH/output
-        echo ::set-output name=CHART_PACKAGE::'${{ inputs.chart_dir }}/${{ inputs.chart_name }}/output/${{ inputs.chart_name }}-${{ inputs.version }}.tgz'
+        echo ::set-output name=CHART_PACKAGE::'${{ inputs.chart_dir }}/${{ inputs.chart_name }}/output/${{ inputs.chart_name }}-${{ inputs.chart_version }}.tgz'
     - 
       # conditionals workaround
       uses: ChristopherHX/conditional@b4a9649204f81002ec9a4ef7d4bf7d6b2ab7fa55
