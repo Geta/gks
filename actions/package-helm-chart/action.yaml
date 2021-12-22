@@ -31,4 +31,4 @@ runs:
         step: |
           name: Push Helm chart to registry
           shell: bash
-          run: helm cm-push ${{ steps.CHART_PACKAGE.outputs.CHART_PACKAGE }} ${{ inputs.helm_repository_project }}
+          run: helm cm-push ${{ steps.package.outputs.CHART_PACKAGE }} ${{ inputs.helm_repository_project }}
