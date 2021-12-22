@@ -21,15 +21,8 @@ runs:
       shell: bash
       run: |
         CHART_PATH=${{ inputs.chart_dir }}/${{ inputs.chart_name }}
-        PACKAGE_PATH=$(helm package $CHART_PATH --app-version '${{ inputs.chart_version }}' --version '${{ inputs.chart_version }}' --dependency-update --destination $CHART_PATH/output)
-        echo ::set-output name=CHART_PACKAGE::$PACKAGE_PATH
-    -
-      name: Get package path
-      id: split
-      shell: bash
-      run: |
-        PACKAGE='${{ steps.package.outputs.CHART_PACKAGE }}'
-        echo ::set-output name=NAME::$(echo "${PACKAGE:*:}")
+        helm package $CHART_PATH --app-version '${{ inputs.chart_version }}' --version '${{ inputs.chart_version }}' --dependency-update --destination $CHART_PATH/output)
+        echo ::set-output name=CHART_PACKAGE::'${{ inputs.chart_dir }}/${{ inputs.chart_name }}/output/${{ inputs.chart_name }}-${{ inputs.version }}.tgz'
     - 
       # conditionals workaround
       uses: ChristopherHX/conditional@b4a9649204f81002ec9a4ef7d4bf7d6b2ab7fa55
@@ -38,4 +31,4 @@ runs:
         step: |
           name: Push Helm chart to registry
           shell: bash
-          run: helm cm-push ${{ steps.split.outputs.NAME }} ${{ inputs.helm_repository_project }}
+          run: helm cm-push ${{ steps.CHART_PACKAGE.outputs.CHART_PACKAGE }} ${{ inputs.helm_repository_project }}
