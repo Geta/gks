@@ -102,7 +102,7 @@ jobs:
         with:
           ref: '${{ inputs.git_ref }}'
           token: '${{ secrets.gh_token }}'
-          submodules: '${{ inputs.with_submodules }}'
+          submodules: ${{ inputs.with_submodules }}
       -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
