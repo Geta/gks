@@ -6,9 +6,9 @@ inputs:
     default: '.github/config.yaml'
 outputs:
   app_name: 
-    value: '${{ steps.appname.outputs.data }}'
-  dockerfile:
-    value: '${{ steps.dockerfile.outputs.data }}'
+    value: '${{ steps.app_name.outputs.data }}'
+  app_dockerfile:
+    value: '${{ steps.app_dockerfile.outputs.data }}'
 
   harbor_project:
     value: '${{ steps.harbor_project.outputs.data }}'
@@ -37,8 +37,8 @@ outputs:
     value: '${{ steps.docker_execute.outputs.data }}'
   docker_severity:
     value: '${{ steps.docker_severity.outputs.data }}'
-  docker_dockerfile:
-    value: '${{ steps.docker_dockerfile.outputs.data }}'
+  docker_quality:
+    value: '${{ steps.docker_quality.outputs.data }}'
 runs:
   using: "composite"
   steps:
@@ -147,7 +147,7 @@ runs:
     -
       name: Read Docker dockerfile check flag
       uses: KJ002/read-yaml@1.5
-      id: docker_dockerfile
+      id: docker_quality
       with:
         file: '${{ inputs.file }}'
         key-path: '["analysis", "docker", "dockerfile_check"]'
