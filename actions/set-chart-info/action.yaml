@@ -26,22 +26,22 @@ runs:
       name: Update Helm chart name
       uses: fjogeleit/yaml-update-action@master
       with:
-        workDir: '${{ inputs.chart_dir }}/${{ inputs.chart_name }}'
+        workDir: ${{ inputs.chart_dir }}
         valueFile: 'Chart.yaml'
         propertyPath: 'name'
-        value: '${{ inputs.chart_name }}'
-        commitChange: 'false'
-        updateFile: 'true'
+        value: ${{ inputs.chart_name }}
+        commitChange: false
+        updateFile: true
     - 
       name: Update Helm chart version
       uses: fjogeleit/yaml-update-action@master
       with:
-        workDir: '${{ inputs.chart_dir }}/${{ inputs.chart_name }}'
+        workDir: ${{ inputs.chart_dir }}
         valueFile: 'Chart.yaml'
         propertyPath: 'version'
-        value: '${{ inputs.chart_version }}'
-        commitChange: 'false'
-        updateFile: 'true'
+        value: ${{ inputs.chart_version }}
+        commitChange: false
+        updateFile: true
     - 
       # conditionals workaround
       uses: ChristopherHX/conditional@b4a9649204f81002ec9a4ef7d4bf7d6b2ab7fa55
@@ -51,12 +51,12 @@ runs:
           name: Update Helm shared chart name
           uses: fjogeleit/yaml-update-action@master
           with:
-            workDir: '${{ inputs.chart_dir }}/${{ inputs.chart_name }}'
+            workDir: ${{ inputs.chart_dir }}
             valueFile: 'Chart.yaml'
             propertyPath: 'dependencies.0.name'
-            value: '${{ inputs.shared_chart_name }}'
-            commitChange: 'false'
-            updateFile: 'true'
+            value: ${{ inputs.shared_chart_name }}
+            commitChange: false
+            updateFile: true
     - 
       # conditionals workaround
       uses: ChristopherHX/conditional@b4a9649204f81002ec9a4ef7d4bf7d6b2ab7fa55
@@ -66,12 +66,12 @@ runs:
           name: Update Helm shared chart version
           uses: fjogeleit/yaml-update-action@master
           with:
-            workDir: '${{ inputs.chart_dir }}/${{ inputs.chart_name }}'
+            workDir: ${{ inputs.chart_dir }}
             valueFile: 'Chart.yaml'
             propertyPath: 'dependencies.0.version'
-            value: '${{ inputs.shared_chart_version }}'
-            commitChange: 'false'
-            updateFile: 'true'
+            value: ${{ inputs.shared_chart_version }}
+            commitChange: false
+            updateFile: true
     - 
       # conditionals workaround
       uses: ChristopherHX/conditional@b4a9649204f81002ec9a4ef7d4bf7d6b2ab7fa55
@@ -81,12 +81,12 @@ runs:
           name: Update Helm chart description
           uses: fjogeleit/yaml-update-action@master
           with:
-            workDir: '${{ inputs.chart_dir }}/${{ inputs.chart_name }}'
+            workDir: ${{ inputs.chart_dir }}
             valueFile: 'Chart.yaml'
             propertyPath: 'description'
-            value: '${{ inputs.chart_description }}'
-            commitChange: 'false'
-            updateFile: 'true'
+            value: ${{ inputs.chart_description }}
+            commitChange: false
+            updateFile: true
     - 
       # conditionals workaround
       uses: ChristopherHX/conditional@b4a9649204f81002ec9a4ef7d4bf7d6b2ab7fa55
@@ -96,9 +96,9 @@ runs:
           name: Update Helm chart description
           uses: fjogeleit/yaml-update-action@master
           with:
-            workDir: '${{ inputs.chart_dir }}/${{ inputs.chart_name }}'
+            workDir: ${{ inputs.chart_dir }}
             valueFile: 'values.yaml'
             propertyPath: 'image.repository'
-            value: '${{ inputs.docker_image_url }}'
-            commitChange: 'false'
-            updateFile: 'true'
+            value: ${{ inputs.docker_image_url }}
+            commitChange: false
+            updateFile: true
