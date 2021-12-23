@@ -93,15 +93,15 @@ jobs:
   publish-docker:
     runs-on: ubuntu-latest
     outputs:
-      image_name: '${{ steps.image.outputs.image_name }}'
-      image_tag: '${{ steps.image.outputs.image_tag }}'  
+      image_name: ${{ steps.image.outputs.image_name }}
+      image_tag: ${{ steps.image.outputs.image_tag }}
     steps:
       - 
         name: Checkout code
         uses: actions/checkout@v2
         with:
-          ref: '${{ inputs.git_ref }}'
-          token: '${{ secrets.gh_token }}'
+          ref: ${{ inputs.git_ref }}
+          token: ${{ secrets.gh_token }}
           submodules: ${{ inputs.with_submodules }}
       -
         name: Set up Docker Buildx
@@ -111,8 +111,8 @@ jobs:
         uses: docker/login-action@v1
         with:
           registry: '${{ secrets.harbor_address }}/${{ inputs.project_name }}'
-          username: '${{ secrets.harbor_user }}'
-          password: '${{ secrets.harbor_token }}'
+          username: ${{ secrets.harbor_user }}
+          password: ${{ secrets.harbor_token }}
       -
         name: Compose Docker image info
         id: image
@@ -130,8 +130,8 @@ jobs:
           push: true
           #cache-from: type=registry,ref=${{ env.cache_image }}
           #cache-to: type=registry,mode=max,ref=${{ env.cache_image }}
-          context: '${{ inputs.docker_context }}'
-          file: '${{ inputs.dockerfile }}'
+          context: ${{ inputs.docker_context }}
+          file: ${{ inputs.dockerfile }}
           build-args: |
             DOCKER_REGISTRY=${{ secrets.harbor_address }}/${{ inputs.proxy_project_name }}/
             ${{ inputs.docker_args }}
@@ -151,11 +151,11 @@ jobs:
         env:
           HELM_REPO_URL: 'https://${{ secrets.harbor_address }}/chartrepo'
         with:
-          helm_repository_url: '${{ env.HELM_REPO_URL }}'
-          helm_repository_user: '${{ secrets.harbor_user }}'
-          helm_repository_token: '${{ secrets.harbor_token }}'
-          helm_repository_project: '${{ inputs.project_name }}'
-          helm_repository_project2: '${{ inputs.shared_project_name }}'
+          helm_repository_url: ${{ env.HELM_REPO_URL }}
+          helm_repository_user: ${{ secrets.harbor_user }}
+          helm_repository_token: ${{ secrets.harbor_token }}
+          helm_repository_project: ${{ inputs.project_name }}
+          helm_repository_project2: ${{ inputs.shared_project_name }}
       -
         name: Compose Helm chart name
         id: chart
@@ -169,18 +169,18 @@ jobs:
         uses: Geta/gks/actions/pull-chart@actions/v1
         with:
           chart_dir: '${{ inputs.helm_chart_dir }}/${{ steps.chart.outputs.chart_name }}'
-          chart_name: '${{ inputs.helm_template_chart_name }}'
-          chart_version: '${{ inputs.helm_template_chart_version }}'
-          repo_project: '${{ inputs.shared_project_name }}'
+          chart_name: ${{ inputs.helm_template_chart_name }}
+          chart_version: ${{ inputs.helm_template_chart_version }}
+          repo_project: ${{ inputs.shared_project_name }}
       -
         name: Set chart info
         uses: Geta/gks/actions/set-chart-info@actions/v1
         with:
-          chart_dir: '${{ inputs.helm_chart_dir }}'
-          chart_name: '${{ steps.chart.outputs.chart_name }}'
+          chart_dir: ${{ inputs.helm_chart_dir }}
+          chart_name: ${{ steps.chart.outputs.chart_name }}'
           chart_description: '${{ inputs.app_name }} chart'
-          chart_version: '${{ steps.chart.outputs.chart_version }}'
-          docker_image_url: '${{ needs.publish-docker.outputs.image_name }}'
+          chart_version: ${{ steps.chart.outputs.chart_version }}
+          docker_image_url: ${{ needs.publish-docker.outputs.image_name }}
       -
         name: Lint Helm Chart
         uses: Geta/gks/actions/lint-helm-chart@actions/v1
@@ -190,8 +190,8 @@ jobs:
         name: Push service Helm chart
         uses: Geta/gks/actions/package-helm-chart@actions/v1
         with:
-          chart_dir: '${{ inputs.helm_chart_dir }}'
-          chart_name: '${{ steps.chart.outputs.chart_name }}'
-          chart_version: '${{ steps.chart.outputs.chart_version }}'
-          helm_repository_project: '${{ inputs.project_name }}'
+          chart_dir: ${{ inputs.helm_chart_dir }}
+          chart_name: ${{ steps.chart.outputs.chart_name }}
+          chart_version: ${{ steps.chart.outputs.chart_version }}
+          helm_repository_project: ${{ inputs.project_name }}
           push: true
