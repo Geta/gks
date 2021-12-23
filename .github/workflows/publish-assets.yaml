@@ -93,7 +93,6 @@ jobs:
 
 
   publish-helm:
-    needs: publish-docker
     runs-on: ubuntu-latest
     steps:
       -
