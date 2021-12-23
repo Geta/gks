@@ -9,9 +9,41 @@ outputs:
     value: '${{ steps.appname.outputs.data }}'
   dockerfile:
     value: '${{ steps.dockerfile.outputs.data }}'
+
+  harbor_project:
+    value: '${{ steps.harbor_project.outputs.data }}'
+  harbor_proxy_project:
+    value: '${{ steps.harbor_proxy_project.outputs.data }}'
+  harbor_helm_template:
+    value: '${{ steps.harbor_helm_template.outputs.data }}'
+
+  git_submodules:
+    value: '${{ steps.git_submodules.outputs.data }}'
+
+  sonarqube_execute:
+    value: '${{ steps.sonarqube_execute.outputs.data }}'
+  sonarqube_project:
+    value: '${{ steps.sonarqube_project.outputs.data }}'
+  sonarqube_validate:
+    value: '${{ steps.sonarqube_validate.outputs.data }}'
+  sonarqube_platform:
+    value: '${{ steps.sonarqube_platform.outputs.data }}'
+  sonarqube_exclusions:
+    value: '${{ steps.sonarqube_exclusions.outputs.data }}'
+  sonarqube_dotnet:
+    value: '${{ steps.sonarqube_dotnet.outputs.data }}'
+
+  docker_execute:
+    value: '${{ steps.docker_execute.outputs.data }}'
+  docker_severity:
+    value: '${{ steps.docker_severity.outputs.data }}'
+  docker_dockerfile:
+    value: '${{ steps.docker_dockerfile.outputs.data }}'
 runs:
   using: "composite"
   steps:
+
+    # App configs
     -
       name: Read application name
       uses: KJ002/read-yaml@1.5
@@ -20,9 +52,109 @@ runs:
         file: '${{ inputs.file }}'
         key-path: '["app", "name"]'
     -
-      name: Read application name
+      name: Read Dockerfile path
       uses: KJ002/read-yaml@1.5
       id: dockerfile
       with:
         file: '${{ inputs.file }}'
         key-path: '["app", "dockerfile"]'
+
+    # Harbor configs
+    -
+      name: Read Harbor project name
+      uses: KJ002/read-yaml@1.5
+      id: harbor_project
+      with:
+        file: '${{ inputs.file }}'
+        key-path: '["harbor", "project"]'
+    -
+      name: Read Harbor proxy project name
+      uses: KJ002/read-yaml@1.5
+      id: harbor_proxy_project
+      with:
+        file: '${{ inputs.file }}'
+        key-path: '["harbor", "proxy_project"]'
+    -
+      name: Read Harbor Helm template version 
+      uses: KJ002/read-yaml@1.5
+      id: harbor_helm_template
+      with:
+        file: '${{ inputs.file }}'
+        key-path: '["harbor", "helm_template"]'
+
+    # Git configs
+    -
+      name: Read Git sumbodules flag
+      uses: KJ002/read-yaml@1.5
+      id: git_submodules
+      with:
+        file: '${{ inputs.file }}'
+        key-path: '["git", "submodules"]'
+
+    # SonarQube analysis configs
+    -
+      name: Read SonarQube execution flag
+      uses: KJ002/read-yaml@1.5
+      id: sonarqube_execute
+      with:
+        file: '${{ inputs.file }}'
+        key-path: '["analysis", "sonarqube", "execute"]'
+    -
+      name: Read SonarQube project name
+      uses: KJ002/read-yaml@1.5
+      id: sonarqube_project
+      with:
+        file: '${{ inputs.file }}'
+        key-path: '["analysis", "sonarqube", "project"]'
+    -
+      name: Read SonarQube validation flag
+      uses: KJ002/read-yaml@1.5
+      id: sonarqube_validate
+      with:
+        file: '${{ inputs.file }}'
+        key-path: '["analysis", "sonarqube", "validate"]'
+    -
+      name: Read SonarQube platform
+      uses: KJ002/read-yaml@1.5
+      id: sonarqube_platform
+      with:
+        file: '${{ inputs.file }}'
+        key-path: '["analysis", "sonarqube", "platform"]'
+   -
+      name: Read SonarQube exclusions
+      uses: KJ002/read-yaml@1.5
+      id: sonarqube_exclusions
+      with:
+        file: '${{ inputs.file }}'
+        key-path: '["analysis", "sonarqube", "exclusions"]'
+   -
+      name: Read SonarQube dotnet version
+      uses: KJ002/read-yaml@1.5
+      id: sonarqube_dotnet
+      with:
+        file: '${{ inputs.file }}'
+        key-path: '["analysis", "sonarqube", "dotnet_version"]'
+
+
+    # Docker analysis configs
+    -
+      name: Read Docker execution flag
+      uses: KJ002/read-yaml@1.5
+      id: docker_execute
+      with:
+        file: '${{ inputs.file }}'
+        key-path: '["analysis", "docker", "execute"]'
+    -
+      name: Read Docker severity
+      uses: KJ002/read-yaml@1.5
+      id: sonarqube_severity
+      with:
+        file: '${{ inputs.file }}'
+        key-path: '["analysis", "docker", "severity"]'
+    -
+      name: Read Docker dockerfile check flag
+      uses: KJ002/read-yaml@1.5
+      id: sonarqube_dockerfile
+      with:
+        file: '${{ inputs.file }}'
+        key-path: '["analysis", "docker", "dockerfile_check"]'

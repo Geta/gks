@@ -1,0 +1,161 @@
+name: Execute Analysis
+on:
+  workflow_call:
+    inputs:
+      git_ref:
+        required: true
+        type: string
+        description: 'Git reference'
+      version:
+        required: true
+        type: string
+        description: 'Version'
+      with_submodules:
+        required: false
+        type: boolean
+        description: 'Checkoug Git submodules or not'
+        default: false
+      sonar_execute:
+        required: false
+        type: boolean
+        description: 'Whether to execute SonarQube analysis'
+        default: false
+      sonar_platform:
+        required: true
+        type: string
+        description: 'Platform type dotnet | js'
+      sonar_exclusions:
+        required: false
+        type: string
+        description: 'SonarQube exclusions'
+        default: ''
+      sonar_project:
+        required: true
+        type: string
+        description: 'SonarQube project name'
+      sonar_validate:
+        required: false
+        type: string
+        description: 'Determines whether to wait for SonarQube quality gate results. Fails build in case of negative results'
+        default: true
+      dotnet_version:
+        required: false
+        type: string
+        description: '.NET SDK version to install'
+        default: ''
+      java_version:
+        required: false
+        type: string
+        description: 'Java SDK version to install (required for SonarQube)'
+        default: '1.11'
+      docker_execute:
+        required: false
+        type: boolean
+        description: 'Whether to execute Docker image analysis'
+        default: false
+      docker_image:
+        required: false
+        type: string
+        description: 'Docker image name'
+        default: ''
+      docker_severity:
+        required: false
+        type: string
+        description: 'Scanning severity treshold'
+        default: 'HIGH'
+      docker_quality:
+        required: false
+        type: boolean
+        description: 'Run image quality checks or not'
+        default: true
+    secrets:
+      gh_token:
+        required: true
+        description: 'GitHub token'
+      sq_token:
+        required: true
+        description: 'SonarQube token'
+      sq_address:
+        required: true
+        description: 'SonarQube address'
+jobs:
+  docker-image:
+    if: inputs.docker_execute == true
+    runs-on: ubuntu-latest
+    steps:
+      - 
+        name: Scan Docker image
+        uses: azure/container-scan@v0
+        with:
+          username: '${{ secrets.harbor_user }}'
+          password: '${{ secrets.harbor_token }}'
+          severity-threshold: '${{ inputs.docker_severity }}'
+          run-quality-checks: ${{ inputs.docker_quality }}
+          image-name: '${{ inputs.docker_image }}'
+
+  sonarqube-dotnet:
+    if: (inputs.sonar_execute == true) && (inputs.sonar_platform == 'dotnet')
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ inputs.java_version }}
+      -
+        uses: actions/checkout@v2
+        with:
+          ref: '${{ inputs.git_ref }}'
+          fetch-depth: 0
+          submodules: ${{ inputs.with_submodules }}
+          token: '${{ secrets.gh_token }}'
+      -
+        name: Set up .NET SDK
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '${{ inputs.dotnet_version }}'
+      -
+        name: Install SonarQube scanner
+        run: dotnet tool install dotnet-sonarscanner --global
+      -
+        name: Build and analyze
+        env:
+          GITHUB_TOKEN: ${{ secrets.gh_token }}
+        run: |
+          dotnet sonarscanner begin /v:"${{ inputs.version }}" /d:sonar.exclusions="${{ inputs.exclusions }}" /k:"${{ inputs.sonar_project }}" /d:sonar.login="${{ secrets.sq_token }}" /d:sonar.host.url="${{ secrets.sq_address }}" /d:sonar.qualitygate.wait=${{ inputs.sonar_validate }}
+          dotnet build
+          dotnet sonarscanner end /d:sonar.login="${{ secrets.sq_token }}"
+  
+  sonarqube-js:
+    if: (inputs.sonar_execute == true) && (inputs.sonar_platform == 'js')
+    runs-on: ubuntu-latest
+    steps:
+      - 
+        name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          ref: '${{ inputs.git_ref }}'
+          fetch-depth: 0
+          submodules: ${{ inputs.with_submodules }}
+          token: '${{ secrets.gh_token }}'
+      -
+        name: Set SonarQube Project Properties
+        env:
+          SONAR_PROPERTIES_FILE: 'sonar-project.properties'
+        run: |
+          rm -f ${{ env.SONAR_PROPERTIES_FILE }}
+          echo "sonar.projectKey=${{ inputs.sonar_project }}" >> ${{ env.SONAR_PROPERTIES_FILE }}
+          echo "sonar.projectVersion=${{ inputs.version }}" >> ${{ env.SONAR_PROPERTIES_FILE }}
+      - 
+        name: Scan codebase
+        uses: sonarsource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.sq_token }}
+          SONAR_HOST_URL: ${{ secrets.sq_address }}
+      - 
+        name: Quality gate status check
+        if: inputs.sonar_validate
+        uses: sonarsource/sonarqube-quality-gate-action@master
+        timeout-minutes: 5
+        env:
+          SONAR_TOKEN: ${{ inputs.sq_token }}
