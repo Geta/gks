@@ -42,8 +42,6 @@ outputs:
 runs:
   using: "composite"
   steps:
-
-    # App configs
     -
       name: Read application name
       uses: KJ002/read-yaml@1.5
@@ -59,7 +57,6 @@ runs:
         file: '${{ inputs.file }}'
         key-path: '["app", "dockerfile"]'
 
-    # Harbor configs
     -
       name: Read Harbor project name
       uses: KJ002/read-yaml@1.5
@@ -82,7 +79,6 @@ runs:
         file: '${{ inputs.file }}'
         key-path: '["harbor", "helm_template"]'
 
-    # Git configs
     -
       name: Read Git sumbodules flag
       uses: KJ002/read-yaml@1.5
@@ -91,7 +87,6 @@ runs:
         file: '${{ inputs.file }}'
         key-path: '["git", "submodules"]'
 
-    # SonarQube analysis configs
     -
       name: Read SonarQube execution flag
       uses: KJ002/read-yaml@1.5
@@ -135,8 +130,6 @@ runs:
         file: '${{ inputs.file }}'
         key-path: '["analysis", "sonarqube", "dotnet_version"]'
 
-
-    # Docker analysis configs
     -
       name: Read Docker execution flag
       uses: KJ002/read-yaml@1.5
