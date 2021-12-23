@@ -10,10 +10,10 @@ on:
         required: true
         type: string
         description: 'Version'
-      with_submodules:
+      submodules:
         required: false
         type: boolean
-        description: 'Checkoug Git submodules or not'
+        description: 'Checkout Git submodules or not'
         default: false
       sonar_execute:
         required: false
@@ -88,7 +88,6 @@ on:
         description: 'Harbor token'
 jobs:
   docker-image:
-    if: inputs.docker_execute == false
     runs-on: ubuntu-latest
     steps:
       - 
@@ -116,7 +115,7 @@ jobs:
         with:
           ref: ${{ inputs.git_ref }}
           fetch-depth: 0
-          submodules: ${{ inputs.with_submodules }}
+          submodules: ${{ inputs.submodules }}
           token: ${{ secrets.gh_token }}
       -
         name: Set up .NET SDK
@@ -145,7 +144,7 @@ jobs:
         with:
           ref: ${{ inputs.git_ref }}
           fetch-depth: 0
-          submodules: ${{ inputs.with_submodules }}
+          submodules: ${{ inputs.submodules }}
           token: ${{ secrets.gh_token }}
       -
         name: Set SonarQube Project Properties
