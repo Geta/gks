@@ -6,7 +6,7 @@ on:
         required: true
         type: string
         description: 'Git reference'
-      with_submodules:
+      submodules:
         required: false
         type: boolean
         description: 'Checkout submodules'
@@ -102,7 +102,7 @@ jobs:
         with:
           ref: ${{ inputs.git_ref }}
           token: ${{ secrets.gh_token }}
-          submodules: ${{ inputs.with_submodules }}
+          submodules: ${{ inputs.submodules }}
       -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
@@ -140,58 +140,3 @@ jobs:
             ${{ steps.image.outputs.image_name }}:${{ steps.image.outputs.image_tag }}
             ${{ steps.image.outputs.image_name }}:latest
             ${{ inputs.docker_tags }}
-
-  publish-helm:
-    needs: publish-docker
-    runs-on: ubuntu-latest
-    steps:
-      -
-        name: Set up Helm
-        uses: Geta/gks/actions/setup-helm@actions/v1
-        env:
-          HELM_REPO_URL: 'https://${{ secrets.harbor_address }}/chartrepo'
-        with:
-          helm_repository_url: ${{ env.HELM_REPO_URL }}
-          helm_repository_user: ${{ secrets.harbor_user }}
-          helm_repository_token: ${{ secrets.harbor_token }}
-          helm_repository_project: ${{ inputs.project_name }}
-          helm_repository_project2: ${{ inputs.shared_project_name }}
-      -
-        name: Compose Helm chart name
-        id: chart
-        run: |
-          CHART_NAME='${{ inputs.project_name }}-${{ inputs.app_name }}-${{ inputs.environment }}'
-          CHART_VERSION='${{ needs.publish-docker.outputs.image_tag }}'
-          echo ::set-output name=chart_name::$CHART_NAME
-          echo ::set-output name=chart_version::$CHART_VERSION
-      -
-        name: Pull template chart
-        uses: Geta/gks/actions/pull-chart@actions/v1
-        with:
-          chart_dir: '${{ inputs.helm_chart_dir }}/${{ steps.chart.outputs.chart_name }}'
-          chart_name: ${{ inputs.helm_template_chart_name }}
-          chart_version: ${{ inputs.helm_template_chart_version }}
-          repo_project: ${{ inputs.shared_project_name }}
-      -
-        name: Set chart info
-        uses: Geta/gks/actions/set-chart-info@actions/v1
-        with:
-          chart_dir: ${{ inputs.helm_chart_dir }}
-          chart_name: ${{ steps.chart.outputs.chart_name }}'
-          chart_description: '${{ inputs.app_name }} chart'
-          chart_version: ${{ steps.chart.outputs.chart_version }}
-          docker_image_url: ${{ needs.publish-docker.outputs.image_name }}
-      -
-        name: Lint Helm Chart
-        uses: Geta/gks/actions/lint-helm-chart@actions/v1
-        with:
-          chart_dir: '${{ inputs.helm_chart_dir }}/${{ steps.chart.outputs.chart_name }}'
-      -
-        name: Push service Helm chart
-        uses: Geta/gks/actions/package-helm-chart@actions/v1
-        with:
-          chart_dir: ${{ inputs.helm_chart_dir }}
-          chart_name: ${{ steps.chart.outputs.chart_name }}
-          chart_version: ${{ steps.chart.outputs.chart_version }}
-          helm_repository_project: ${{ inputs.project_name }}
-          push: true
