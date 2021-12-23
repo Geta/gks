@@ -90,53 +90,59 @@ on:
         required: false
         description: 'Docker secret args'
 jobs:
-  publish-docker:
+
+
+  publish-helm:
+    needs: publish-docker
     runs-on: ubuntu-latest
-    outputs:
-      image_name: ${{ steps.image.outputs.image_name }}
-      image_tag: ${{ steps.image.outputs.image_tag }}
     steps:
-      - 
-        name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          ref: ${{ inputs.git_ref }}
-          token: ${{ secrets.gh_token }}
-          submodules: ${{ inputs.submodules }}
       -
-        name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-      - 
-        name: Log in to Harbor
-        uses: docker/login-action@v1
-        with:
-          registry: '${{ secrets.harbor_address }}/${{ inputs.project_name }}'
-          username: ${{ secrets.harbor_user }}
-          password: ${{ secrets.harbor_token }}
-      -
-        name: Compose Docker image info
-        id: image
-        run: |
-          IMAGE_NAME='${{ secrets.harbor_address }}/${{ inputs.project_name }}/${{ inputs.app_name }}/${{ inputs.environment }}'
-          IMAGE_TAG='${{ inputs.version }}-${{ inputs.environment }}.${{ inputs.build_number }}'
-          echo ::set-output name=image_name::$IMAGE_NAME
-          echo ::set-output name=image_tag::$IMAGE_TAG
-      - 
-        name: Build and push Docker image
-        uses: docker/build-push-action@v2
+        name: Set up Helm
+        uses: Geta/gks/actions/setup-helm@actions/v1
         env:
-          cache_image: '${{ steps.image.outputs.image_name }}:cache'
+          HELM_REPO_URL: 'https://${{ secrets.harbor_address }}/chartrepo'
         with:
+          helm_repository_url: ${{ env.HELM_REPO_URL }}
+          helm_repository_user: ${{ secrets.harbor_user }}
+          helm_repository_token: ${{ secrets.harbor_token }}
+          helm_repository_project: ${{ inputs.project_name }}
+          helm_repository_project2: ${{ inputs.shared_project_name }}
+      -
+        name: Compose Helm chart name
+        id: chart
+        run: |
+          CHART_NAME='${{ inputs.project_name }}-${{ inputs.app_name }}-${{ inputs.environment }}'
+          CHART_VERSION='${{ needs.publish-docker.outputs.image_tag }}'
+          echo ::set-output name=chart_name::$CHART_NAME
+          echo ::set-output name=chart_version::$CHART_VERSION
+      -
+        name: Pull template chart
+        uses: Geta/gks/actions/pull-chart@actions/v1
+        with:
+          chart_dir: '${{ inputs.helm_chart_dir }}/${{ steps.chart.outputs.chart_name }}'
+          chart_name: ${{ inputs.helm_template_chart_name }}
+          chart_version: ${{ inputs.helm_template_chart_version }}
+          repo_project: ${{ inputs.shared_project_name }}
+      -
+        name: Set chart info
+        uses: Geta/gks/actions/set-chart-info@actions/v1
+        with:
+          chart_dir: ${{ inputs.helm_chart_dir }}
+          chart_name: ${{ steps.chart.outputs.chart_name }}'
+          chart_description: '${{ inputs.app_name }} chart'
+          chart_version: ${{ steps.chart.outputs.chart_version }}
+          docker_image_url: ${{ needs.publish-docker.outputs.image_name }}
+      -
+        name: Lint Helm Chart
+        uses: Geta/gks/actions/lint-helm-chart@actions/v1
+        with:
+          chart_dir: '${{ inputs.helm_chart_dir }}/${{ steps.chart.outputs.chart_name }}'
+      -
+        name: Push service Helm chart
+        uses: Geta/gks/actions/package-helm-chart@actions/v1
+        with:
+          chart_dir: ${{ inputs.helm_chart_dir }}
+          chart_name: ${{ steps.chart.outputs.chart_name }}
+          chart_version: ${{ steps.chart.outputs.chart_version }}
+          helm_repository_project: ${{ inputs.project_name }}
           push: true
-          #cache-from: type=registry,ref=${{ env.cache_image }}
-          #cache-to: type=registry,mode=max,ref=${{ env.cache_image }}
-          context: ${{ inputs.docker_context }}
-          file: ${{ inputs.dockerfile }}
-          build-args: |
-            DOCKER_REGISTRY=${{ secrets.harbor_address }}/${{ inputs.proxy_project_name }}/
-            ${{ inputs.docker_args }}
-            ${{ secrets.docker_args }}
-          tags: |
-            ${{ steps.image.outputs.image_name }}:${{ steps.image.outputs.image_tag }}
-            ${{ steps.image.outputs.image_name }}:latest
-            ${{ inputs.docker_tags }}
