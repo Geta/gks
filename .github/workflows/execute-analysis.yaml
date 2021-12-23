@@ -112,6 +112,7 @@ jobs:
           java-version: ${{ inputs.java_version }}
       -
         uses: actions/checkout@v2
+        name: Checkout code
         with:
           ref: '${{ inputs.git_ref }}'
           fetch-depth: 0
