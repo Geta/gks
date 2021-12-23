@@ -115,14 +115,14 @@ runs:
       with:
         file: '${{ inputs.file }}'
         key-path: '["analysis", "sonarqube", "platform"]'
-   -
+    -
       name: Read SonarQube exclusions
       uses: KJ002/read-yaml@1.5
       id: sonarqube_exclusions
       with:
         file: '${{ inputs.file }}'
         key-path: '["analysis", "sonarqube", "exclusions"]'
-   -
+    -
       name: Read SonarQube dotnet version
       uses: KJ002/read-yaml@1.5
       id: sonarqube_dotnet
