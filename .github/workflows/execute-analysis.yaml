@@ -21,18 +21,20 @@ on:
         description: 'Whether to execute SonarQube analysis'
         default: false
       sonar_platform:
-        required: true
+        required: false
         type: string
         description: 'Platform type dotnet | js'
+        default: ''
       sonar_exclusions:
         required: false
         type: string
         description: 'SonarQube exclusions'
         default: ''
       sonar_project:
-        required: true
+        required: false
         type: string
         description: 'SonarQube project name'
+        default: ''
       sonar_validate:
         required: false
         type: string
