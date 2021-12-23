@@ -147,14 +147,14 @@ runs:
     -
       name: Read Docker severity
       uses: KJ002/read-yaml@1.5
-      id: sonarqube_severity
+      id: docker_severity
       with:
         file: '${{ inputs.file }}'
         key-path: '["analysis", "docker", "severity"]'
     -
       name: Read Docker dockerfile check flag
       uses: KJ002/read-yaml@1.5
-      id: sonarqube_dockerfile
+      id: docker_dockerfile
       with:
         file: '${{ inputs.file }}'
         key-path: '["analysis", "docker", "dockerfile_check"]'
