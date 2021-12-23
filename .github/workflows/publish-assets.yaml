@@ -190,7 +190,7 @@ jobs:
         name: Push service Helm chart
         uses: Geta/gks/actions/package-helm-chart@actions/v1
         with:
-          chart_dir: ${{ inputs.helm_chart_dir }}
+          chart_dir: '${{ inputs.helm_chart_dir }}/${{ steps.chart.outputs.chart_name }}'
           chart_name: ${{ steps.chart.outputs.chart_name }}
           chart_version: ${{ steps.chart.outputs.chart_version }}
           helm_repository_project: ${{ inputs.project_name }}
