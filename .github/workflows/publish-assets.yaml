@@ -177,7 +177,7 @@ jobs:
         uses: Geta/gks/actions/set-chart-info@actions/v1
         with:
           chart_dir: '${{ inputs.helm_chart_dir }}/${{ steps.chart.outputs.chart_name }}'
-          chart_name: ${{ steps.chart.outputs.chart_name }}'
+          chart_name: ${{ steps.chart.outputs.chart_name }}
           chart_description: '${{ inputs.app_name }} chart'
           chart_version: ${{ steps.chart.outputs.chart_version }}
           docker_image_url: ${{ needs.publish-docker.outputs.image_name }}
