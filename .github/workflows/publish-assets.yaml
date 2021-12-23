@@ -160,7 +160,7 @@ jobs:
         name: Compose Helm chart name
         id: chart
         run: |
-          CHART_NAME='${{ inputs.project_name }}-${{ needs.publish-docker.outputs.app_name }}-${{ inputs.environment }}'
+          CHART_NAME='${{ inputs.project_name }}-${{ inputs.app_name }}-${{ inputs.environment }}'
           CHART_VERSION='${{ needs.publish-docker.outputs.image_tag }}'
           echo ::set-output name=chart_name::$CHART_NAME
           echo ::set-output name=chart_version::$CHART_VERSION
@@ -178,7 +178,7 @@ jobs:
         with:
           chart_dir: '${{ inputs.helm_chart_dir }}'
           chart_name: '${{ steps.chart.outputs.chart_name }}'
-          chart_description: '${{ needs.publish-docker.outputs.app_name }} chart'
+          chart_description: '${{ inputs.app_name }} chart'
           chart_version: '${{ steps.chart.outputs.chart_version }}'
           docker_image_url: '${{ needs.publish-docker.outputs.image_name }}'
       -
