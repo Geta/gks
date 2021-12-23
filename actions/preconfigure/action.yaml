@@ -47,14 +47,14 @@ runs:
     -
       name: Read application name
       uses: KJ002/read-yaml@1.5
-      id: appname
+      id: app_name
       with:
         file: '${{ inputs.file }}'
         key-path: '["app", "name"]'
     -
       name: Read Dockerfile path
       uses: KJ002/read-yaml@1.5
-      id: dockerfile
+      id: app_dockerfile
       with:
         file: '${{ inputs.file }}'
         key-path: '["app", "dockerfile"]'
