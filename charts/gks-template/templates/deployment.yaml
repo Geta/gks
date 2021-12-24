@@ -1,0 +1,1 @@
+{{- include "gks.shared.deployment" . -}}
