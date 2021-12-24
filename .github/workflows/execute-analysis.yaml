@@ -12,14 +12,14 @@ on:
         description: 'Version'
       submodules:
         required: false
-        type: boolean
+        type: string
         description: 'Checkout Git submodules or not'
-        default: false
+        default: 'false'
       sonar_execute:
         required: false
-        type: boolean
+        type: string
         description: 'Whether to execute SonarQube analysis'
-        default: false
+        default: 'false'
       sonar_platform:
         required: false
         type: string
@@ -57,9 +57,9 @@ on:
         default: '1.11'
       docker_execute:
         required: false
-        type: boolean
+        type: string
         description: 'Whether to execute Docker image analysis'
-        default: false
+        default: 'false'
       docker_image:
         required: false
         type: string
@@ -72,9 +72,9 @@ on:
         default: 'HIGH'
       docker_quality:
         required: false
-        type: boolean
+        type: string
         description: 'Run image quality checks or not'
-        default: true
+        default: 'true'
     secrets:
       gh_token:
         required: true
