@@ -1,0 +1,20 @@
+name: 'Generate chart readme'
+inputs:
+  chart_dir:
+    required: true
+    description: 'Helm chart directory'
+runs:
+  using: "composite"
+  steps:
+    - 
+      name: Generate README
+      shell: bash
+      env:
+        SEMVER_VERSION: 'v1.5.0'
+        VERSION: '1.5.0'
+        ARCHIVE_NAME: 'helm-dics.gz'
+      run: |
+        curl -L https://github.com/norwoodj/helm-docs/releases/download/${{ env.SEMVER_VERSION }}/helm-docs_${{ env.VERSION }}_Linux_x86_64.tar.gz > ${{ env.ARCHIVE_NAME }}
+        tar -xvf ${{ env.ARCHIVE_NAME }} helm-docs
+        chmod u+x helm-docs
+        ./helm-docs -c ${{ inputs.chart_dir }}

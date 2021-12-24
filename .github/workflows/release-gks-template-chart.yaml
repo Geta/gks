@@ -14,47 +14,52 @@ jobs:
       HELM_CHART_NAME: 'gks-template'
       HELM_CHART_PATH: 'charts'
       HELM_CHART_DESCRIPTION: 'Template chart'
-      VERSION: '1.0.${{ github.run_number }}'
+      VERSION: 'v1.0.${{ github.run_number }}'
     outputs:
-      HARBOR_PROJECT_NAME: '${{ env.HARBOR_PROJECT_NAME }}'
-      HELM_CHART_NAME: '${{ env.HELM_CHART_NAME }}'
-      HELM_CHART_PATH: '${{ env.HELM_CHART_PATH }}'
-      VERSION: '${{ env.VERSION }}'
+      HARBOR_PROJECT_NAME: ${{ env.HARBOR_PROJECT_NAME }}
+      HELM_CHART_NAME: ${{ env.HELM_CHART_NAME }}
+      HELM_CHART_PATH: ${{ env.HELM_CHART_PATH }}
+      VERSION: ${{ env.VERSION }}
     steps:
       - 
         name: Checkout develop branch
         uses: actions/checkout@v2
         with:
-          ref: '${{ github.ref }}'
-          token: '${{ secrets.GKS_GH_ACCESS_TOKEN }}'
+          ref: ${{ github.ref }}
+          token: ${{ secrets.GKS_GH_ACCESS_TOKEN }}
       -
         name: Set up Helm
         uses: Geta/gks/actions/setup-helm@actions/v1
         with:
           helm_repository_url: 'https://${{ secrets.GKS_HARBOR_ADDRESS }}/chartrepo'
-          helm_repository_user: '${{ secrets.GKS_HARBOR_USER }}'
-          helm_repository_token: '${{ secrets.GKS_HARBOR_PASSWORD }}'
-          helm_repository_project: '${{ env.HARBOR_PROJECT_NAME }}'
+          helm_repository_user: ${{ secrets.GKS_HARBOR_USER }}
+          helm_repository_token: ${{ secrets.GKS_HARBOR_PASSWORD }}
+          helm_repository_project: ${{ env.HARBOR_PROJECT_NAME }}
       -
         name: Set template Helm chart info
         uses: Geta/gks/actions/set-chart-info@actions/v1
         with:
-          chart_dir: '${{ env.HELM_CHART_PATH }}'
-          chart_name: '${{ env.HELM_CHART_NAME }}'
-          chart_description: '${{ env.HELM_CHART_DESCRIPTION }}'
-          chart_version: '${{ env.VERSION }}'
+          chart_dir: ${{ env.HELM_CHART_PATH }}
+          chart_name: ${{ env.HELM_CHART_NAME }}
+          chart_description: ${{ env.HELM_CHART_DESCRIPTION }}
+          chart_version: ${{ env.VERSION }}
       -
         name: Lint Helm Chart
         uses: Geta/gks/actions/lint-helm-chart@actions/v1
         with:
           chart_dir: '${{ env.HELM_CHART_PATH }}/${{ env.HELM_CHART_NAME }}'
       -
+        name: Generate README
+        uses: Geta/gks/actions/generate-chart-readme@actions/v1
+        with:
+          chart_dir: ${{ env.HELM_CHART_PATH }}
+      -
         name: Push template Helm chart
         id: package
         uses: Geta/gks/actions/package-helm-chart@actions/v1
         with:
-          chart_dir: '${{ env.HELM_CHART_PATH }}'
-          chart_name: '${{ env.HELM_CHART_NAME }}'
-          chart_version: '${{ env.VERSION }}'
-          helm_repository_project: '${{ env.HARBOR_PROJECT_NAME }}'
+          chart_dir: ${{ env.HELM_CHART_PATH }}
+          chart_name: ${{ env.HELM_CHART_NAME }}
+          chart_version: ${{ env.VERSION }}
+          helm_repository_project: ${{ env.HARBOR_PROJECT_NAME }}
           push: true

@@ -10,13 +10,10 @@ inputs:
   chart_version:
     required: false
     default: ''
+  chart_app_version:
+    required: false
+    default: ''
   docker_image_url:
-    required: false
-    default: ''
-  shared_chart_name:
-    required: false
-    default: ''
-  shared_chart_version:
     required: false
     default: ''
 runs:
@@ -44,36 +41,23 @@ runs:
         updateFile: true
     - 
       # conditionals workaround
+      name: Set chart app version
       uses: ChristopherHX/conditional@b4a9649204f81002ec9a4ef7d4bf7d6b2ab7fa55
       with:
-        if: ${{ inputs.shared_chart_name != '' }}
+        if: ${{ inputs.chart_app_version != '' }}
         step: |
-          name: Update Helm shared chart name
+          name: Update Helm app version
           uses: fjogeleit/yaml-update-action@master
           with:
             workDir: ${{ inputs.chart_dir }}
             valueFile: 'Chart.yaml'
-            propertyPath: 'dependencies.0.name'
-            value: ${{ inputs.shared_chart_name }}
+            propertyPath: 'appVersion'
+            value: ${{ inputs.chart_app_version }}
             commitChange: false
             updateFile: true
     - 
       # conditionals workaround
-      uses: ChristopherHX/conditional@b4a9649204f81002ec9a4ef7d4bf7d6b2ab7fa55
-      with:
-        if: ${{ inputs.shared_chart_version != '' }}
-        step: |
-          name: Update Helm shared chart version
-          uses: fjogeleit/yaml-update-action@master
-          with:
-            workDir: ${{ inputs.chart_dir }}
-            valueFile: 'Chart.yaml'
-            propertyPath: 'dependencies.0.version'
-            value: ${{ inputs.shared_chart_version }}
-            commitChange: false
-            updateFile: true
-    - 
-      # conditionals workaround
+      name: Set chart description
       uses: ChristopherHX/conditional@b4a9649204f81002ec9a4ef7d4bf7d6b2ab7fa55
       with:
         if: ${{ inputs.chart_description != '' }}
@@ -89,6 +73,7 @@ runs:
             updateFile: true
     - 
       # conditionals workaround
+      name: Set Docker image url
       uses: ChristopherHX/conditional@b4a9649204f81002ec9a4ef7d4bf7d6b2ab7fa55
       with:
         if: ${{ inputs.docker_image_url != '' }}
