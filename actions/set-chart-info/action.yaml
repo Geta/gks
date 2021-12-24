@@ -19,26 +19,19 @@ inputs:
 runs:
   using: "composite"
   steps:
+    -
+      name: Install YQ
+      uses: chrisdickinson/setup-yq@lates
     - 
       name: Update Helm chart name
-      uses: fjogeleit/yaml-update-action@master
-      with:
-        workDir: ${{ inputs.chart_dir }}
-        valueFile: 'Chart.yaml'
-        propertyPath: 'name'
-        value: ${{ inputs.chart_name }}
-        commitChange: false
-        updateFile: true
+      shell: bash
+      run: |
+        yq w '${{ inputs.chart_dir }}/Chart.yaml' 'name' ${{ inputs.chart_name }}
     - 
       name: Update Helm chart version
-      uses: fjogeleit/yaml-update-action@master
-      with:
-        workDir: ${{ inputs.chart_dir }}
-        valueFile: 'Chart.yaml'
-        propertyPath: 'version'
-        value: ${{ inputs.chart_version }}
-        commitChange: false
-        updateFile: true
+      shell: bash
+      run: |
+        yq w '${{ inputs.chart_dir }}/Chart.yaml' 'version' ${{ inputs.chart_version }}
     - 
       # conditionals workaround
       name: Set chart app version
@@ -47,14 +40,9 @@ runs:
         if: ${{ inputs.chart_app_version != '' }}
         step: |
           name: Update Helm app version
-          uses: fjogeleit/yaml-update-action@master
-          with:
-            workDir: ${{ inputs.chart_dir }}
-            valueFile: 'Chart.yaml'
-            propertyPath: 'appVersion'
-            value: ${{ inputs.chart_app_version }}
-            commitChange: false
-            updateFile: true
+          shell: bash
+          run: |
+            yq w '${{ inputs.chart_dir }}/Chart.yaml' 'appVersion' ${{ inputs.chart_app_version }}
     - 
       # conditionals workaround
       name: Set chart description
@@ -62,19 +50,10 @@ runs:
       with:
         if: ${{ inputs.chart_description != '' }}
         step: |
-          name: Update Helm chart description
-          uses: fjogeleit/yaml-update-action@master
-          with:
-            workDir: ${{ inputs.chart_dir }}
-            valueFile: 'Chart.yaml'
-            propertyPath: 'description'
-            value: ${{ inputs.chart_description }}
-            commitChange: false
-            updateFile: true
-    -
-      name: test_before
-      shell: bash
-      run: cat ${{ inputs.chart_dir }}/values.yaml
+          name: Update Helm app description
+          shell: bash
+          run: |
+            yq w '${{ inputs.chart_dir }}/Chart.yaml' 'description' ${{ inputs.chart_description }}
     - 
       # conditionals workaround
       name: Set Docker image url
@@ -82,16 +61,7 @@ runs:
       with:
         if: ${{ inputs.docker_image_url != '' }}
         step: |
-          name: Update Helm chart description
-          uses: fjogeleit/yaml-update-action@master
-          with:
-            workDir: ${{ inputs.chart_dir }}
-            valueFile: 'values.yaml'
-            propertyPath: 'image.repository'
-            value: ${{ inputs.docker_image_url }}
-            commitChange: false
-            updateFile: true
-    -
-      name: test_after
-      shell: bash
-      run: cat ${{ inputs.chart_dir }}/values.yaml
+          name: Update values default image
+          shell: bash
+          run: |
+            yq w '${{ inputs.chart_dir }}/values.yaml' 'image.repository' ${{ inputs.docker_image_url }}
