@@ -30,7 +30,7 @@ runs:
             helm pull '${{ inputs.repo_project }}/${{ inputs.chart_name }}' --untar --untardir ${{ inputs.chart_dir }}
           fi
         fi
-        mv '${{ inputs.chart_dir }}/${{ inputs.chart_name }}/*' ${{ inputs.chart_dir }}
-        rm -rf '${{ inputs.chart_dir }}/${{ inputs.chart_name }}'
+        mv ${{ inputs.chart_dir }}/${{ inputs.chart_name }}/* ${{ inputs.chart_dir }}
+        rm -rf ${{ inputs.chart_dir }}/${{ inputs.chart_name }}
         cat ${{ inputs.chart_dir }}/Chart.yaml
         cat ${{ inputs.chart_dir }}/values.yaml
