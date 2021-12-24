@@ -73,6 +73,13 @@ on:
         required: true
         type: string
         description: 'Template chart name'
+    outputs:
+      image_name: 
+        value: ${{ jobs.publish-docker.outputs.image_name }}
+        description: 'Published image name'
+      image_tag:
+        value: ${{ jobs.publish-helm.outputs.image_tag }}
+        description: 'Published image tag'
     secrets:
       gh_token:
         required: true
