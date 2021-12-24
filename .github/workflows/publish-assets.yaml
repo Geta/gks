@@ -8,9 +8,9 @@ on:
         description: 'Git reference'
       submodules:
         required: false
-        type: boolean
+        type: string
         description: 'Checkout submodules'
-        default: false
+        default: 'false'
       app_name:
         required: true
         type: string
