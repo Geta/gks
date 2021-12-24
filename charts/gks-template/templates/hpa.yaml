@@ -1,1 +1,1 @@
-{{- include "gcc.shared.hpa" . -}}
+{{- include "gks.shared.hpa" . -}}

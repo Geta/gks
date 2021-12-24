@@ -1,1 +1,1 @@
-{{- include "gcc.shared.service" . -}}
+{{- include "gks.shared.service" . -}}
