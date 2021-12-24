@@ -39,7 +39,7 @@ jobs:
         name: Set template Helm chart info
         uses: Geta/gks/actions/set-chart-info@actions/v1
         with:
-          chart_dir: ${{ env.HELM_CHART_PATH }}
+          chart_dir: '${{ env.HELM_CHART_PATH }}/${{ env.HELM_CHART_NAME }}'
           chart_name: ${{ env.HELM_CHART_NAME }}
           chart_description: ${{ env.HELM_CHART_DESCRIPTION }}
           chart_version: ${{ env.VERSION }}
@@ -52,13 +52,13 @@ jobs:
         name: Generate README
         uses: Geta/gks/actions/generate-chart-readme@actions/v1
         with:
-          chart_dir: ${{ env.HELM_CHART_PATH }}
+          chart_dir: '${{ env.HELM_CHART_PATH }}/${{ env.HELM_CHART_NAME }}'
       -
         name: Push template Helm chart
         id: package
         uses: Geta/gks/actions/package-helm-chart@actions/v1
         with:
-          chart_dir: ${{ env.HELM_CHART_PATH }}
+          chart_dir: '${{ env.HELM_CHART_PATH }}/${{ env.HELM_CHART_NAME }}'
           chart_name: ${{ env.HELM_CHART_NAME }}
           chart_version: ${{ env.VERSION }}
           helm_repository_project: ${{ env.HARBOR_PROJECT_NAME }}
