@@ -18,14 +18,14 @@ outputs:
     value: ${{ steps.harbor_helm_template.outputs.data }}
 
   git_submodules:
-    value: ${{ steps.git_submodules.outputs.data == 'true' }}
+    value: ${{ fromJSON(steps.git_submodules.outputs.data) }}
 
   sonarqube_execute:
-    value: ${{ steps.sonarqube_execute.outputs.data == 'true' }}
+    value: ${{ fromJSON(steps.sonarqube_execute.outputs.data) }}
   sonarqube_project:
     value: ${{ steps.sonarqube_project.outputs.data }}
   sonarqube_validate:
-    value: ${{ steps.sonarqube_validate.outputs.data == 'true' }}
+    value: ${{ fromJSON(steps.sonarqube_validate.outputs.data) }}
   sonarqube_platform:
     value: ${{ steps.sonarqube_platform.outputs.data }}
   sonarqube_exclusions:
@@ -34,11 +34,11 @@ outputs:
     value: ${{ steps.sonarqube_dotnet.outputs.data }}
 
   docker_execute:
-    value: ${{ steps.docker_execute.outputs.data == 'true' }}
+    value: ${{ fromJSON(steps.docker_execute.outputs.data) }}
   docker_severity:
     value: ${{ steps.docker_severity.outputs.data }}
   docker_quality:
-    value: ${{ steps.docker_quality.outputs.data == 'true' }}
+    value: ${{ fromJSON(steps.docker_quality.outputs.data) }}
 runs:
   using: "composite"
   steps:
