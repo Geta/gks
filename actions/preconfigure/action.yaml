@@ -9,6 +9,8 @@ outputs:
     value: ${{ steps.app_name.outputs.data }}
   app_dockerfile:
     value: ${{ steps.app_dockerfile.outputs.data }}
+  app_packages_url:
+    value: ${{ steps.app_packages_url.outputs.data }}
 
   harbor_project:
     value: ${{ steps.harbor_project.outputs.data }}
@@ -60,6 +62,13 @@ runs:
       with:
         file: ${{ inputs.file }}
         key-path: '["app", "dockerfile"]'
+    -
+      name: Read packages url
+      uses: KJ002/read-yaml@1.5
+      id: app_packages_url
+      with:
+        file: ${{ inputs.file }}
+        key-path: '["app", "packages_url"]'
 
     -
       name: Read Harbor project name
