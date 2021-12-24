@@ -71,6 +71,9 @@ runs:
             value: ${{ inputs.chart_description }}
             commitChange: false
             updateFile: true
+    -
+      name: test_before
+      run: cat ${{ inputs.chart_dir }}/values.yaml
     - 
       # conditionals workaround
       name: Set Docker image url
@@ -87,3 +90,6 @@ runs:
             value: ${{ inputs.docker_image_url }}
             commitChange: false
             updateFile: true
+    -
+      name: test_after
+      run: cat ${{ inputs.chart_dir }}/values.yaml

@@ -11,7 +11,5 @@ runs:
       shell: bash
       run: |
         cd ${{ inputs.chart_dir }}
-        cat values.yaml
-        cat Chart.yaml
         helm lint . --strict
         cd -
