@@ -196,6 +196,11 @@ jobs:
         with:
           chart_dir: '${{ inputs.helm_chart_dir }}/${{ steps.chart.outputs.chart_name }}'
       -
+        name: Generate README
+        uses: Geta/gks/actions/generate-chart-readme@actions/v1
+        with:
+          chart_dir: '${{ inputs.helm_chart_dir }}/${{ steps.chart.outputs.chart_name }}'
+      -
         name: Push service Helm chart
         uses: Geta/gks/actions/package-helm-chart@actions/v1
         with:
