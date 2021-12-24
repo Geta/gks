@@ -40,6 +40,11 @@ on:
         type: string
         description: 'Determines whether to wait for SonarQube quality gate results. Fails build in case of negative results'
         default: true
+      sonar_domain:
+        required: false
+        type: string
+        description: 'SonarQube address'
+        default: ''
       dotnet_version:
         required: false
         type: string
@@ -77,9 +82,6 @@ on:
       sq_token:
         required: false
         description: 'SonarQube token'
-      sq_address:
-        required: false
-        description: 'SonarQube address'
       harbor_user:
         required: false
         description: 'Harbor user'
@@ -130,7 +132,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.gh_token }}
         run: |
-          dotnet sonarscanner begin /v:"${{ inputs.version }}" /d:sonar.exclusions="${{ inputs.sonar_exclusions }}" /k:"${{ inputs.sonar_project }}" /d:sonar.login="${{ secrets.sq_token }}" /d:sonar.host.url="${{ secrets.sq_address }}" /d:sonar.qualitygate.wait=${{ inputs.sonar_validate }}
+          dotnet sonarscanner begin /v:"${{ inputs.version }}" /d:sonar.exclusions="${{ inputs.sonar_exclusions }}" /k:"${{ inputs.sonar_project }}" /d:sonar.login="${{ secrets.sq_token }}" /d:sonar.host.url="https://${{ inputs.sonar_domain }}" /d:sonar.qualitygate.wait=${{ inputs.sonar_validate }}
           dotnet build
           dotnet sonarscanner end /d:sonar.login="${{ secrets.sq_token }}"
   
@@ -159,7 +161,7 @@ jobs:
         uses: sonarsource/sonarqube-scan-action@master
         env:
           SONAR_TOKEN: ${{ secrets.sq_token }}
-          SONAR_HOST_URL: ${{ secrets.sq_address }}
+          SONAR_HOST_URL: 'https://${{ inputs.sonar_domain }}'
       - 
         name: Quality gate status check
         if: inputs.sonar_validate

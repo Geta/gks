@@ -16,6 +16,8 @@ outputs:
     value: ${{ steps.harbor_proxy_project.outputs.data }}
   harbor_helm_template:
     value: ${{ steps.harbor_helm_template.outputs.data }}
+  harbor_domain:
+    value: ${{ steps.harbor_domain.outputs.data }}
 
   git_submodules:
     value: ${{ steps.git_submodules.outputs.data }}
@@ -32,6 +34,8 @@ outputs:
     value: ${{ steps.sonarqube_exclusions.outputs.data }}
   sonarqube_dotnet:
     value: ${{ steps.sonarqube_dotnet.outputs.data }}
+  sonarqube_domain:
+    value: ${{ steps.sonarqube_domain.outputs.data }}
 
   docker_execute:
     value: ${{ steps.docker_execute.outputs.data }}
@@ -78,6 +82,13 @@ runs:
       with:
         file: ${{ inputs.file }}
         key-path: '["harbor", "helm_template"]'
+    -
+      name: Read Harbor domain name
+      uses: KJ002/read-yaml@1.5
+      id: harbor_domain
+      with:
+        file: ${{ inputs.file }}
+        key-path: '["harbor", "domain"]'
 
     -
       name: Read Git sumbodules flag
@@ -129,6 +140,13 @@ runs:
       with:
         file: ${{ inputs.file }}
         key-path: '["analysis", "sonarqube", "dotnet_version"]'
+    -
+      name: Read SonaQube domain name
+      uses: KJ002/read-yaml@1.5
+      id: sonarqube_domain
+      with:
+        file: ${{ inputs.file }}
+        key-path: '["analysis", "sonarqube", "domain"]'
 
     -
       name: Read Docker execution flag
