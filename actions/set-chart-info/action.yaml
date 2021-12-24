@@ -73,6 +73,7 @@ runs:
             updateFile: true
     -
       name: test_before
+      shell: bash
       run: cat ${{ inputs.chart_dir }}/values.yaml
     - 
       # conditionals workaround
@@ -92,4 +93,5 @@ runs:
             updateFile: true
     -
       name: test_after
+      shell: bash
       run: cat ${{ inputs.chart_dir }}/values.yaml
