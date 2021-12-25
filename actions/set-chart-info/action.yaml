@@ -21,17 +21,25 @@ runs:
   steps:
     -
       name: Install YQ
-      uses: chrisdickinson/setup-yq@latest
+      shell: bash
+      env:
+        VERSION: 'v4.16.2'
+        ARCHIVE_NAME: 'yq.tar.gz'
+      run: |
+        curl -L https://github.com/mikefarah/yq/releases/download/${{ env.VERSION }}/yq_linux_arm64.tar.gz > ${{ env.ARCHIVE_NAME }}
+        tar -xvf ${{ env.ARCHIVE_NAME }} yq_linux_amd64
+        mv yq_linux_amd64 yq
+        chmod u+x yq
     - 
       name: Update Helm chart name
       shell: bash
       run: |
-        yq w '${{ inputs.chart_dir }}/Chart.yaml' 'name' '${{ inputs.chart_name }}' > 'Chart.yaml'
+        ./yq e '.name = "${{ inputs.chart_name }}"' -i '${{ inputs.chart_dir }}/Chart.yaml'
     - 
       name: Update Helm chart version
       shell: bash
       run: |
-        yq w '${{ inputs.chart_dir }}/Chart.yaml' 'version' '${{ inputs.chart_version }}' > 'Chart.yaml'
+        ./yq e '.version = "${{ inputs.chart_version }}"' -i '${{ inputs.chart_dir }}/Chart.yaml'
     - 
       # conditionals workaround
       name: Set chart app version
@@ -41,7 +49,7 @@ runs:
         step: |
           shell: bash
           run: |
-            yq w '${{ inputs.chart_dir }}/Chart.yaml' 'appVersion' '${{ inputs.chart_app_version }}' > 'Chart.yaml'
+            ./yq e '.appVersion = "${{ inputs.chart_app_version }}"' -i '${{ inputs.chart_dir }}/Chart.yaml'
     - 
       # conditionals workaround
       name: Set chart description
@@ -51,7 +59,7 @@ runs:
         step: |
           shell: bash
           run: |
-            yq w '${{ inputs.chart_dir }}/Chart.yaml' 'description' '${{ inputs.chart_description }}' > 'Chart.yaml'
+            ./yq e '.description = "${{ inputs.chart_description }}"' -i '${{ inputs.chart_dir }}/Chart.yaml'
     - 
       # conditionals workaround
       name: Set Docker image url
@@ -61,4 +69,4 @@ runs:
         step: |
           shell: bash
           run: |
-            yq w '${{ inputs.chart_dir }}/values.yaml' 'image.repository' '${{ inputs.docker_image_url }}' > 'values.yaml'
+            ./yq e '.image.repository = "${{ inputs.docker_image_url }}"' -i '${{ inputs.chart_dir }}/values.yaml'
