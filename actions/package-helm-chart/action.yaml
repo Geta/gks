@@ -20,7 +20,7 @@ runs:
       name: Package Helm chart
       shell: bash
       run: |
-        helm package ${{ inputs.chart_dir }} --app-version ${{ inputs.chart_version }} --version ${{ inputs.chart_version }} --dependency-update --destination '${{ inputs.chart_dir }}/output'
+        helm package '${{ inputs.chart_dir }}' --app-version '${{ inputs.chart_version }}' --version '${{ inputs.chart_version }}' --dependency-update --destination '${{ inputs.chart_dir }}/output'
         CHART='${{ inputs.chart_dir }}/output/${{ inputs.chart_name }}-${{ inputs.chart_version }}.tgz'
         echo ::set-output name=CHART_PACKAGE::$CHART
     - 
@@ -31,4 +31,4 @@ runs:
         step: |
           name: Push Helm chart to registry
           shell: bash
-          run: helm cm-push ${{ steps.package.outputs.CHART_PACKAGE }} ${{ inputs.helm_repository_project }}
+          run: helm cm-push '${{ steps.package.outputs.CHART_PACKAGE }}' '${{ inputs.helm_repository_project }}'
