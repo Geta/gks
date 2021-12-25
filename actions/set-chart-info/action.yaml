@@ -26,12 +26,12 @@ runs:
       name: Update Helm chart name
       shell: bash
       run: |
-        yq w '${{ inputs.chart_dir }}/Chart.yaml' 'name' '${{ inputs.chart_name }}'
+        yq w '${{ inputs.chart_dir }}/Chart.yaml' 'name' '${{ inputs.chart_name }}' > 'Chart.yaml'
     - 
       name: Update Helm chart version
       shell: bash
       run: |
-        yq w '${{ inputs.chart_dir }}/Chart.yaml' 'version' '${{ inputs.chart_version }}'
+        yq w '${{ inputs.chart_dir }}/Chart.yaml' 'version' '${{ inputs.chart_version }}' > 'Chart.yaml'
     - 
       # conditionals workaround
       name: Set chart app version
@@ -41,7 +41,7 @@ runs:
         step: |
           shell: bash
           run: |
-            yq w '${{ inputs.chart_dir }}/Chart.yaml' 'appVersion' '${{ inputs.chart_app_version }}'
+            yq w '${{ inputs.chart_dir }}/Chart.yaml' 'appVersion' '${{ inputs.chart_app_version }}' > 'Chart.yaml'
     - 
       # conditionals workaround
       name: Set chart description
@@ -51,7 +51,7 @@ runs:
         step: |
           shell: bash
           run: |
-            yq w '${{ inputs.chart_dir }}/Chart.yaml' 'description' '${{ inputs.chart_description }}'
+            yq w '${{ inputs.chart_dir }}/Chart.yaml' 'description' '${{ inputs.chart_description }}' > 'Chart.yaml'
     - 
       # conditionals workaround
       name: Set Docker image url
@@ -61,4 +61,4 @@ runs:
         step: |
           shell: bash
           run: |
-            yq w '${{ inputs.chart_dir }}/values.yaml' 'image.repository' '${{ inputs.docker_image_url }}'
+            yq w '${{ inputs.chart_dir }}/values.yaml' 'image.repository' '${{ inputs.docker_image_url }}' > 'values.yaml'

@@ -19,9 +19,11 @@ runs:
       id: package
       name: Package Helm chart
       shell: bash
+      env:
+        OUT_DIR: 'output'
       run: |
-        helm package '${{ inputs.chart_dir }}' --app-version '${{ inputs.chart_version }}' --version '${{ inputs.chart_version }}' --dependency-update --destination '${{ inputs.chart_dir }}/output'
-        CHART='${{ inputs.chart_dir }}/output/${{ inputs.chart_name }}-${{ inputs.chart_version }}.tgz'
+        helm package '${{ inputs.chart_dir }}' --app-version '${{ inputs.chart_version }}' --version '${{ inputs.chart_version }}' --dependency-update --destination '${{ inputs.chart_dir }}/${{ env.OUT_DIR }}'
+        CHART='${{ inputs.chart_dir }}/${{ env.OUT_DIR }}/${{ inputs.chart_name }}-${{ inputs.chart_version }}.tgz'
         echo ::set-output name=CHART_PACKAGE::$CHART
     - 
       # conditionals workaround
