@@ -21,7 +21,7 @@ runs:
   steps:
     -
       name: Install YQ
-      uses: chrisdickinson/setup-yq@lates
+      uses: chrisdickinson/setup-yq@latest
     - 
       name: Update Helm chart name
       shell: bash
