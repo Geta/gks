@@ -26,7 +26,7 @@ runs:
         VERSION: 'v4.16.2'
         ARCHIVE_NAME: 'yq.tar.gz'
       run: |
-        curl -L https://github.com/mikefarah/yq/releases/download/${{ env.VERSION }}/yq_linux_arm64.tar.gz > ${{ env.ARCHIVE_NAME }}
+        curl -L https://github.com/mikefarah/yq/releases/download/${{ env.VERSION }}/yq_linux_amd64.tar.gz > ${{ env.ARCHIVE_NAME }}
         tar -xvf ${{ env.ARCHIVE_NAME }} ./yq_linux_amd64
         mv ./yq_linux_amd64 ./yq
         chmod u+x /.yq
