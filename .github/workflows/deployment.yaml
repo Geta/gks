@@ -41,8 +41,10 @@ jobs:
       -
         if: steps.deploy.outputs.conclusion == 'success'
         name: Notify success
+        run: |
 
       - 
         if: steps.deploy.outputs.conclusion == 'failure'
         name: Notify failure
+        run: |
 
