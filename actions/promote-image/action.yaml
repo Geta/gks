@@ -1,6 +1,6 @@
 name: 'Promote Docker image'
 inputs:
-  repo_address:
+  repo_domain:
     required: true
   repo_user:
     required: true
@@ -17,8 +17,8 @@ inputs:
   version:
     required: true
 outputs:
-  IMAGE:
-    value: ${{ steps.promote.outputs.IMAGE }}
+  image_name:
+    value: ${{ steps.promote.outputs.image_name }}
 runs:
   using: "composite"
   steps:
@@ -27,23 +27,24 @@ runs:
       id: pull
       shell: bash
       env:
-        DOCKER_API_URL: 'https://${{ inputs.repo_address }}/v2/${{ inputs.repo_project }}/${{ inputs.repo_name }}/${{ inputs.env_from }}/tags/list'
+        DOCKER_API_URL: 'https://${{ inputs.repo_domain }}/v2/${{ inputs.repo_project }}/${{ inputs.repo_name }}/${{ inputs.env_from }}/tags/list'
       run: |
-        response=$(curl -u '${{ inputs.repo_user }}:${{ inputs.repo_token }}' --request GET '${{ env.DOCKER_API_URL }}')
-        BUILD=$(echo $response | jq .tags | grep '${{ inputs.version }}-${{ inputs.env_from }}.' | sed 's/${{ inputs.version }}-${{ inputs.env_from }}.//g' | sed 's/[ ,\"]//g' | sort --version-sort -r | head -1)
-        IMAGE='${{ inputs.repo_address }}/${{ inputs.repo_project }}/${{ inputs.repo_name }}/${{ inputs.env_from }}:${{ inputs.version }}-${{ inputs.env_from }}'
-        LATEST_IMAGE="$IMAGE.$BUILD"
-        docker pull $LATEST_IMAGE
-        echo ::set-output name=LATEST_IMAGE::$LATEST_IMAGE
+        RESPONSE=$(curl -u '${{ inputs.repo_user }}:${{ inputs.repo_token }}' --request GET '${{ env.DOCKER_API_URL }}')
+        BUILD=$(echo $RESPONSE | jq .tags | grep '${{ inputs.version }}-${{ inputs.env_from }}.' | sed 's/${{ inputs.version }}-${{ inputs.env_from }}.//g' | sed 's/[ ,\"]//g' | sort --version-sort -r | head -1)
+        TAG='${{ inputs.repo_domain }}/${{ inputs.repo_project }}/${{ inputs.repo_name }}/${{ inputs.env_from }}:${{ inputs.version }}-${{ inputs.env_from }}'
+        docker pull "$TAG.$BUILD"
+        echo ::set-output name=latest_tag::$TAG
+        echo ::set-output name=latest_build::$BUILD
     -
       name: Promote latest Docker image
       id: promote
       shell: bash
       env:
-        DESTINATION_IMAGE: '${{ inputs.repo_address }}/${{ inputs.repo_project }}/${{ inputs.repo_name }}/${{ inputs.env_to }}'
+        SOURCE_IMAGE: '${{ steps.pull.outputs.latest_tag }}.${{ steps.pull.outputs.latest_build }}'
+        DESTINATION_IMAGE: '${{ inputs.repo_domain }}/${{ inputs.repo_project }}/${{ inputs.repo_name }}/${{ inputs.env_to }}'
       run: |
-        docker tag '${{ steps.pull.outputs.LATEST_IMAGE }}' '${{ env.DESTINATION_IMAGE }}:${{ inputs.version }}'
-        docker tag '${{ steps.pull.outputs.LATEST_IMAGE }}' '${{ env.DESTINATION_IMAGE }}:latest'
+        docker tag '${{ env.SOURCE_IMAGE }}' '${{ env.DESTINATION_IMAGE }}:${{ inputs.version }}'
+        docker tag '${{ env.SOURCE_IMAGE }}' '${{ env.DESTINATION_IMAGE }}:latest'
         docker push "${{ env.DESTINATION_IMAGE }}:${{ inputs.version }}"
         docker push '${{ env.DESTINATION_IMAGE }}:latest'
-        echo ::set-output name=IMAGE::${{ env.DESTINATION_IMAGE }}
+        echo ::set-output name=image_name::${{ env.DESTINATION_IMAGE }}

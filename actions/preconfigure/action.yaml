@@ -23,8 +23,6 @@ outputs:
 
   git_submodules:
     value: ${{ steps.git_submodules.outputs.data }}
-  git_check_name:
-    value: ${{ steps.git_check_name.outputs.data }}
 
   sonarqube_execute:
     value: ${{ steps.sonarqube_execute.outputs.data }}
@@ -108,13 +106,6 @@ runs:
       with:
         file: ${{ inputs.file }}
         key-path: '["git", "submodules"]'
-    -
-      name: Read Git check name
-      uses: KJ002/read-yaml@1.5
-      id: git_check_name
-      with:
-        file: ${{ inputs.file }}
-        key-path: '["git", "check_name"]'
 
     -
       name: Read SonarQube execution flag
