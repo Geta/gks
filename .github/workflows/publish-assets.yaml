@@ -133,11 +133,11 @@ jobs:
         name: Build and push Docker image
         uses: docker/build-push-action@v2
         env:
-          cache_image: '${{ steps.image.outputs.image_name }}'
+          cache_image: '${{ steps.image.outputs.image_name }}:cache'
         with:
           push: true
-          cache-from: 'type=registry,ref=${{ env.cache_image }}'
-          cache-to: 'type=registry,mode=max,ref=${{ env.cache_image }}'
+          #cache-from: 'type=registry,ref=${{ env.cache_image }}'
+          #cache-to: 'type=registry,mode=max,ref=${{ env.cache_image }}'
           context: ${{ inputs.docker_context }}
           file: ${{ inputs.dockerfile }}
           build-args: |
