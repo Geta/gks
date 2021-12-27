@@ -1,0 +1,48 @@
+name: Deployment
+on:
+  workflow_call:
+    inputs:
+      git_ref:
+        required: true
+        type: string
+        description: 'Git reference'
+      check_name:
+        required: true
+        type: string
+        description: 'Github check name'
+      wait_interval:
+        required: false
+        type: string
+        description: 'Wait interval in seconds between checks'
+        default: '10'
+      wait_timeout:
+        required: false
+        type: string
+        description: 'Wait timeout'
+        default: '600'
+    secrets:
+      gh_token:
+        required: true
+        description: 'GitHub token'
+jobs:
+  track-deployment:
+    runs-on: ubuntu-latest
+    steps:
+      - 
+        name: Wait for Flux reconciliation
+        uses: fountainhead/action-wait-for-check@v1.0.0
+        id: deploy
+        with:
+          ref: ${{ inputs.git_ref }}
+          token: ${{ secrets.gh_token }}
+          checkName: ${{ inputs.check_name }}
+          timeoutSeconds: ${{ inputs.wait_timeout }}
+          intervalSeconds: ${{ inputs.wait_interval }}
+      -
+        if: steps.deploy.outputs.conclusion == 'success'
+        name: Notify success
+
+      - 
+        if: steps.deploy.outputs.conclusion == 'failure'
+        name: Notify failure
+
