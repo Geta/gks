@@ -90,6 +90,7 @@ on:
         description: 'Harbor token'
 jobs:
   docker-image:
+    if: inputs.docker_execute == true
     runs-on: ubuntu-latest
     steps:
       - 
