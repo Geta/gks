@@ -89,16 +89,6 @@ on:
         required: false
         description: 'Harbor token'
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      -
-        name: Echo
-        shell: bash
-        run: |
-          echo "EXECUTE: ${{ inputs.sonar_execute }}"
-          echo "PLATFORM: ${{ inputs.sonar_platform }}"
-
   docker-image:
     if: inputs.docker_execute == 'true'
     runs-on: ubuntu-latest
