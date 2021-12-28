@@ -90,7 +90,7 @@ on:
         description: 'Harbor token'
 jobs:
   docker-image:
-    if: inputs.docker_execute == true
+    if: inputs.docker_execute == 'true'
     runs-on: ubuntu-latest
     steps:
       - 
@@ -104,7 +104,7 @@ jobs:
           image-name: ${{ inputs.docker_image }}
 
   sonarqube-dotnet:
-    if: (inputs.sonar_execute == true) && (inputs.sonar_platform == 'dotnet')
+    if: (inputs.sonar_execute == 'true') && (inputs.sonar_platform == 'dotnet')
     runs-on: ubuntu-latest
     steps:
       -
@@ -138,7 +138,7 @@ jobs:
           dotnet sonarscanner end /d:sonar.login="${{ secrets.sq_token }}"
   
   sonarqube-js:
-    if: (inputs.sonar_execute == true) && (inputs.sonar_platform == 'js')
+    if: (inputs.sonar_execute == 'true') && (inputs.sonar_platform == 'js')
     runs-on: ubuntu-latest
     steps:
       - 
