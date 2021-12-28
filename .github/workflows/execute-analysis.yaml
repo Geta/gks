@@ -75,10 +75,18 @@ on:
         type: string
         description: 'Run image quality checks or not'
         default: 'true'
+      packages_url:
+        required: false
+        type: string
+        description: 'Packages url'
+        default: ''
     secrets:
       gh_token:
         required: true
         description: 'GitHub token'
+      gh_user:
+        required: false
+        description: 'GitHub user'
       sq_token:
         required: false
         description: 'SonarQube token'
@@ -133,6 +141,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.gh_token }}
         run: |
+          dotnet nuget add source ${{ inputs.packages_url }} -n github -u ${{ secrets.gh_user }} -p ${{ secrets.gh_token }} --store-password-in-clear-text
           dotnet sonarscanner begin /v:"${{ inputs.version }}" /d:sonar.exclusions="${{ inputs.sonar_exclusions }}" /k:"${{ inputs.sonar_project }}" /d:sonar.login="${{ secrets.sq_token }}" /d:sonar.host.url="https://${{ inputs.sonar_domain }}" /d:sonar.qualitygate.wait=${{ inputs.sonar_validate }}
           dotnet build
           dotnet sonarscanner end /d:sonar.login="${{ secrets.sq_token }}"
