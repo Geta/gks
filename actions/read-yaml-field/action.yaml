@@ -21,6 +21,5 @@ runs:
       shell: bash
       id: read
       run: |
-        VALUE=$(${{ inputs.yq_dir }}/yq e '${{ inputs.path }}' '${{ inputs.file }}') | sed 's/null//g'
-        echo "$VALUE"
+        VALUE=$(echo $(${{ inputs.yq_dir }}/yq e '${{ inputs.path }}' '${{ inputs.file }}') | sed 's/null//g')
         echo ::set-output name=data::$VALUE
