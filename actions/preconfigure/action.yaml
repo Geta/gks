@@ -123,13 +123,6 @@ runs:
     -
       name: Read SonarQube execution flag
       shell: bash
-      id: git_submodules
-      run: |
-        VALUE=$(./yq e '.git.submodules' '${{ inputs.file }}' | sed 's/null//g')
-        echo ::set-output name=git_submodules::$VALUE
-
-      uses: KJ002/read-yaml@1.5
-      shell: bash
       id: sonarqube_execute
       run: |
         VALUE=$(./yq e '.analysis.sonarqube.execute' '${{ inputs.file }}' | sed 's/null//g')
@@ -182,20 +175,19 @@ runs:
       shell: bash
       id: docker_execute
       run: |
-        VALUE=$(./yq e '.analysis.sonarqube.execute' '${{ inputs.file }}' | sed 's/null//g')
+        VALUE=$(./yq e '.analysis.docker.execute' '${{ inputs.file }}' | sed 's/null//g')
         echo ::set-output name=docker_execute::$VALUE
     -
       name: Read Docker severity
-      uses: KJ002/read-yaml@1.5
       shell: bash
       id: docker_severity
       run: |
-        VALUE=$(./yq e '.analysis.sonarqube.severity' '${{ inputs.file }}' | sed 's/null//g')
+        VALUE=$(./yq e '.analysis.docker.severity' '${{ inputs.file }}' | sed 's/null//g')
         echo ::set-output name=docker_severity::$VALUE
     -
       name: Read Docker dockerfile check flag
       shell: bash
       id: docker_quality
       run: |
-        VALUE=$(./yq e '.analysis.sonarqube.dockerfile_check' '${{ inputs.file }}' | sed 's/null//g')
+        VALUE=$(./yq e '.analysis.docker.dockerfile_check' '${{ inputs.file }}' | sed 's/null//g')
         echo ::set-output name=docker_quality::$VALUE
