@@ -1,0 +1,23 @@
+name: 'Install YQ'
+inputs:
+  version:
+    required: false
+    description: 'YQ version'
+    default: 'v4.16.2'
+  dir:
+    required: false
+    description: 'Directory to install to'
+    default: '.'
+runs:
+  using: "composite"
+  steps:
+    -
+      name: Install YQ
+      shell: bash
+      env:
+        ARCHIVE_NAME: 'yq.tar.gz'
+      run: |
+        curl -L https://github.com/mikefarah/yq/releases/download/${{ inputs.version }}/yq_linux_amd64.tar.gz > ${{ env.ARCHIVE_NAME }}
+        tar -xvf ${{ env.ARCHIVE_NAME }} ./yq_linux_amd64
+        mv yq_linux_amd64 "${{ inputs.dir }}/yq"
+        chmod u+x "${{ inputs.dir }}/yq"

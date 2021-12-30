@@ -11,6 +11,8 @@ outputs:
     value: ${{ steps.app_dockerfile.outputs.data }}
   app_packages_url:
     value: ${{ steps.app_packages_url.outputs.data }}
+  app_docker_context:
+    value: ${{ steps.app_docker_context.outputs.data }}
 
   harbor_project:
     value: ${{ steps.harbor_project.outputs.data }}
@@ -49,132 +51,151 @@ runs:
   using: "composite"
   steps:
     -
+      name: Install YQ
+      uses: Geta/gks/actions/setup-yq@actions/v1
+
+    -
       name: Read application name
-      uses: KJ002/read-yaml@1.5
+      shell: bash
       id: app_name
-      with:
-        file: ${{ inputs.file }}
-        key-path: '["app", "name"]'
+      run: |
+        VALUE=$(./yq e '.app.name' '${{ inputs.file }}' | sed 's/null//g')
+        echo ::set-output name=app_name::$VALUE
     -
       name: Read Dockerfile path
-      uses: KJ002/read-yaml@1.5
+      shell: bash
       id: app_dockerfile
-      with:
-        file: ${{ inputs.file }}
-        key-path: '["app", "dockerfile"]'
+      run: |
+        VALUE=(./yq e '.app.dockerfile' '${{ inputs.file }}' | sed 's/null//g')
+        echo ::set-output name=app_dockerfile::$VALUE
     -
       name: Read packages url
-      uses: KJ002/read-yaml@1.5
+      shell: bash
       id: app_packages_url
-      with:
-        file: ${{ inputs.file }}
-        key-path: '["app", "packages_url"]'
+      run: |
+        VALUE=$(./yq e '.app.packages_url' '${{ inputs.file }}' | sed 's/null//g')
+        echo ::set-output name=app_packages_url::$VALUE
+    -
+      name: Read docker context dir
+      shell: bash
+      id: app_docker_context
+      run: |
+        VALUE=$(./yq e '.app.docker_context' '${{ inputs.file }}' | sed 's/null//g')
+        echo ::set-output name=app_docker_context::$VALUE
 
     -
       name: Read Harbor project name
-      uses: KJ002/read-yaml@1.5
+      shell: bash
       id: harbor_project
-      with:
-        file: ${{ inputs.file }}
-        key-path: '["harbor", "project"]'
+      run: |
+        VALUE=$(./yq e '.harbor.project' '${{ inputs.file }}' | sed 's/null//g')
+        echo ::set-output name=harbor_project::$VALUE
     -
       name: Read Harbor proxy project name
-      uses: KJ002/read-yaml@1.5
+      shell: bash
       id: harbor_proxy_project
-      with:
-        file: ${{ inputs.file }}
-        key-path: '["harbor", "proxy_project"]'
+      run: |
+        VALUE=$(./yq e '.harbor.proxy_project' '${{ inputs.file }}' | sed 's/null//g')
+        echo ::set-output name=harbor_proxy_project::$VALUE
     -
-      name: Read Harbor Helm template version 
-      uses: KJ002/read-yaml@1.5
+      name: Read Harbor Helm template version
+      shell: bash
       id: harbor_helm_template
-      with:
-        file: ${{ inputs.file }}
-        key-path: '["harbor", "helm_template"]'
+      run: |
+        VALUE=$(./yq e '.harbor.helm_template' '${{ inputs.file }}' | sed 's/null//g')
+        echo ::set-output name=harbor_helm_template::$VALUE
     -
       name: Read Harbor domain name
-      uses: KJ002/read-yaml@1.5
+      shell: bash
       id: harbor_domain
-      with:
-        file: ${{ inputs.file }}
-        key-path: '["harbor", "domain"]'
+      run: |
+        VALUE=$(./yq e '.harbor.domain' '${{ inputs.file }}' | sed 's/null//g')
+        echo ::set-output name=harbor_domain::$VALUE
 
     -
       name: Read Git sumbodules flag
-      uses: KJ002/read-yaml@1.5
+      shell: bash
       id: git_submodules
-      with:
-        file: ${{ inputs.file }}
-        key-path: '["git", "submodules"]'
+      run: |
+        VALUE=$(./yq e '.git.submodules' '${{ inputs.file }}' | sed 's/null//g')
+        echo ::set-output name=git_submodules::$VALUE
 
     -
       name: Read SonarQube execution flag
+      shell: bash
+      id: git_submodules
+      run: |
+        VALUE=$(./yq e '.git.submodules' '${{ inputs.file }}' | sed 's/null//g')
+        echo ::set-output name=git_submodules::$VALUE
+
       uses: KJ002/read-yaml@1.5
+      shell: bash
       id: sonarqube_execute
-      with:
-        file: ${{ inputs.file }}
-        key-path: '["analysis", "sonarqube", "execute"]'
+      run: |
+        VALUE=$(./yq e '.analysis.sonarqube.execute' '${{ inputs.file }}' | sed 's/null//g')
+        echo ::set-output name=sonarqube_execute::$VALUE
     -
       name: Read SonarQube project name
-      uses: KJ002/read-yaml@1.5
+      shell: bash
       id: sonarqube_project
-      with:
-        file: ${{ inputs.file }}
-        key-path: '["analysis", "sonarqube", "project"]'
+      run: |
+        VALUE=$(./yq e '.analysis.sonarqube.project' '${{ inputs.file }}' | sed 's/null//g')
+        echo ::set-output name=sonarqube_project::$VALUE
     -
       name: Read SonarQube validation flag
-      uses: KJ002/read-yaml@1.5
+      shell: bash
       id: sonarqube_validate
-      with:
-        file: ${{ inputs.file }}
-        key-path: '["analysis", "sonarqube", "validate"]'
+      run: |
+        VALUE=$(./yq e '.analysis.sonarqube.validate' '${{ inputs.file }}' | sed 's/null//g')
+        echo ::set-output name=sonarqube_validate::$VALUE
     -
       name: Read SonarQube platform
-      uses: KJ002/read-yaml@1.5
+      shell: bash
       id: sonarqube_platform
-      with:
-        file: ${{ inputs.file }}
-        key-path: '["analysis", "sonarqube", "platform"]'
+      run: |
+        VALUE=$(./yq e '.analysis.sonarqube.platform' '${{ inputs.file }}' | sed 's/null//g')
+        echo ::set-output name=sonarqube_platform::$VALUE
     -
       name: Read SonarQube exclusions
-      uses: KJ002/read-yaml@1.5
+      shell: bash
       id: sonarqube_exclusions
-      with:
-        file: ${{ inputs.file }}
-        key-path: '["analysis", "sonarqube", "exclusions"]'
+      run: |
+        VALUE=$(./yq e '.analysis.sonarqube.exclusions' '${{ inputs.file }}' | sed 's/null//g')
+        echo ::set-output name=sonarqube_exclusions::$VALUE
     -
       name: Read SonarQube dotnet version
-      uses: KJ002/read-yaml@1.5
+      shell: bash
       id: sonarqube_dotnet
-      with:
-        file: ${{ inputs.file }}
-        key-path: '["analysis", "sonarqube", "dotnet_version"]'
+      run: |
+        VALUE=$(./yq e '.analysis.sonarqube.dotnet_version' '${{ inputs.file }}' | sed 's/null//g')
+        echo ::set-output name=sonarqube_dotnet::$VALUE
     -
       name: Read SonaQube domain name
-      uses: KJ002/read-yaml@1.5
+      shell: bash
       id: sonarqube_domain
-      with:
-        file: ${{ inputs.file }}
-        key-path: '["analysis", "sonarqube", "domain"]'
+      run: |
+        VALUE=$(./yq e '.analysis.sonarqube.domain' '${{ inputs.file }}' | sed 's/null//g')
+        echo ::set-output name=sonarqube_domain::$VALUE
 
     -
       name: Read Docker execution flag
-      uses: KJ002/read-yaml@1.5
+      shell: bash
       id: docker_execute
-      with:
-        file: ${{ inputs.file }}
-        key-path: '["analysis", "docker", "execute"]'
+      run: |
+        VALUE=$(./yq e '.analysis.sonarqube.execute' '${{ inputs.file }}' | sed 's/null//g')
+        echo ::set-output name=docker_execute::$VALUE
     -
       name: Read Docker severity
       uses: KJ002/read-yaml@1.5
+      shell: bash
       id: docker_severity
-      with:
-        file: ${{ inputs.file }}
-        key-path: '["analysis", "docker", "severity"]'
+      run: |
+        VALUE=$(./yq e '.analysis.sonarqube.severity' '${{ inputs.file }}' | sed 's/null//g')
+        echo ::set-output name=docker_severity::$VALUE
     -
       name: Read Docker dockerfile check flag
-      uses: KJ002/read-yaml@1.5
+      shell: bash
       id: docker_quality
-      with:
-        file: ${{ inputs.file }}
-        key-path: '["analysis", "docker", "dockerfile_check"]'
+      run: |
+        VALUE=$(./yq e '.analysis.sonarqube.dockerfile_check' '${{ inputs.file }}' | sed 's/null//g')
+        echo ::set-output name=docker_quality::$VALUE
