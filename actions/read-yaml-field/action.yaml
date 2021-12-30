@@ -22,5 +22,5 @@ runs:
       id: read
       run: |
         VALUE=$(${{ inputs.yq_dir }}/yq e '${{ inputs.path }}' '${{ inputs.file }}') | sed 's/null//g'
-        echo $VALUE
+        echo "$VALUE"
         echo ::set-output name=data::$VALUE
