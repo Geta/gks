@@ -1,0 +1,26 @@
+name: 'Read YAML field'
+inputs:
+  yq_dir:
+    required: false
+    description: 'YQ directory'
+    default: '.'
+  path:
+    required: true
+    description: 'YQ path query'
+  file:
+    required: true
+    description: 'Yaml file'
+outputs:
+  data:
+    value: ${{ steps.read.outputs.data }}
+runs:
+  using: "composite"
+  steps:
+    -
+      name: Read YAML field
+      shell: bash
+      id: read
+      run: |
+        VALUE=$(${{ inputs.yq_dir }}/yq e '${{ inputs.path }}' '${{ inputs.file }}') | sed 's/null//g'
+        echo $VALUE
+        echo ::set-output name=data::$VALUE

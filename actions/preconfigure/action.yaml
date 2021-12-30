@@ -56,138 +56,138 @@ runs:
 
     -
       name: Read application name
-      shell: bash
       id: app_name
-      run: |
-        VALUE=$(./yq e '.app.name' '${{ inputs.file }}') | sed 's/null//g'
-        echo ::set-output name=app_name::$VALUE
+      uses: Geta/gks/actions/read-yaml-field@actions/v1
+      with:
+        path: '.app.name'
+        file: ${{ inputs.file }}
     -
       name: Read Dockerfile path
-      shell: bash
       id: app_dockerfile
-      run: |
-        VALUE=(./yq e '.app.dockerfile' '${{ inputs.file }}') | sed 's/null//g'
-        echo ::set-output name=app_dockerfile::$VALUE
+      uses: Geta/gks/actions/read-yaml-field@actions/v1
+      with:
+        path: '.app.dockerfile'
+        file: ${{ inputs.file }}
     -
       name: Read packages url
-      shell: bash
       id: app_packages_url
-      run: |
-        VALUE=$(./yq e '.app.packages_url' '${{ inputs.file }}') | sed 's/null//g'
-        echo ::set-output name=app_packages_url::$VALUE
+      uses: Geta/gks/actions/read-yaml-field@actions/v1
+      with:
+        path: '.app.packages_url'
+        file: ${{ inputs.file }}
     -
       name: Read docker context dir
-      shell: bash
       id: app_docker_context
-      run: |
-        VALUE=$(./yq e '.app.docker_context' '${{ inputs.file }}') | sed 's/null//g'
-        echo ::set-output name=app_docker_context::$VALUE
+      uses: Geta/gks/actions/read-yaml-field@actions/v1
+      with:
+        path: '.app.docker_context'
+        file: ${{ inputs.file }}
 
     -
       name: Read Harbor project name
-      shell: bash
       id: harbor_project
-      run: |
-        VALUE=$(./yq e '.harbor.project' '${{ inputs.file }}') | sed 's/null//g'
-        echo ::set-output name=harbor_project::$VALUE
+      uses: Geta/gks/actions/read-yaml-field@actions/v1
+      with:
+        path: '.harbor.project'
+        file: ${{ inputs.file }}
     -
       name: Read Harbor proxy project name
-      shell: bash
       id: harbor_proxy_project
-      run: |
-        VALUE=$(./yq e '.harbor.proxy_project' '${{ inputs.file }}') | sed 's/null//g'
-        echo ::set-output name=harbor_proxy_project::$VALUE
+      uses: Geta/gks/actions/read-yaml-field@actions/v1
+      with:
+        path: '.harbor.proxy_project'
+        file: ${{ inputs.file }}
     -
       name: Read Harbor Helm template version
-      shell: bash
       id: harbor_helm_template
-      run: |
-        VALUE=$(./yq e '.harbor.helm_template' '${{ inputs.file }}') | sed 's/null//g'
-        echo ::set-output name=harbor_helm_template::$VALUE
+      uses: Geta/gks/actions/read-yaml-field@actions/v1
+      with:
+        path: '.harbor.helm_template'
+        file: ${{ inputs.file }}
     -
       name: Read Harbor domain name
-      shell: bash
       id: harbor_domain
-      run: |
-        VALUE=$(./yq e '.harbor.domain' '${{ inputs.file }}') | sed 's/null//g'
-        echo ::set-output name=harbor_domain::$VALUE
+      uses: Geta/gks/actions/read-yaml-field@actions/v1
+      with:
+        path: '.harbor.domain'
+        file: ${{ inputs.file }}
 
     -
       name: Read Git sumbodules flag
-      shell: bash
       id: git_submodules
-      run: |
-        VALUE=$(./yq e '.git.submodules' '${{ inputs.file }}') | sed 's/null//g'
-        echo ::set-output name=git_submodules::$VALUE
+      uses: Geta/gks/actions/read-yaml-field@actions/v1
+      with:
+        path: '.git.submodules'
+        file: ${{ inputs.file }}
 
     -
       name: Read SonarQube execution flag
-      shell: bash
       id: sonarqube_execute
-      run: |
-        VALUE=$(./yq e '.analysis.sonarqube.execute' '${{ inputs.file }}') | sed 's/null//g'
-        echo ::set-output name=sonarqube_execute::$VALUE
+      uses: Geta/gks/actions/read-yaml-field@actions/v1
+      with:
+        path: '.analysis.sonarqube.execute'
+        file: ${{ inputs.file }}
     -
       name: Read SonarQube project name
-      shell: bash
       id: sonarqube_project
-      run: |
-        VALUE=$(./yq e '.analysis.sonarqube.project' '${{ inputs.file }}') | sed 's/null//g'
-        echo ::set-output name=sonarqube_project::$VALUE
+      uses: Geta/gks/actions/read-yaml-field@actions/v1
+      with:
+        path: '.analysis.sonarqube.project'
+        file: ${{ inputs.file }}
     -
       name: Read SonarQube validation flag
-      shell: bash
       id: sonarqube_validate
-      run: |
-        VALUE=$(./yq e '.analysis.sonarqube.validate' '${{ inputs.file }}') | sed 's/null//g'
-        echo ::set-output name=sonarqube_validate::$VALUE
+      uses: Geta/gks/actions/read-yaml-field@actions/v1
+      with:
+        path: '.analysis.sonarqube.validate'
+        file: ${{ inputs.file }}
     -
       name: Read SonarQube platform
-      shell: bash
       id: sonarqube_platform
-      run: |
-        VALUE=$(./yq e '.analysis.sonarqube.platform' '${{ inputs.file }}') | sed 's/null//g'
-        echo ::set-output name=sonarqube_platform::$VALUE
+      uses: Geta/gks/actions/read-yaml-field@actions/v1
+      with:
+        path: '.analysis.sonarqube.platform'
+        file: ${{ inputs.file }}
     -
       name: Read SonarQube exclusions
-      shell: bash
       id: sonarqube_exclusions
-      run: |
-        VALUE=$(./yq e '.analysis.sonarqube.exclusions' '${{ inputs.file }}') | sed 's/null//g'
-        echo ::set-output name=sonarqube_exclusions::$VALUE
+      uses: Geta/gks/actions/read-yaml-field@actions/v1
+      with:
+        path: '.analysis.sonarqube.exclusions'
+        file: ${{ inputs.file }}
     -
       name: Read SonarQube dotnet version
-      shell: bash
       id: sonarqube_dotnet
-      run: |
-        VALUE=$(./yq e '.analysis.sonarqube.dotnet_version' '${{ inputs.file }}') | sed 's/null//g'
-        echo ::set-output name=sonarqube_dotnet::$VALUE
+      uses: Geta/gks/actions/read-yaml-field@actions/v1
+      with:
+        path: '.analysis.sonarqube.dotnet_version'
+        file: ${{ inputs.file }}
     -
       name: Read SonaQube domain name
-      shell: bash
       id: sonarqube_domain
-      run: |
-        VALUE=$(./yq e '.analysis.sonarqube.domain' '${{ inputs.file }}') | sed 's/null//g'
-        echo ::set-output name=sonarqube_domain::$VALUE
+      uses: Geta/gks/actions/read-yaml-field@actions/v1
+      with:
+        path: '.analysis.sonarqube.domain'
+        file: ${{ inputs.file }}
 
     -
       name: Read Docker execution flag
-      shell: bash
       id: docker_execute
-      run: |
-        VALUE=$(./yq e '.analysis.docker.execute' '${{ inputs.file }}' | sed 's/null//g')
-        echo ::set-output name=docker_execute::$VALUE
+      uses: Geta/gks/actions/read-yaml-field@actions/v1
+      with:
+        path: '.analysis.docker.execute'
+        file: ${{ inputs.file }}
     -
       name: Read Docker severity
-      shell: bash
       id: docker_severity
-      run: |
-        VALUE=$(./yq e '.analysis.docker.severity' '${{ inputs.file }}' | sed 's/null//g')
-        echo ::set-output name=docker_severity::$VALUE
+      uses: Geta/gks/actions/read-yaml-field@actions/v1
+      with:
+        path: '.analysis.docker.severity'
+        file: ${{ inputs.file }}
     -
       name: Read Docker dockerfile check flag
-      shell: bash
       id: docker_quality
-      run: |
-        VALUE=$(./yq e '.analysis.docker.dockerfile_check' '${{ inputs.file }}' | sed 's/null//g')
-        echo ::set-output name=docker_quality::$VALUE
+      uses: Geta/gks/actions/read-yaml-field@actions/v1
+      with:
+        path: '.analysis.docker.dockerfile_check'
+        file: ${{ inputs.file }}
