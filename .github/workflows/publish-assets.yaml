@@ -45,10 +45,9 @@ on:
         type: string
         description: 'Environment name'
       docker_context:
-        required: false
+        required: true
         type: string
         description: 'Docker build context'
-        default: '.'
       docker_tags:
         required: false
         type: string
