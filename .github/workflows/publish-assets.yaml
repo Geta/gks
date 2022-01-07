@@ -189,7 +189,7 @@ jobs:
           chart_version: ${{ steps.chart.outputs.chart_version }}
           chart_app_version: ${{ steps.chart.outputs.chart_version }}
           docker_image_url: ${{ needs.publish-docker.outputs.image_name }}
-          docker_image_tag: ${{ needs.publish-docker.outputs.image-tag }}
+          docker_image_tag: ${{ needs.publish-docker.outputs.image_tag }}
       -
         name: Lint Helm Chart
         uses: Geta/gks/actions/lint-helm-chart@actions/v1
