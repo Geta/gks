@@ -125,7 +125,7 @@ jobs:
         id: image
         run: |
           IMAGE_NAME='${{ inputs.harbor_domain }}/${{ inputs.project_name }}/${{ inputs.app_name }}/${{ inputs.environment }}'
-          IMAGE_TAG='${{ inputs.version }}-${{ inputs.environment }}.${{ inputs.build_number }}'
+          IMAGE_TAG='${{ inputs.version }}.${{ inputs.build_number }}'
           echo ::set-output name=image_name::$IMAGE_NAME
           echo ::set-output name=image_tag::$IMAGE_TAG
       - 
