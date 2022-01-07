@@ -168,7 +168,7 @@ jobs:
         id: chart
         run: |
           CHART_NAME='${{ inputs.project_name }}-${{ inputs.app_name }}-${{ inputs.environment }}'
-          CHART_VERSION=${{ inputs.version }}-${{ inputs.build_number }}'
+          CHART_VERSION='${{ inputs.version }}-${{ inputs.build_number }}'
           echo ::set-output name=chart_name::$CHART_NAME
           echo ::set-output name=chart_version::$CHART_VERSION
       -
