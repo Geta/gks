@@ -16,6 +16,9 @@ inputs:
   docker_image_url:
     required: false
     default: ''
+  docker_image_tag:
+    required: false
+    default: ''
 runs:
   using: "composite"
   steps:
@@ -62,3 +65,13 @@ runs:
           shell: bash
           run: |
             ./yq e '.image.repository = "${{ inputs.docker_image_url }}"' -i '${{ inputs.chart_dir }}/values.yaml'
+    - 
+      # conditionals workaround
+      name: Set Docker image tag
+      uses: ChristopherHX/conditional@b4a9649204f81002ec9a4ef7d4bf7d6b2ab7fa55
+      with:
+        if: ${{ inputs.docker_image_tag != '' }}
+        step: |
+          shell: bash
+          run: |
+            ./yq e '.image.tag = "${{ inputs.docker_image_tag }}"' -i '${{ inputs.chart_dir }}/values.yaml'
