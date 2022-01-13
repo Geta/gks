@@ -55,26 +55,6 @@ on:
         type: string
         description: 'Java SDK version to install (required for SonarQube)'
         default: '1.11'
-      docker_execute:
-        required: false
-        type: string
-        description: 'Whether to execute Docker image analysis'
-        default: 'false'
-      docker_image:
-        required: false
-        type: string
-        description: 'Docker image name'
-        default: ''
-      docker_severity:
-        required: false
-        type: string
-        description: 'Scanning severity treshold'
-        default: 'HIGH'
-      docker_quality:
-        required: false
-        type: string
-        description: 'Run image quality checks or not'
-        default: 'true'
       packages_url:
         required: false
         type: string
@@ -97,20 +77,6 @@ on:
         required: false
         description: 'Harbor token'
 jobs:
-  docker-image:
-    if: inputs.docker_execute == 'true'
-    runs-on: ubuntu-latest
-    steps:
-      - 
-        name: Scan Docker image
-        uses: azure/container-scan@v0
-        with:
-          username: ${{ secrets.harbor_user }}
-          password: ${{ secrets.harbor_token }}
-          severity-threshold: ${{ inputs.docker_severity }}
-          run-quality-checks: ${{ inputs.docker_quality }}
-          image-name: ${{ inputs.docker_image }}
-
   sonarqube-dotnet:
     if: (inputs.sonar_execute == 'true') && (inputs.sonar_platform == 'dotnet')
     runs-on: ubuntu-latest
@@ -134,14 +100,12 @@ jobs:
         with:
           dotnet-version: ${{ inputs.dotnet_version }}
       -
-        name: Install SonarQube scanner
-        run: dotnet tool install dotnet-sonarscanner --global
-      -
         name: Build and analyze
         env:
           GITHUB_TOKEN: ${{ secrets.gh_token }}
         run: |
-          dotnet nuget add source ${{ inputs.packages_url }} -n github -u ${{ secrets.gh_user }} -p ${{ secrets.gh_token }} --store-password-in-clear-text
+          dotnet tool install dotnet-sonarscanner --global
+          dotnet nuget add source '${{ inputs.packages_url }}' -n github -u '${{ secrets.gh_user }}' -p '${{ secrets.gh_token }}' --store-password-in-clear-text
           dotnet sonarscanner begin /v:"${{ inputs.version }}" /d:sonar.exclusions="${{ inputs.sonar_exclusions }}" /k:"${{ inputs.sonar_project }}" /d:sonar.login="${{ secrets.sq_token }}" /d:sonar.host.url="https://${{ inputs.sonar_domain }}" /d:sonar.qualitygate.wait=${{ inputs.sonar_validate }}
           dotnet build
           dotnet sonarscanner end /d:sonar.login="${{ secrets.sq_token }}"
