@@ -75,12 +75,12 @@ jobs:
         name: Set up Helm
         uses: Geta/gks/actions/setup-helm@actions/v1
         env:
-          HELM_REPO_URL: 'https://${{ inputs.harbor_domain }}/${{ inputs.harbor_project }}/chartrepo'
+          HELM_REPO_URL: 'https://${{ inputs.harbor_domain }}/chartrepo'
         with:
           helm_repository_url: ${{ env.HELM_REPO_URL }}
           helm_repository_user: ${{ secrets.harbor_user }}
           helm_repository_token: ${{ secrets.harbor_token }}
-          helm_repository_project: ${{ inputs.app_name }}
+          helm_repository_project: ${{ inputs.project_name }}
       -
         name: Compose Helm chart names
         id: chart
