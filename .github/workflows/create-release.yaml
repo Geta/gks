@@ -88,7 +88,7 @@ jobs:
         name: Pull chart
         uses: Geta/gks/actions/pull-chart@actions/v1
         with:
-          chart_dir: '${{ inputs.helm_chart_dir }}/${{ steps.chart.outputs.src_chart_name }}'
+          chart_dir: '${{ inputs.helm_chart_dir }}/${{ steps.chart.outputs.dst_chart_name }}'
           chart_name: ${{ steps.chart.outputs.src_chart_name }}
           chart_version: '^${{ inputs.version }}-1'
           repo_project: ${{ inputs.project_name }}
