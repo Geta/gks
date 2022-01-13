@@ -95,7 +95,7 @@ jobs:
         with:
           chart_dir: '${{ inputs.helm_chart_dir }}/${{ steps.chart.outputs.src_chart_name }}'
           chart_name: ${{ steps.chart.outputs.src_chart_name }}
-          chart_version: '^${{ inputs.version }}-${{ inputs.env_from }}'
+          chart_version: '^${{ inputs.version }}'
           repo_project: ${{ inputs.project_name }}
       -
         name: Set chart info
