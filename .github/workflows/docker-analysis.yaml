@@ -1,0 +1,45 @@
+name: Execute Docker Analysis
+on:
+  workflow_call:
+    inputs:
+      execute:
+        required: false
+        type: string
+        description: 'Whether to execute Docker image analysis'
+        default: 'false'
+      image:
+        required: false
+        type: string
+        description: 'Docker image name'
+        default: ''
+      severity:
+        required: false
+        type: string
+        description: 'Scanning severity treshold'
+        default: 'HIGH'
+      check_quality:
+        required: false
+        type: string
+        description: 'Run image quality checks or not'
+        default: 'true'
+    secrets:
+      harbor_user:
+        required: false
+        description: 'Harbor user'
+      harbor_token:
+        required: false
+        description: 'Harbor token'
+jobs:
+  sonarqube-dotnet:
+    if: (inputs.execute == 'true')
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Scan docker image
+        uses: azure/container-scan@v0
+        with:
+          username: ${{ secrets.harbor_user }}
+          password: ${{ secrets.harbor_token }}
+          severity-threshold: ${{ inputs.severity }}
+          run-quality-checks: ${{ inputs.check_quality }}
+          image-name: ${{ inputs.image }}
