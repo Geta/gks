@@ -12,8 +12,6 @@ inputs:
     required: true
   env_from:
     required: true
-  env_to:
-    required: true
   version:
     required: true
 outputs:
@@ -41,7 +39,7 @@ runs:
       shell: bash
       env:
         SOURCE_IMAGE: '${{ steps.pull.outputs.latest_tag }}.${{ steps.pull.outputs.latest_build }}'
-        DESTINATION_IMAGE: '${{ inputs.repo_domain }}/${{ inputs.repo_project }}/${{ inputs.repo_name }}/${{ inputs.env_to }}'
+        DESTINATION_IMAGE: '${{ inputs.repo_domain }}/${{ inputs.repo_project }}/${{ inputs.repo_name }}'
       run: |
         docker tag '${{ env.SOURCE_IMAGE }}' '${{ env.DESTINATION_IMAGE }}:${{ inputs.version }}'
         docker tag '${{ env.SOURCE_IMAGE }}' '${{ env.DESTINATION_IMAGE }}:latest'

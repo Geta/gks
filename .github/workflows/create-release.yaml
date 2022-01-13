@@ -18,10 +18,6 @@ on:
         required: true
         type: string
         description: 'Source environment'
-      env_to:
-        required: true
-        type: string
-        description: 'Destination environment'
       helm_chart_dir:
         required: false
         type: string
@@ -64,7 +60,6 @@ jobs:
           repo_project: ${{ inputs.project_name }}
           repo_name: ${{ inputs.app_name }}
           env_from: ${{ inputs.env_from }}
-          env_to: ${{ inputs.env_to }}
           version: ${{ inputs.version }}
 
   publish-helm:
@@ -86,7 +81,7 @@ jobs:
         id: chart
         run: |
           SRC_CHART_NAME='${{ inputs.project_name }}-${{ inputs.app_name }}-${{ inputs.env_from }}'
-          DST_CHART_NAME='${{ inputs.project_name }}-${{ inputs.app_name }}-${{ inputs.env_to }}'
+          DST_CHART_NAME='${{ inputs.project_name }}-${{ inputs.app_name }}'
           echo ::set-output name=src_chart_name::$SRC_CHART_NAME
           echo ::set-output name=dst_chart_name::$DST_CHART_NAME
       -
@@ -101,7 +96,7 @@ jobs:
         name: Set chart info
         uses: Geta/gks/actions/set-chart-info@actions/v1
         with:
-          chart_dir: '${{ inputs.helm_chart_dir }}/${{ steps.chart.outputs.dst_chart_name }}'
+          chart_dir: '${{ inputs.helm_chart_dir }}/${{ steps.chart.outputs.src_chart_name }}'
           chart_name: ${{ steps.chart.outputs.dst_chart_name }}
           chart_description: '${{ inputs.app_name }} chart'
           chart_version: ${{ inputs.version }}
