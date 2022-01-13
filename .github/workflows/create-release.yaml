@@ -96,7 +96,7 @@ jobs:
         name: Set chart info
         uses: Geta/gks/actions/set-chart-info@actions/v1
         with:
-          chart_dir: '${{ inputs.helm_chart_dir }}/${{ steps.chart.outputs.src_chart_name }}'
+          chart_dir: '${{ inputs.helm_chart_dir }}/${{ steps.chart.outputs.dst_chart_name }}'
           chart_name: ${{ steps.chart.outputs.dst_chart_name }}
           chart_description: '${{ inputs.app_name }} chart'
           chart_version: ${{ inputs.version }}
