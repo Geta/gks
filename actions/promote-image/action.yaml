@@ -30,7 +30,7 @@ runs:
         DOCKER_API_URL: 'https://${{ inputs.repo_domain }}/v2/${{ inputs.repo_project }}/${{ inputs.repo_name }}/${{ inputs.env_from }}/tags/list'
       run: |
         RESPONSE=$(curl -u '${{ inputs.repo_user }}:${{ inputs.repo_token }}' --request GET '${{ env.DOCKER_API_URL }}')
-        BUILD=$(echo $RESPONSE | jq .tags | sed 's/${{ inputs.version }}.//g' | sed 's/[ ,\"]//g' | sort --version-sort -r | head -1)
+        BUILD=$(echo $RESPONSE | jq .tags | jq .[] | sed 's/${{ inputs.version }}.//g' | sed 's/[latest ,\"]//g' | sort --version-sort -r | head -1)
         TAG='${{ inputs.repo_domain }}/${{ inputs.repo_project }}/${{ inputs.repo_name }}/${{ inputs.env_from }}:${{ inputs.version }}'
         docker pull "$TAG.$BUILD"
         echo ::set-output name=latest_tag::$TAG
