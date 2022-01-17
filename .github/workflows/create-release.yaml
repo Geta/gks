@@ -40,7 +40,6 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       image_name: ${{ steps.image.outputs.image_name }}
-      image_tag: ${{ steps.image.outputs.image_tag }}
     steps:
       -
         name: Log in to Harbor
@@ -100,8 +99,9 @@ jobs:
           chart_name: ${{ steps.chart.outputs.dst_chart_name }}
           chart_description: '${{ inputs.app_name }} chart'
           chart_version: ${{ inputs.version }}
+          chart_app_version: ${{ inputs.version }}
           docker_image_url: ${{ needs.publish-docker.outputs.image_name }}
-          docker_image_tag: ${{ needs.publish-docker.outputs.image_tag }}
+          docker_image_tag: ${{ inputs.version }}
       -
         name: Lint Helm Chart
         uses: Geta/gks/actions/lint-helm-chart@actions/v1

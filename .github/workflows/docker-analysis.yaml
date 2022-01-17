@@ -30,7 +30,7 @@ on:
         required: false
         description: 'Harbor token'
 jobs:
-  sonarqube-dotnet:
+  docker-scan:
     if: (inputs.execute == 'true')
     runs-on: ubuntu-latest
     steps:
