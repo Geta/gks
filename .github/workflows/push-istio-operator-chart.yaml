@@ -9,7 +9,7 @@ env:
   HARBOR_PROJECT_NAME: gks
   HELM_CHART_NAME: istio-operator
   HELM_CHART_PATH: ${{ github.workspace }}/istio-${{ github.event.inputs.istio }}/manifests/charts
-  HELM_REPO_URL: https://harbor.teamgeta.net/gcc/chartrepo
+  HELM_REPO_URL: https://harbor.teamgeta.net/chartrepo
   HELM_REPO_ALIAS: harbor
   OUT_DIR: output
   VERSION: ${{ github.event.inputs.istio }}
