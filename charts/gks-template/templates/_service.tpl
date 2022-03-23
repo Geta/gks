@@ -19,7 +19,7 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
-  {{- if gt (.Values.service.grpcPort | atoi) 0 }}
+  {{- if gt .Values.service.grpcPort 0.0 }}
     - port: {{ .Values.service.grpcPort }}
       targetPort: http
       protocol: TCP
