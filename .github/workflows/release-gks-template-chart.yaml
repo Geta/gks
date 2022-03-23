@@ -15,6 +15,7 @@ jobs:
       HELM_CHART_PATH: 'charts'
       HELM_CHART_DESCRIPTION: 'Template chart'
       VERSION: 'v1.0.${{ github.run_number }}'
+      GKS_HARBOR_ADDRESS: 'harbor.teamgeta.net'
     outputs:
       HARBOR_PROJECT_NAME: ${{ env.HARBOR_PROJECT_NAME }}
       HELM_CHART_NAME: ${{ env.HELM_CHART_NAME }}
@@ -31,7 +32,7 @@ jobs:
         name: Set up Helm
         uses: Geta/gks/actions/setup-helm@actions/v1
         with:
-          helm_repository_url: 'https://${{ secrets.GKS_HARBOR_ADDRESS }}/chartrepo'
+          helm_repository_url: 'https://${{ env.GKS_HARBOR_ADDRESS }}/chartrepo'
           helm_repository_user: ${{ secrets.GKS_HARBOR_USER }}
           helm_repository_token: ${{ secrets.GKS_HARBOR_PASSWORD }}
           helm_repository_project: ${{ env.HARBOR_PROJECT_NAME }}
