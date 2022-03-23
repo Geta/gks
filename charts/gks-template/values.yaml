@@ -33,10 +33,10 @@ securityContext: {}
 service:
   # -- Service type
   type: ClusterIP
-  # -- Service HTTP port
+  # -- Service port
   port: 80
-  # -- Service gRPC port
-  grpcPort: 0
+  # -- Extra ports
+  extraPorts: []
 # -- Environment variables. [Documentation](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/).
 env: []
 # -- Environment variables mapping. [Documentation](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/).

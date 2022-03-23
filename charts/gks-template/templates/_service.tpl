@@ -19,11 +19,11 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
-  {{- if gt .Values.service.grpcPort 0.0 }}
-    - port: {{ .Values.service.grpcPort }}
-      targetPort: http
+  {{- range .Values.service.extraPorts }}
+    - port: {{ .port }}
+      targetPort: {{ .name }}
       protocol: TCP
-      name: grpc
+      name: {{ .name }}
   {{- end }}
   selector:
     {{- include "gks.shared.selectorLabels" . | nindent 4 }}
