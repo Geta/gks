@@ -1,0 +1,111 @@
+name: Push TypeSense Dashboard chart
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version'
+        required: true
+jobs:
+  publish:
+    env:
+      HARBOR_DOMAIN: harbor.teamgeta.net
+      HARBOR_PROJECT: gks
+      HARBOR_PROXY_PROJECT: proxy-cache-dockerhub/library
+      APP_NAME: typesense-dashboard
+      CHART_DIR: 'chart'
+      TEMPLATE_CHART_VERSION: v1.0.14
+      TEMPLATE_CHART_NAME: gks-template
+    runs-on: ubuntu-latest
+    steps:
+      -
+        uses: actions/checkout@v2
+        name: Checkout code
+        with:
+          repository: "bfritscher/${{ env.APP_NAME }}"
+          ref: "tags/${{ inputs.VERSION }}"
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - 
+        name: Log in to Harbor
+        uses: docker/login-action@v1
+        with:
+          registry: '${{ env.HARBOR_DOMAIN }}/${{ env.HARBOR_PROJECT }}'
+          username: ${{ secrets.GKS_HARBOR_USER }}
+          password: ${{ secrets.GKS_HARBOR_PASSWORD }}
+      -
+        name: Compose Docker image info
+        id: image
+        run: |
+          IMAGE_NAME='${{ env.HARBOR_DOMAIN }}/${{ env.HARBOR_PROJECT }}/${{ env.APP_NAME }}'
+          IMAGE_TAG=${{ inputs.VERSION }}
+          echo ::set-output name=image_name::$IMAGE_NAME
+          echo ::set-output name=image_tag::$IMAGE_TAG
+      - 
+        name: Build and push Docker image
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          context: '.'
+          file: Dockerfile
+          build-args: |
+            DOCKER_REGISTRY=${{ env.HARBOR_DOMAIN }}/${{ env.HARBOR_PROXY_PROJECT }}/
+          tags: |
+            ${{ steps.image.outputs.image_name }}:${{ steps.image.outputs.image_tag }}
+            ${{ steps.image.outputs.image_name }}:latest
+      -
+        name: Set up Helm
+        uses: Geta/gks/actions/setup-helm@actions/v1
+        env:
+          HELM_REPO_URL: 'https://${{ env.HARBOR_DOMAIN }}/chartrepo'
+        with:
+          helm_repository_url: ${{ env.HELM_REPO_URL }}
+          helm_repository_user: ${{ secrets.GKS_HARBOR_USER }}
+          helm_repository_token: ${{ secrets.GKS_HARBOR_PASSWORD }}
+          helm_repository_project: ${{ env.HARBOR_PROJECT }}
+      -
+        name: Compose Helm chart name
+        id: chart
+        run: |
+          CHART_NAME='${{ env.HARBOR_PROJECT }}-${{ env.APP_NAME }}'
+          CHART_VERSION='${{ inputs.VERSION }}'
+          echo ::set-output name=chart_name::$CHART_NAME
+          echo ::set-output name=chart_version::$CHART_VERSION
+      -
+        name: Pull template chart
+        uses: Geta/gks/actions/pull-chart@actions/v1
+        with:
+          chart_dir: '${{ env.CHART_DIR }}/${{ steps.chart.outputs.chart_name }}'
+          chart_name: ${{ env.TEMPLATE_CHART_NAME }}
+          chart_version: ${{ env.TEMPLATE_CHART_VERSION }}
+          repo_project: ${{ env.HARBOR_PROJECT }}
+      -
+        name: Set chart info
+        uses: Geta/gks/actions/set-chart-info@actions/v1
+        with:
+          chart_dir: '${{ env.CHART_DIR }}/${{ steps.chart.outputs.chart_name }}'
+          chart_name: ${{ steps.chart.outputs.chart_name }}
+          chart_description: '${{ env.APP_NAME }} chart'
+          chart_version: ${{ steps.chart.outputs.chart_version }}
+          chart_app_version: ${{ steps.chart.outputs.chart_version }}
+          docker_image_url: ${{ steps.image.outputs.image_name }}
+          docker_image_tag: ${{ steps.image.outputs.image_tag }}
+      -
+        name: Lint Helm Chart
+        uses: Geta/gks/actions/lint-helm-chart@actions/v1
+        with:
+          chart_dir: '${{ env.CHART_DIR }}/${{ steps.chart.outputs.chart_name }}'
+      -
+        name: Generate README
+        uses: Geta/gks/actions/generate-chart-readme@actions/v1
+        with:
+          chart_dir: '${{ env.CHART_DIR }}/${{ steps.chart.outputs.chart_name }}'
+      -
+        name: Push service Helm chart
+        uses: Geta/gks/actions/package-helm-chart@actions/v1
+        with:
+          chart_dir: '${{ env.CHART_DIR }}/${{ steps.chart.outputs.chart_name }}'
+          chart_name: ${{ steps.chart.outputs.chart_name }}
+          chart_version: ${{ steps.chart.outputs.chart_version }}
+          helm_repository_project: ${{ env.HARBOR_PROJECT }}
+          push: true
