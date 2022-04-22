@@ -2,8 +2,9 @@ name: Push TypeSense Dashboard chart
 on:
   workflow_dispatch:
     inputs:
-      version:
-        description: 'Release version'
+      tag:
+        description: 'Release tag'
+        type: string
         required: true
 jobs:
   publish:
@@ -15,6 +16,7 @@ jobs:
       CHART_DIR: 'chart'
       TEMPLATE_CHART_VERSION: v1.0.14
       TEMPLATE_CHART_NAME: gks-template
+      VERSION: '${{ inputs.tag }}'
     runs-on: ubuntu-latest
     steps:
       -
@@ -22,7 +24,7 @@ jobs:
         name: Checkout code
         with:
           repository: "bfritscher/${{ env.APP_NAME }}"
-          ref: ${{ inputs.VERSION }}
+          ref: "${{ env.VERSION }}"
       -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
@@ -38,7 +40,7 @@ jobs:
         id: image
         run: |
           IMAGE_NAME='${{ env.HARBOR_DOMAIN }}/${{ env.HARBOR_PROJECT }}/${{ env.APP_NAME }}'
-          IMAGE_TAG=${{ inputs.VERSION }}
+          IMAGE_TAG='${{ env.VERSION }}'
           echo ::set-output name=image_name::$IMAGE_NAME
           echo ::set-output name=image_tag::$IMAGE_TAG
       - 
@@ -68,7 +70,7 @@ jobs:
         id: chart
         run: |
           CHART_NAME='${{ env.HARBOR_PROJECT }}-${{ env.APP_NAME }}'
-          CHART_VERSION='${{ inputs.VERSION }}'
+          CHART_VERSION='${{ env.VERSION }}'
           echo ::set-output name=chart_name::$CHART_NAME
           echo ::set-output name=chart_version::$CHART_VERSION
       -
