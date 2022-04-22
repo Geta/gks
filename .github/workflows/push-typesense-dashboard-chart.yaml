@@ -4,7 +4,6 @@ on:
     inputs:
       tag:
         description: 'Release tag'
-        type: string
         required: true
 jobs:
   publish:
@@ -16,7 +15,7 @@ jobs:
       CHART_DIR: 'chart'
       TEMPLATE_CHART_VERSION: v1.0.14
       TEMPLATE_CHART_NAME: gks-template
-      VERSION: '${{ inputs.tag }}'
+      VERSION: '${{ github.event.inputs.tag }}'
     runs-on: ubuntu-latest
     steps:
       -
