@@ -22,7 +22,7 @@ jobs:
         name: Checkout code
         with:
           repository: "bfritscher/${{ env.APP_NAME }}"
-          ref: "tags/${{ inputs.VERSION }}"
+          ref: ${{ inputs.VERSION }}
       -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
