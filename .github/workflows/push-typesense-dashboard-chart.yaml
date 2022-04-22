@@ -42,6 +42,9 @@ jobs:
           IMAGE_TAG='${{ env.VERSION }}'
           echo ::set-output name=image_name::$IMAGE_NAME
           echo ::set-output name=image_tag::$IMAGE_TAG
+      -
+        name: TEMPORARY! Update dockerfile
+        run: sed -i '/COPY package.json package-lock.json yarn.lock .\//c\COPY package.json yarn.lock .\/' ./Dockerfile
       - 
         name: Build and push Docker image
         uses: docker/build-push-action@v2
