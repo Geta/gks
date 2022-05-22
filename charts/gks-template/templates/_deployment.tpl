@@ -75,7 +75,7 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
         {{- range .Values.sidecars }}
-        - {{ toYaml . }}
+        - {{ toYaml . | nindent 10 }}
         {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
