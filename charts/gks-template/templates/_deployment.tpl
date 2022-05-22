@@ -75,7 +75,15 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
         {{- range .Values.sidecars }}
-        - {{ toYaml . | nindent 10 }}
+        - name: {{ .name }}
+          env:
+            {{- toYaml .env | nindent 12 }}
+          image: {{ .image }}
+          ports:
+          {{- range .ports }}
+            - containerPort: {{ .containerPort }}
+              protocol: {{ .protocol }}
+          {{- end }}
         {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
