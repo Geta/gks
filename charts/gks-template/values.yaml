@@ -81,3 +81,5 @@ nodeSelector: {}
 tolerations: []
 # -- Affinity configuration. [Documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
 affinity: {}
+# -- Pod sidecars. [Documentation](https://kubernetes.io/docs/concepts/workloads/pods/)
+sidecars: []
