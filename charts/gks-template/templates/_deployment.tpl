@@ -83,6 +83,7 @@ spec:
           {{- range .ports }}
             - containerPort: {{ .containerPort }}
               protocol: {{ .protocol }}
+              name: {{ .name }}
           {{- end }}
         {{- end }}
       {{- with .Values.nodeSelector }}

@@ -35,6 +35,10 @@ service:
   type: ClusterIP
   # -- Service port
   port: 80
+  # -- Target port
+  targetPort: http
+  # -- Protocol
+  protocol: TCP
   # -- Extra ports
   extraPorts: []
 # -- Environment variables. [Documentation](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/).

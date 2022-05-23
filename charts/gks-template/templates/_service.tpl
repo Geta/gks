@@ -16,13 +16,13 @@ spec:
   type: {{ .Values.service.type }}
   ports:
     - port: {{ .Values.service.port }}
-      targetPort: http
-      protocol: TCP
+      targetPort: {{ .Values.service.targetPort }}
+      protocol: {{ .Values.service.protocol }}
       name: http
   {{- range .Values.service.extraPorts }}
     - port: {{ .port }}
       targetPort: {{ .name }}
-      protocol: TCP
+      protocol: {{ default "TCP" .protocol }}
       name: {{ .name }}
   {{- end }}
   selector:
