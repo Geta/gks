@@ -13,6 +13,10 @@ outputs:
     value: ${{ steps.app_packages_url.outputs.data }}
   app_docker_context:
     value: ${{ steps.app_docker_context.outputs.data }}
+  app_build_image_tag:
+    value: ${{ steps.app_build_image_tag.outputs.data }}
+  app_runtime_image_tag:
+    value: ${{ steps.app_runtime_image_tag.outputs.data }}
 
   harbor_project:
     value: ${{ steps.harbor_project.outputs.data }}
@@ -81,6 +85,20 @@ runs:
       uses: Geta/gks/actions/read-yaml-field@actions/v1
       with:
         path: '.app.docker_context'
+        file: ${{ inputs.file }}
+    -
+      name: Read build image tag
+      id: app_build_image_tag
+      uses: Geta/gks/actions/read-yaml-field@actions/v1
+      with:
+        path: '.app.build_image_tag'
+        file: ${{ inputs.file }}
+    -
+      name: Read runtime image tag
+      id: app_runtime_image_tag
+      uses: Geta/gks/actions/read-yaml-field@actions/v1
+      with:
+        path: '.app.runtime_image_tag'
         file: ${{ inputs.file }}
 
     -
