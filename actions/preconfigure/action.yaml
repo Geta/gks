@@ -51,6 +51,17 @@ outputs:
     value: ${{ steps.docker_severity.outputs.data }}
   docker_quality:
     value: ${{ steps.docker_quality.outputs.data }}
+
+  sync_branch_name:
+    value: ${{ steps.sync_branch_name.outputs.data }}
+  sync_branch_timestamp:
+    value: ${{ steps.sync_branch_timestamp.outputs.data }}
+  sync_pr_create:
+    value: ${{ steps.sync_pr_create.outputs.data }}
+  sync_pr_assignees:
+    value: ${{ steps.sync_pr_assignees.outputs.data }}
+  sync_repos:
+    value: ${{ steps.sync_repos.outputs.data }}
 runs:
   using: "composite"
   steps:
@@ -208,4 +219,40 @@ runs:
       uses: Geta/gks/actions/read-yaml-field@actions/v1
       with:
         path: '.analysis.docker.dockerfile_check'
+        file: ${{ inputs.file }}
+
+    -
+      name: Read branch name
+      id: sync_branch_name
+      uses: Geta/gks/actions/read-yaml-field@actions/v1
+      with:
+        path: '.sync.branch.name'
+        file: ${{ inputs.file }}
+    -
+      name: Read branch timestamp state
+      id: sync_branch_timestamp
+      uses: Geta/gks/actions/read-yaml-field@actions/v1
+      with:
+        path: '.sync.branch.timestamp'
+        file: ${{ inputs.file }}
+    -
+      name: Read pr create state
+      id: sync_pr_create
+      uses: Geta/gks/actions/read-yaml-field@actions/v1
+      with:
+        path: '.sync.pr.create'
+        file: ${{ inputs.file }}
+    -
+      name: Read pr assignees
+      id: sync_pr_assignees
+      uses: Geta/gks/actions/read-yaml-field@actions/v1
+      with:
+        path: '.sync.pr.assignees'
+        file: ${{ inputs.file }}
+    -
+      name: Read core repo sync repos
+      id: sync_repos
+      uses: Geta/gks/actions/read-yaml-field@actions/v1
+      with:
+        path: '.sync.repos'
         file: ${{ inputs.file }}
