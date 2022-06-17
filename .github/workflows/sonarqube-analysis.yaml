@@ -130,6 +130,7 @@ jobs:
           rm -f ${{ env.SONAR_PROPERTIES_FILE }}
           echo "sonar.projectKey=${{ inputs.sonar_project }}" >> ${{ env.SONAR_PROPERTIES_FILE }}
           echo "sonar.projectVersion=${{ inputs.version }}" >> ${{ env.SONAR_PROPERTIES_FILE }}
+          echo "sonar.exclusions=${{ inputs.sonar_exclusions }}" >> ${{ env.SONAR_PROPERTIES_FILE }}
       - 
         name: Scan codebase
         uses: sonarsource/sonarqube-scan-action@master
