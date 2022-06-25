@@ -39,6 +39,7 @@ spec:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       volumes:
         {{- toYaml .Values.volumes | nindent 8 }}
+      terminationGracePeriodSeconds: {{- .Values.terminationGracePeriodSeconds }}
       containers:
         - name: {{ .Chart.Name }}
           env:
@@ -49,6 +50,8 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          lifecycle:
+            {{- toYaml .Values.podLifecycle | nindent 12 }}
           volumeMounts:
             {{- toYaml .Values.volumeMounts | nindent 12 }}
           ports:
