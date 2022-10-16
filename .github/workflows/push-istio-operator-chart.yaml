@@ -41,7 +41,7 @@ jobs:
         run: |
           CHART_PATH=${{ env.HELM_CHART_PATH }}/${{ env.HELM_CHART_NAME }}
           PACKAGE_PATH=$(helm package $CHART_PATH --dependency-update --destination $CHART_PATH/${{ env.OUT_DIR }})
-          echo ::set-output name=CHART_PACKAGE::$PACKAGE_PATH
+          echo "CHART_PACKAGE=$PACKAGE_PATH" >> $GITHUB_ENV
       -
         name: Get package path
         uses: jungwinter/split@v1

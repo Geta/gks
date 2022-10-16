@@ -22,4 +22,4 @@ runs:
       id: read
       run: |
         VALUE=$(echo $(${{ inputs.yq_dir }}/yq e '${{ inputs.path }}' '${{ inputs.file }}') | sed 's/null//g')
-        echo ::set-output name=data::$VALUE
+        echo "data=$VALUE" >> $GITHUB_ENV

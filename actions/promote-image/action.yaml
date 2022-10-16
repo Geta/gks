@@ -31,8 +31,8 @@ runs:
         BUILD=$(echo $RESPONSE | jq .tags[] | jq 'select(. | startswith("${{ inputs.version }}"))' | sed 's/${{ inputs.version }}.//g' | sed 's/[latest ,\"]//g' | sort --version-sort -r | head -1)
         TAG='${{ inputs.repo_domain }}/${{ inputs.repo_project }}/${{ inputs.repo_name }}/${{ inputs.env_from }}:${{ inputs.version }}'
         docker pull "$TAG.$BUILD"
-        echo ::set-output name=latest_tag::$TAG
-        echo ::set-output name=latest_build::$BUILD
+        echo "latest_tag=$TAG" >> $GITHUB_ENV
+        echo "latest_build=$BUILD" >> $GITHUB_ENV
     -
       name: Promote latest Docker image
       id: promote
@@ -45,4 +45,4 @@ runs:
         docker tag '${{ env.SOURCE_IMAGE }}' '${{ env.DESTINATION_IMAGE }}:latest'
         docker push "${{ env.DESTINATION_IMAGE }}:${{ inputs.version }}"
         docker push '${{ env.DESTINATION_IMAGE }}:latest'
-        echo ::set-output name=image_name::${{ env.DESTINATION_IMAGE }}
+        echo "image_name=${{ env.DESTINATION_IMAGE }}" >> $GITHUB_ENV
