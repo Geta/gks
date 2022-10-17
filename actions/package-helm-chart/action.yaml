@@ -24,7 +24,7 @@ runs:
       run: |
         helm package '${{ inputs.chart_dir }}' --app-version '${{ inputs.chart_version }}' --version '${{ inputs.chart_version }}' --dependency-update --destination '${{ inputs.chart_dir }}/${{ env.OUT_DIR }}'
         CHART='${{ inputs.chart_dir }}/${{ env.OUT_DIR }}/${{ inputs.chart_name }}-${{ inputs.chart_version }}.tgz'
-        echo "CHART_PACKAGE=$CHART" >> $GITHUB_ENV
+        echo "CHART_PACKAGE=$CHART" >> $GITHUB_OUTPUT
     - 
       # conditionals workaround
       uses: ChristopherHX/conditional@b4a9649204f81002ec9a4ef7d4bf7d6b2ab7fa55

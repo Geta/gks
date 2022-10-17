@@ -81,8 +81,8 @@ jobs:
         run: |
           SRC_CHART_NAME='${{ inputs.project_name }}-${{ inputs.app_name }}-${{ inputs.env_from }}'
           DST_CHART_NAME='${{ inputs.project_name }}-${{ inputs.app_name }}'
-          echo "src_chart_name=$SRC_CHART_NAME" >> $GITHUB_ENV
-          echo "dst_chart_name=$DST_CHART_NAME" >> $GITHUB_ENV
+          echo "src_chart_name=$SRC_CHART_NAME" >> $GITHUB_OUTPUT
+          echo "dst_chart_name=$DST_CHART_NAME" >> $GITHUB_OUTPUT
       -
         name: Pull chart
         uses: Geta/gks/actions/pull-chart@actions/v1

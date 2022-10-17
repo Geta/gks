@@ -40,8 +40,8 @@ jobs:
         run: |
           IMAGE_NAME='${{ env.HARBOR_DOMAIN }}/${{ env.HARBOR_PROJECT }}/${{ env.APP_NAME }}'
           IMAGE_TAG='${{ env.VERSION }}'
-          echo "image_name=$IMAGE_NAME" >> $GITHUB_ENV
-          echo "image_tag=$IMAGE_TAG" >> $GITHUB_ENV
+          echo "image_name=$IMAGE_NAME" >> $GITHUB_OUTPUT
+          echo "image_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
       -
         name: TEMPORARY! Update dockerfile
         run: sed -i '/COPY package.json package-lock.json yarn.lock .\//c\COPY package.json yarn.lock .\/' ./Dockerfile
@@ -73,8 +73,8 @@ jobs:
         run: |
           CHART_NAME='${{ env.HARBOR_PROJECT }}-${{ env.APP_NAME }}'
           CHART_VERSION='${{ env.VERSION }}'
-          echo "chart_name=$CHART_NAME" >> $GITHUB_ENV
-          echo "chart_version=$CHART_VERSION" >> $GITHUB_ENV
+          echo "chart_name=$CHART_NAME" >> $GITHUB_OUTPUT
+          echo "chart_version=$CHART_VERSION" >> $GITHUB_OUTPUT
       -
         name: Pull template chart
         uses: Geta/gks/actions/pull-chart@actions/v1
