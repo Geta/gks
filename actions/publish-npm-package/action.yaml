@@ -73,6 +73,13 @@ runs:
         cd ${{ steps.fetch.outputs.out_path }}
         node ./scripts/build
     -
+      name: Get package version
+      id: version
+      shell: bash
+      run: |
+        VERSION=$(jq ".version" package.json)
+        echo "number=$VERSION" >> $GITHUB_OUTPUT
+    -
       name: Publish package
       shell: bash
       env:
@@ -80,5 +87,5 @@ runs:
         NPM_GETA_URL: ${{ inputs.packages_url }}
       run: |
         cd ${{ steps.fetch.outputs.out_path }}
-        yarn publish --new-version ${{ inputs.version }}-alpha.${{ inputs.build_number }}        
-        echo ':electric_plug: **NPM package:** TOBEDONE' >> $GITHUB_STEP_SUMMARY
+        yarn publish --new-version ${{ steps.version.outputs.number }}      
+        echo ':electric_plug: **NPM package:** ${{ inputs.service_name }}-${{ steps.version.outputs.number }} >> $GITHUB_STEP_SUMMARY
