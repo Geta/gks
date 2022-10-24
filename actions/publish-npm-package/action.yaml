@@ -1,0 +1,84 @@
+name: 'Publish NPM Package'
+inputs:
+  repository_name:
+    required: true
+  service_name:
+    required: true
+  version:
+    required: true
+  build_number:
+    required: true
+  env:
+    required: true
+  template_revision:
+    required: true
+  src_files_dir:
+    required: true
+  node_version:
+    required: false
+    default: '16'
+  gh_token:
+    required: true
+  packages_url:
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - 
+      name: Install Node
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ inputs.node_version }}
+    -
+      name: Fetch NPM template
+      id: fetch
+      shell: bash
+      env:
+        package_name: package.tar.gz
+        package_path: /tmp/npm
+        out_path: /tmp/npm/output
+      run: |
+        REVISION=$(echo '${{ inputs.template_revision }}' | sed 's/\/\\//g')
+        URL=$(echo "https://github.com/Geta/gks/raw/$REVISION/packages/npm-template/${{ env.package_name }}")
+        mkdir ${{ env.package_path }}
+        wget -c $URL -O ${{ env.package_path }}/${{ env.package_name }}
+        mkdir ${{ env.out_path }}
+        tar -xzf ${{ env.package_path }}/${{ env.package_name }} -C ${{ env.out_path }}
+        cd ${{ env.out_path }}
+        cp -r ${{ inputs.src_files_dir }}/. ./src
+        echo "out_path=${{ env.out_path }}" >> $GITHUB_OUTPUT
+    -
+      name: Set up package
+      shell: bash
+      run: |
+        cd ${{ steps.fetch.outputs.out_path }}
+        echo "REPO NAME IS ${{ inputs.repository_name }}"
+        node ./scripts/setup repositoryName=${{ inputs.repository_name }} serviceName=${{ inputs.service_name }} version=${{ inputs.version }} buildNumber=${{ inputs.build_number }} environment=${{ inputs.env }}
+    -
+      name: Yarn install
+      shell: bash
+      env:
+        NPM_GETA_PAT: ${{ inputs.gh_token }}
+        NPM_GETA_URL: ${{ inputs.packages_url }}
+      run: |
+        cd ${{ steps.fetch.outputs.out_path }}
+        yarn install --frozen-lockfile
+    -
+      name: Build package
+      shell: bash
+      env:
+        NPM_GETA_PAT: ${{ inputs.gh_token }}
+        NPM_GETA_URL: ${{ inputs.packages_url }}
+      run: |
+        cd ${{ steps.fetch.outputs.out_path }}
+        node ./scripts/build
+    -
+      name: Publish package
+      shell: bash
+      env:
+        NPM_GETA_PAT: ${{ inputs.gh_token }}
+        NPM_GETA_URL: ${{ inputs.packages_url }}
+      run: |
+        cd ${{ steps.fetch.outputs.out_path }}
+        yarn publish --new-version ${{ inputs.version }}-alpha.${{ inputs.build_number }}        
+        echo ':electric_plug: **NPM package:** TOBEDONE' >> $GITHUB_STEP_SUMMARY

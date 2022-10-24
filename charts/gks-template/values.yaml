@@ -1,5 +1,16 @@
 # -- Number of replicas to run.
 replicaCount: 1
+# -- Autoscaling configuration. [Documentation](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/).
+# @default -- `{}`
+autoscaling:
+  # -- Whether to enable HPA or not
+  enabled: false
+  # -- Min amount of replicas
+  minReplicas: 1
+  # -- Max amount of replicas
+  maxReplicas: 100
+  # -- Target CPU utilization percentage
+  targetCPUUtilizationPercentage: 80
 # -- Image configuration. [Documentation](https://kubernetes.io/docs/concepts/containers/images/).
 # @default -- `{}`
 image:
@@ -45,10 +56,13 @@ service:
 env: []
 # -- Environment variables mapping. [Documentation](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/).
 envFrom: []
-# -- Tenant name.
-tenant: ''
 # -- Pod level annotations.
 podAnnotations: {}
+# -- Additional pod labels
+podLabels: {}
+# -- Pod lifecycle rules
+# @default -- `{}`
+podLifecycle: {}
 # -- Deployment level annotations.
 deploymentAnnotations: []
 # -- Service level annotations.
@@ -64,21 +78,10 @@ probes:
   liveness: {}
   # -- Startup probe configuration.
   startup: {}
-  # -- readiness probe configuration.
+  # -- Readiness probe configuration.
   readiness: {}
 # -- Resources configuration. [Documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/).
 resources: {}
-# -- Autoscaling configuration. [Documentation](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/).
-# @default -- `{}`
-autoscaling:
-  # -- Whether to enable HPA or not
-  enabled: false
-  # -- Min amount of replicas
-  minReplicas: 1
-  # -- Max amount of replicas
-  maxReplicas: 100
-  # -- Target CPU utilization percentage
-  targetCPUUtilizationPercentage: 80
 # -- Node selector configuration. [Documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/).
 nodeSelector: {}
 # -- Tolerations configuration. [Documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/).
@@ -87,3 +90,5 @@ tolerations: []
 affinity: {}
 # -- Pod sidecars. [Documentation](https://kubernetes.io/docs/concepts/workloads/pods/)
 sidecars: []
+# -- Pod termination grace period seconds. [Documentation] (https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/)
+terminationGracePeriodSeconds: 30

@@ -52,6 +52,17 @@ outputs:
   docker_quality:
     value: ${{ steps.docker_quality.outputs.data }}
 
+  clientgen_enabled:
+    value: ${{ steps.clientgen_enabled.outputs.data }}
+  clientgen_repo_name:
+    value: ${{ steps.clientgen_repo_name.outputs.data }}
+  clientgen_service_name:
+    value: ${{ steps.clientgen_service_name.outputs.data }}
+  clientgen_template_rev:
+    value: ${{ steps.clientgen_template_rev.outputs.data }}
+  clientgen_node_version:
+    value: ${{ steps.clientgen_node_version.outputs.data }}
+
   sync_branch_name:
     value: ${{ steps.sync_branch_name.outputs.data }}
   sync_branch_timestamp:
@@ -219,6 +230,42 @@ runs:
       uses: Geta/gks/actions/read-yaml-field@actions/v1
       with:
         path: '.analysis.docker.dockerfile_check'
+        file: ${{ inputs.file }}
+
+    -
+      name: Read client generation state
+      id: clientgen_enabled
+      uses: Geta/gks/actions/read-yaml-field@actions/v1
+      with:
+        path: '.app.client_generation.enabled'
+        file: ${{ inputs.file }}
+    -
+      name: Read client generation repository name
+      id: clientgen_repo_name
+      uses: Geta/gks/actions/read-yaml-field@actions/v1
+      with:
+        path: '.app.client_generation.repository_name'
+        file: ${{ inputs.file }}
+    -
+      name: Read client generation service name
+      id: clientgen_service_name
+      uses: Geta/gks/actions/read-yaml-field@actions/v1
+      with:
+        path: '.app.client_generation.service_name'
+        file: ${{ inputs.file }}
+    -
+      name: Read client generation package template revision
+      id: clientgen_template_rev
+      uses: Geta/gks/actions/read-yaml-field@actions/v1
+      with:
+        path: '.app.client_generation.package_template_revision'
+        file: ${{ inputs.file }}
+    -
+      name: Read client generation node version
+      id: clientgen_node_version
+      uses: Geta/gks/actions/read-yaml-field@actions/v1
+      with:
+        path: '.app.client_generation.node_version'
         file: ${{ inputs.file }}
 
     -
