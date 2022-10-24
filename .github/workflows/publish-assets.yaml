@@ -210,7 +210,7 @@ jobs:
           echo "client_out_dir=${{ env.out_dir }}" >> $GITHUB_OUTPUT
       -
         name: Publish TypeScript client
-        uses: Geta/gks/actions/publish-npm-package@actions/v2
+        uses: Geta/gks/actions/publish-npm-package@actions/v1
         with:
           repository_name: ${{ inputs.clientgen_repo_name }}
           service_name: ${{ inputs.clientgen_service_name }}
