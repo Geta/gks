@@ -55,6 +55,12 @@ runs:
         echo "REPO NAME IS ${{ inputs.repository_name }}"
         node ./scripts/setup repositoryName=${{ inputs.repository_name }} serviceName=${{ inputs.service_name }} version=${{ inputs.version }} buildNumber=${{ inputs.build_number }} environment=${{ inputs.env }}
     -
+      name: Update README
+      shell: bash
+      run: |
+        cd ${{ steps.fetch.outputs.out_path }}
+        sed -i "s/{SERVICE}/${{ inputs.service_name }}/" README.md
+    -
       name: Yarn install
       shell: bash
       env:
