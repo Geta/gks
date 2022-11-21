@@ -48,12 +48,19 @@ runs:
         cp -r ${{ inputs.src_files_dir }}/. ./src
         echo "out_path=${{ env.out_path }}" >> $GITHUB_OUTPUT
     -
+      name: Format version number
+      id: version
+      shell: bash
+      run: |
+        VERSION=$(echo ${{ inputs.version }} | sed 's/v//g')
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+    -
       name: Set up package
       shell: bash
       run: |
         cd ${{ steps.fetch.outputs.out_path }}
         echo "REPO NAME IS ${{ inputs.repository_name }}"
-        node ./scripts/setup repositoryName=${{ inputs.repository_name }} serviceName=${{ inputs.service_name }} version=${{ inputs.version }} buildNumber=${{ inputs.build_number }} environment=${{ inputs.env }}
+        node ./scripts/setup repositoryName=${{ inputs.repository_name }} serviceName=${{ inputs.service_name }} version=${{ steps.version.outputs.version }} buildNumber=${{ inputs.build_number }} environment=${{ inputs.env }}
     -
       name: Update README
       shell: bash
