@@ -1,0 +1,93 @@
+name: Build notification templates
+inputs:
+  title:
+    required: true
+    type: string
+    description: Title
+  user:
+    required: true
+    type: string
+    description: User name
+  app:
+    required: true
+    type: string
+    description: Application name
+  icon_url:
+    required: false
+    type: string
+    default: ''
+    description: Icon
+  action_url:
+    required: true
+    type: string
+    description: Current action url
+  version:
+    required: true
+    type: string
+    description: Version
+  hash:
+    required: true
+    type: string
+    description: Commit hash
+  revision:
+    required: true
+    type: string
+    description: Template revision
+  initial_state:
+    required: true
+    type: string
+    description: Initial phase state
+outputs:
+  template_file:
+    value: ${{ steps.file.outputs.file }}
+    description: Template file path
+  phase_state:
+    value: ${{ steps.phases.outputs.state }}
+    description: Phases notification state
+runs:
+  using: "composite"
+  steps:
+    -
+      name: Fetch message layout template
+      id: file
+      shell: bash
+      env:
+        FILE: slack-template.json
+        DIR: "."
+      run: |
+        URL=$(echo "https://github.com/Geta/gks/raw/${{ inputs.revision }}/assets/${{ env.FILE }}")
+        wget -c $URL -O ${{ env.DIR }}/${{ env.FILE }}
+        JSON=$(cat "${{ env.DIR }}/${{ env.FILE }}")
+        STORE_IN_FILE=$(echo "slack-template-${{ inputs.app }}.json")
+        echo $JSON > $STORE_IN_FILE
+        PATH=$(readlink -f $STORE_IN_FILE)
+        echo "file=$PATH" >> $GITHUB_OUTPUT
+    -
+      name: Create build phases templatle file
+      id: phases
+      shell: bash
+      run: |
+        INITIAL=$(echo "${{ inputs.initial_state }}")
+        ARRAY=$(jq --raw-input --slurp 'split("\n") | map(select(. != ""))' <<< $INITIAL)
+        echo $ARRAY
+        JSON=$(jq ".phases = $ARRAY" <<< "{}")
+        echo $JSON
+        BASE64=$(echo $JSON | base64 -w 0)
+        echo "$BASE64"
+        echo "state=$BASE64" >> $GITHUB_OUTPUT
+    -
+      name: Build template
+      id: template
+      shell: bash
+      run: |
+        ICON=$([[ '${{ inputs.icon_url }}' != '' ]] && echo "${{ inputs.icon_url }}" || echo "https://www.getadigital.com/images/logo-white.png")
+        HASH=$(echo "${{ inputs.hash }}")
+        HASH=$(echo "${HASH:0:10}")
+        JSON=$(cat ${{ steps.file.outputs.file }})
+        JSON=$(jq ".text = \"${{ inputs.title }}\"" <<< $JSON)
+        JSON=$(jq ".icon_emoji=\":github:\"" <<< $JSON)
+        JSON=$(jq ".blocks[0].text.text = \"${{ inputs.title }}\"" <<< $JSON)
+        JSON=$(jq ".blocks[2].text.text = \"*<${{ inputs.action_url }}|${{ inputs.app }}>*\n${{ inputs.version }}\n${{ inputs.user }}\n$HASH\"" <<< $JSON)
+        JSON=$(jq ".blocks[2].accessory.image_url = \"$ICON\"" <<< $JSON)
+        JSON=$(jq ".blocks[4].text.text = \"${{ inputs.initial_state }}\"" <<< $JSON)
+        echo $JSON > ${{ steps.file.outputs.file }}

@@ -9,7 +9,7 @@ inputs:
   push:
     required: false
     default: false
-  helm_repository_project:
+  repo_alias:
     required: false
     default: ''
 runs:
@@ -33,4 +33,4 @@ runs:
         step: |
           name: Push Helm chart to registry
           shell: bash
-          run: helm cm-push '${{ steps.package.outputs.CHART_PACKAGE }}' '${{ inputs.helm_repository_project }}'
+          run: helm cm-push '${{ steps.package.outputs.CHART_PACKAGE }}' '${{ inputs.repo_alias }}'

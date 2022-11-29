@@ -1,0 +1,41 @@
+name: Read config file
+inputs:
+  file:
+    required: true
+    description: Configuration file path
+  ref:
+    required: true
+    description: Git reference
+  gh_token:
+    required: true
+    description: Github token
+outputs:
+  settings: 
+    value: ${{ steps.json.outputs.settings }}
+    description: JSON settings as string
+runs:
+  using: "composite"
+  steps:
+    -
+      uses: actions/checkout@v3
+      name: Checkout code
+      with:
+        ref: ${{ inputs.ref }}
+        token: ${{ inputs.gh_token }}
+        submodules: false
+    -
+      name: Report source reference
+      shell: bash
+      run: |
+        echo ':computer: ${{ github.ref }}' >> $GITHUB_STEP_SUMMARY
+        echo ':link: ${{ github.sha }}' >> $GITHUB_STEP_SUMMARY
+    -
+      name: Read JSON config
+      id: json
+      shell: bash
+      run: |
+        SETTINGS=$(cat ${{ inputs.file }})
+        SETTINGS="${SETTINGS//'%'/'%25'}"
+        SETTINGS="${SETTINGS//$'\n'/}"
+        SETTINGS="${SETTINGS//$'\r'/}"
+        echo "settings=$SETTINGS" >> $GITHUB_OUTPUT

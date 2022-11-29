@@ -1,0 +1,73 @@
+name: Configure notifications
+on:
+  workflow_call:
+    inputs:
+      app:
+        required: true
+        type: string
+        description: Application name
+      icon:
+        required: false
+        type: string
+        default: ''
+        description: Application icon
+      version:
+        required: true
+        type: string
+        description: Application version
+      settings:
+        required: true
+        type: string
+        description: Settings JSON string
+      initial_state:
+        required: true
+        type: string
+        description: Initial phase state
+    outputs:
+      artifact:
+        value: ${{ jobs.configure.outputs.artifact }}
+        description: Github artifact containing slack message template
+      template_file:
+        value: ${{ jobs.configure.outputs.file }}
+        description: Slack message template file
+      phase_state:
+        value: ${{ jobs.configure.outputs.phase_state }}
+jobs:
+  configure:
+    runs-on: ubuntu-latest
+    outputs:
+      artifact: ${{ steps.artifact.outputs.name }}
+      file: ${{ steps.artifact.outputs.template_file }}
+      phase_state: ${{ steps.template.outputs.phase_state }}
+    env:
+      ARTIFACT: slack-templates
+    steps:
+      -
+        name: Get notification template
+        id: template
+        uses: Geta/gks/actions/build-notification-template@actions/v2
+        with:
+          title: ${{ github.workflow }}
+          user: ${{ github.actor }}
+          app: ${{ inputs.app }}
+          icon_url: ${{ inputs.icon }}
+          action_url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          version: ${{ inputs.version }}.${{ github.run_number }}
+          hash: ${{ github.sha }}
+          revision: ${{ fromJson(inputs.settings).general.slack.templateRef }}
+          initial_state: ${{ inputs.initial_state }}
+      -
+        name: Store template in artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.ARTIFACT }}
+          path: ${{ steps.template.outputs.template_file }}
+          if-no-files-found: error
+          retention-days: 5
+      -
+        name: Output
+        id: artifact
+        run: |
+          echo "name=${{ env.ARTIFACT }}" >> $GITHUB_OUTPUT
+          FILENAME=$(basename ${{ steps.template.outputs.template_file }})
+          echo "template_file=$FILENAME" >> $GITHUB_OUTPUT

@@ -39,7 +39,7 @@ runs:
         out_path: /tmp/npm/output
       run: |
         REVISION=$(echo '${{ inputs.template_revision }}' | sed 's/\/\\//g')
-        URL=$(echo "https://github.com/Geta/gks/raw/$REVISION/packages/npm-template/${{ env.package_name }}")
+        URL=$(echo "https://github.com/Geta/gks/raw/$REVISION/assets/npm-template/${{ env.package_name }}")
         mkdir ${{ env.package_path }}
         wget -c $URL -O ${{ env.package_path }}/${{ env.package_name }}
         mkdir ${{ env.out_path }}

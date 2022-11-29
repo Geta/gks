@@ -1,0 +1,209 @@
+name: Publish Helm chart
+on:
+  workflow_call:
+    inputs:
+      phase:
+        required: true
+        type: number
+        description: Build phase index
+      app:
+        required: true
+        type: string
+        description: Application name
+      env:
+        required: true
+        type: string
+        description: Environment name
+      version:
+        required: true
+        type: string
+        description: Version number
+      settings:
+        required: true
+        type: string
+        description: Settings json string
+      image_name:
+        required: true
+        type: string
+        description: Docker image name
+      image_tag:
+        required: true
+        type: string
+        description: Docker image tag
+      slack_artifact_name:
+        required: false
+        type: string
+        default: ''
+        description: Github artifact name containing slack template
+      slack_template_file:
+        required: false
+        type: string
+        default: ''
+        description: Slack message template file name
+      slack_phase_state:
+        required: false
+        type: string
+        default: ''
+        description: Slack notification state
+      slack_message_id:
+        required: false
+        type: string
+        default: ''
+        description: Slack message id
+    outputs:
+      slack_state:
+        value: ${{ jobs.helm.outputs.slack_state }}
+        description: Slack phase state
+jobs:
+  helm:
+    runs-on: ubuntu-latest
+    env:
+      MAIN_REPO_ALIAS: main
+      TEMPLATE_REPO_ALIAS: template
+      STATUS_STEP: ""
+      SLACK_TEMPLATE_DIR: /tmp/slack
+    outputs:
+      slack_state: ${{ steps.after-build-template.outputs.state }}
+    steps:
+      -
+        name: Download notification template
+        if: inputs.slack_artifact_name != ''
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ inputs.slack_artifact_name }}
+          path: ${{ env.SLACK_TEMPLATE_DIR }}
+      -
+        name: Add build start notifcation step
+        if: inputs.slack_artifact_name != ''
+        id: slack-build-start
+        uses: Geta/gks/actions/add-notification-step@actions/v2
+        with:
+          template_path: ${{ env.SLACK_TEMPLATE_DIR }}/${{ inputs.slack_template_file }}
+          phase: ${{ inputs.phase }}
+          step: ":hourglass: *Helm chart*"
+          state: ${{ inputs.slack_phase_state }}
+      -
+        name: Notify start
+        if: inputs.slack_artifact_name != ''
+        id: slack
+        uses: slackapi/slack-github-action@v1
+        with:
+          update-ts: ${{ inputs.slack_message_id }}
+          channel-id: ${{ fromJson(inputs.settings).general.slack.channel }}
+          payload-file-path: ${{ env.SLACK_TEMPLATE_DIR }}/${{ inputs.slack_template_file }}
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.GKS_GCC_SLACK_BOT_TOKEN }}
+      -
+        name: Install Helm
+        uses: azure/setup-helm@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GKS_GH_ACCESS_TOKEN }}
+      -
+        name: Install Helm Push plugin
+        run: helm plugin install https://github.com/chartmuseum/helm-push.git
+      -
+        name: Add main Helm repo
+        uses: Geta/gks/actions/add-helm-repo@actions/v2
+        with:
+          alias: ${{ env.MAIN_REPO_ALIAS }}
+          user: ${{ secrets.GKS_HELM_REGISTRY_USER }}
+          token: ${{ secrets.GKS_HELM_REGISTRY_PASSWORD }}
+          url: ${{ fromJson(inputs.settings).artifacts.helm.repoUrl }}
+      -
+        name: Add template Helm repo
+        uses: Geta/gks/actions/add-helm-repo@actions/v2
+        with:
+          alias: ${{ env.TEMPLATE_REPO_ALIAS }}
+          user: ${{ secrets.GKS_HELM_REGISTRY_USER }}
+          token: ${{ secrets.GKS_HELM_REGISTRY_PASSWORD }}
+          url: ${{ fromJson(inputs.settings).artifacts.helm.templateRepoUrl }}
+      -
+        name: Compose Helm chart name
+        id: chart
+        run: |
+          PREFIX=$([[ '${{ fromJson(inputs.settings).build.helm.chartNamePrefix }}' != '' ]] && echo '${{ fromJson(inputs.settings).build.helm.chartNamePrefix }}-' || echo '')
+          NAME=$(echo ${{ inputs.app }}-${{ inputs.env }})
+          CHART_NAME="$PREFIX$NAME"
+          CHART_VERSION="${{ inputs.version }}-${{ github.run_number }}"
+          echo "chart_name=$CHART_NAME" >> $GITHUB_OUTPUT
+          echo "chart_version=$CHART_VERSION" >> $GITHUB_OUTPUT
+      -
+        name: Pull template chart
+        uses: Geta/gks/actions/pull-chart@actions/v2
+        with:
+          chart_dir: chart/${{ fromJson(inputs.settings).build.helm.templateChart.name }}
+          chart_name: ${{ fromJson(inputs.settings).build.helm.templateChart.name }}
+          chart_version: ${{ fromJson(inputs.settings).build.helm.templateChart.version }}
+          repo_alias: ${{ env.TEMPLATE_REPO_ALIAS }}
+      -
+        name: Set chart info
+        uses: Geta/gks/actions/set-chart-info@actions/v2
+        with:
+          chart_dir: chart/${{ fromJson(inputs.settings).build.helm.templateChart.name }}
+          chart_name: ${{ steps.chart.outputs.chart_name }}
+          chart_description: ${{ inputs.app }} chart
+          chart_version: ${{ steps.chart.outputs.chart_version }}
+          chart_app_version: ${{ steps.chart.outputs.chart_version }}
+          docker_image_url: ${{ inputs.image_name }}
+          docker_image_tag: ${{ inputs.image_tag }}
+      -
+        name: Lint Helm Chart
+        uses: Geta/gks/actions/lint-helm-chart@actions/v1
+        with:
+          chart_dir: chart/${{ fromJson(inputs.settings).build.helm.templateChart.name }}
+      -
+        name: Generate README
+        uses: Geta/gks/actions/generate-chart-readme@actions/v1
+        with:
+          chart_dir: chart/${{ fromJson(inputs.settings).build.helm.templateChart.name }}
+      -
+        name: Push service Helm chart
+        uses: Geta/gks/actions/package-helm-chart@actions/v2
+        with:
+          chart_dir: chart/${{ fromJson(inputs.settings).build.helm.templateChart.name }}
+          chart_name: ${{ steps.chart.outputs.chart_name }}
+          chart_version: ${{ steps.chart.outputs.chart_version }}
+          repo_alias: ${{ env.MAIN_REPO_ALIAS }}
+          push: true
+      -
+        name: Report Helm chart
+        run: |
+          echo ':file_folder: ${{ steps.chart.outputs.chart_name }}:${{ steps.chart.outputs.chart_version }}' >> $GITHUB_STEP_SUMMARY
+      -
+        name: Prepare success slack message
+        if: success()
+        run: |
+          STEP=$(echo ":white_check_mark: *Helm chart*")
+          echo "STATUS_STEP=$STEP" >> $GITHUB_ENV
+      -
+        name: Prepare failure slack message
+        if: failure()
+        run: |
+          STEP=$(echo ":x: *Helm chart*")
+          echo "STATUS_STEP=$STEP" >> $GITHUB_ENV
+      -
+        name: Prepare cancel slack message
+        if: cancelled()
+        run: |
+          STEP=$(echo ":grey_exclamation: *Helm chart*")
+          echo "STATUS_STEP=$STEP" >> $GITHUB_ENV
+      -
+        name: Add build status notifcation step
+        if: always() && steps.slack.conclusion == 'success' && inputs.slack_artifact_name != ''
+        id: after-build-template
+        uses: Geta/gks/actions/add-notification-step@actions/v2
+        with:
+          template_path: ${{ env.SLACK_TEMPLATE_DIR }}/${{ inputs.slack_template_file }}
+          phase: ${{ inputs.phase }}
+          step: ${{ env.STATUS_STEP }}
+          state: ${{ steps.slack-build-start.outputs.state }}
+      -
+        name: Notify status
+        if: always() && inputs.slack_artifact_name != ''
+        uses: slackapi/slack-github-action@v1
+        with:
+          update-ts: ${{ inputs.slack_message_id }}
+          channel-id: ${{ fromJson(inputs.settings).general.slack.channel }}
+          payload-file-path: ${{ env.SLACK_TEMPLATE_DIR }}/${{ inputs.slack_template_file }}
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.GKS_GCC_SLACK_BOT_TOKEN }}

@@ -1,0 +1,193 @@
+name: Publish Docker image
+on:
+  workflow_call:
+    inputs:
+      phase:
+        required: true
+        type: number
+        description: Build phase index
+      app:
+        required: true
+        type: string
+        description: Application name
+      env:
+        required: true
+        type: string
+        description: Environment name
+      version:
+        required: true
+        type: string
+        description: Version number
+      settings:
+        required: true
+        type: string
+        description: Settings json string
+      slack_artifact_name:
+        required: false
+        type: string
+        default: ''
+        description: Github artifact name containing slack template
+      slack_template_file:
+        required: false
+        type: string
+        default: ''
+        description: Slack message template file name
+      slack_phase_state:
+        required: false
+        type: string
+        default: ''
+        description: Slack notification state
+    outputs:
+      image_name:
+        value: ${{ jobs.docker.outputs.image_name }}
+        description: Docker image name
+      image_tag:
+        value: ${{ jobs.docker.outputs.image_tag }}
+        description: Docker image tag
+      slack_state:
+        value: ${{ jobs.docker.outputs.slack_state }}
+        description: Slack phase state
+      slack_message_id:
+        value: ${{ jobs.docker.outputs.slack_message_id }}
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    outputs:
+      image_name: ${{ steps.info.outputs.image_name }}
+      image_tag: ${{ steps.info.outputs.image_tag }}
+      slack_state: ${{ steps.after-build-template.outputs.state }}
+      slack_message_id: ${{ steps.slack.outputs.ts }}
+    env:
+      STATUS_STEP: ""
+      SLACK_TEMPLATE_DIR: /tmp/slack
+    steps:
+      -
+        name: Download notification template
+        if: inputs.slack_artifact_name != ''
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ inputs.slack_artifact_name }}
+          path: ${{ env.SLACK_TEMPLATE_DIR }}
+      -
+        name: Add build start notification step
+        if: inputs.slack_artifact_name != ''
+        id: slack-build-start
+        uses: Geta/gks/actions/add-notification-step@actions/v2
+        with:
+          template_path: ${{ env.SLACK_TEMPLATE_DIR }}/${{ inputs.slack_template_file }}
+          phase: ${{ inputs.phase }}
+          step: ":hourglass: *Docker image*"
+          state: ${{ inputs.slack_phase_state }}
+      -
+        name: Notify start
+        if: inputs.slack_artifact_name != ''
+        id: slack
+        uses: slackapi/slack-github-action@v1
+        with:
+          channel-id: ${{ fromJson(inputs.settings).general.slack.channel }}
+          payload-file-path: ${{ env.SLACK_TEMPLATE_DIR }}/${{ inputs.slack_template_file }}
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.GKS_GCC_SLACK_BOT_TOKEN }}
+      - 
+        name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+          token: ${{ secrets.GKS_GH_ACCESS_TOKEN }}
+          submodules: ${{ fromJson(inputs.settings).source.submodules }}
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - 
+        name: Log in to Docker registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ fromJson(inputs.settings).artifacts.docker.repoUrl }}
+          username: ${{ secrets.GKS_DOCKER_REGISTRY_USER }}
+          password: ${{ secrets.GKS_DOCKER_REGISTRY_PASSWORD }}
+      -
+        name: Compose Docker build info
+        id: info
+        run: |
+          IMAGE_NAME=${{ fromJson(inputs.settings).artifacts.docker.repoUrl }}/${{ inputs.app }}/${{ inputs.env }}
+          echo "image_name=$IMAGE_NAME" >> $GITHUB_OUTPUT
+          IMAGE_TAG='${{ inputs.version }}.${{ github.run_number }}'
+          echo "image_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
+          FULL_IMAGE_TAG='${{ inputs.version }}'
+          echo "full_image_tag=$FULL_IMAGE_TAG" >> $GITHUB_OUTPUT
+          DOCKER_REGISTRY=$([[ '${{ fromJson(inputs.settings).artifacts.docker.proxyRepoUrl }}' != '' ]] && echo "DOCKER_REGISTRY=${{ fromJson(inputs.settings).artifacts.docker.proxyRepoUrl }}/" || echo "")
+          echo "registry=$DOCKER_REGISTRY" >> $GITHUB_OUTPUT
+          VERSION=$(echo ${{ inputs.version }} | sed 's/v//g')
+          echo "version=$VERSION.${{ github.run_number }}" >> $GITHUB_OUTPUT
+          BUILD_IMAGE_TAG=$([[ '${{ fromJson(inputs.settings).build.docker.baseImages.build }}' != '' ]] && echo "BUILD_IMAGE_TAG=${{ fromJson(inputs.settings).build.docker.baseImages.build }}" || echo "")
+          echo "build_image_tag=$BUILD_IMAGE_TAG" >> $GITHUB_OUTPUT
+          RUNTIME_IMAGE_TAG=$([[ '${{ fromJson(inputs.settings).build.docker.baseImages.runtime }}' != '' ]] && echo "RUNTIME_IMAGE_TAG=${{ fromJson(inputs.settings).build.docker.baseImages.runtime }}" || echo "")
+          echo "runtime_image_tag=$RUNTIME_IMAGE_TAG" >> $GITHUB_OUTPUT
+      - 
+        name: Build Docker image
+        uses: docker/build-push-action@v3
+        #! env:
+        #!   cache_image: '${{ steps.info.outputs.image_name }}:cache'
+        with:
+          #cache-from: 'type=registry,ref=${{ env.cache_image }}'
+          #cache-to: 'type=registry,mode=max,ref=${{ env.cache_image }}'
+          push: true
+          context: ${{ fromJson(inputs.settings).build.docker.context }}
+          file: ${{ fromJson(inputs.settings).build.docker.file }}
+          build-args: |
+            ${{ steps.info.outputs.registry }}
+            ${{ steps.info.outputs.build_image_tag }}
+            ${{ steps.info.outputs.runtime_image_tag }}
+            BUILD_NUMBER=${{ github.run_number }}
+            RELEASE_VERSION=${{ inputs.version }}
+            ASSEMBLY_VERSION=${{ steps.info.outputs.version }}
+            COMMIT_HASH=${{ github.sha }}
+            PACKAGES_URL=${{ fromJson(inputs.settings).artifacts.npm.repoUrl }}
+            PACKAGES_USER=${{ secrets.GKS_GH_USER }}
+            PACKAGES_PAT=${{ secrets.GKS_GH_ACCESS_TOKEN }}
+          tags: |
+            ${{ steps.info.outputs.image_name }}:latest
+            ${{ steps.info.outputs.image_name }}:${{ steps.info.outputs.image_tag }}
+            ${{ steps.info.outputs.image_name }}:${{ steps.info.outputs.full_image_tag }}
+      -
+        name: Report Docker image
+        run: |
+          echo ':whale: ${{ steps.info.outputs.image_name }}:${{ steps.info.outputs.image_tag }}' >> $GITHUB_STEP_SUMMARY
+      -
+        name: Prepare success slack message
+        if: success()
+        run: |
+          STEP=$(echo ":white_check_mark: *Docker image*")
+          echo "STATUS_STEP=$STEP" >> $GITHUB_ENV
+      -
+        name: Prepare failure slack message
+        if: failure()
+        run: |
+          STEP=$(echo ":x: *Docker image*")
+          echo "STATUS_STEP=$STEP" >> $GITHUB_ENV
+      -
+        name: Prepare cancel slack message
+        if: cancelled()
+        run: |
+          STEP=$(echo ":grey_exclamation: *Docker image*")
+          echo "STATUS_STEP=$STEP" >> $GITHUB_ENV
+      -
+        name: Add build status notification step
+        if: always() && steps.slack.conclusion == 'success' && inputs.slack_artifact_name != ''
+        id: after-build-template
+        uses: Geta/gks/actions/add-notification-step@actions/v2
+        with:
+          template_path: ${{ env.SLACK_TEMPLATE_DIR }}/${{ inputs.slack_template_file }}
+          phase: ${{ inputs.phase }}
+          step: ${{ env.STATUS_STEP }}
+          state: ${{ steps.slack-build-start.outputs.state }}
+      -
+        name: Notify status
+        if: always() && inputs.slack_artifact_name != ''
+        uses: slackapi/slack-github-action@v1
+        with:
+          update-ts: ${{ steps.slack.outputs.ts }}
+          channel-id: ${{ fromJson(inputs.settings).general.slack.channel }}
+          payload-file-path: ${{ env.SLACK_TEMPLATE_DIR }}/${{ inputs.slack_template_file }}
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.GKS_GCC_SLACK_BOT_TOKEN }}

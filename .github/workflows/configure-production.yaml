@@ -1,0 +1,63 @@
+name: Configure Production Workflow
+on:
+  workflow_call:
+    inputs:
+      config_file:
+        required: false
+        type: string         
+        default: .github/config.json
+        description: Config file path
+    outputs:
+      settings:
+        value: ${{ jobs.configure.outputs.settings }}
+        description: Configuration JSON as string
+      version:
+        value: ${{ jobs.configure.outputs.version }}
+        description: Latest released version
+jobs:
+  configure:
+    runs-on: ubuntu-latest
+    outputs:
+      settings: ${{ steps.settings.outputs.settings }}
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      -
+        name: Match version format
+        uses: actions-ecosystem/action-regex-match@v2
+        id: regex
+        with:
+          text: ${{ github.head_ref }}
+          regex: '^((release|hotfix)\/v[0-9]+.[0-9]+.[0-9]+)$'
+      -
+        name: Validate version match
+        if: ${{ steps.regex.outputs.match == '' }}
+        run: |
+          echo "Invalid branch name '${{ github.head_ref }}'"
+          exit 1
+      -
+        name: Get version
+        id: version
+        run: |
+          VERSION=$(echo '${{ github.head_ref }}' | sed 's/release\///g' | sed 's/hotfix\///g')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+      - 
+        name: Check tag existence
+        uses: mukunku/tag-exists-action@v1.0.0
+        id: tag
+        with: 
+          tag: ${{ steps.version.outputs.version }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GKS_GH_ACCESS_TOKEN }}
+      -
+        name: Fail if tag exists
+        if: steps.tag.outputs.exists == 'true'
+        run: |
+          echo "Release with tag '${{ steps.version.outputs.version }}' already exists"
+          exit 1
+      -
+        uses: Geta/gks/actions/read-config-file@actions/v2
+        id: settings
+        with:
+          file: ${{ inputs.config_file }}
+          ref: ${{ github.ref }}
+          gh_token: ${{ secrets.GKS_GH_ACCESS_TOKEN }}

@@ -1,0 +1,45 @@
+name: Configure Test Workflow
+on:
+  workflow_call:
+    inputs:
+      config_file:
+        required: false
+        type: string
+        default: .github/config.json
+        description: Config file path
+    outputs:
+      settings:
+        value: ${{ jobs.configure.outputs.settings }}
+        description: Configuration JSON as string
+      version:
+        value: ${{ jobs.configure.outputs.version }}
+        description: Latest released version
+jobs:
+  configure:
+    runs-on: ubuntu-latest
+    outputs:
+      settings: ${{ steps.settings.outputs.settings }}
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      -
+        uses: Geta/gks/actions/read-config-file@actions/v2
+        id: settings
+        with:
+          file: ${{ inputs.config_file }}
+          ref: ${{ github.ref }}
+          gh_token: ${{ secrets.GKS_GH_ACCESS_TOKEN }}
+      -
+        name: Get latest tag
+        id: tag
+        continue-on-error: true
+        uses: oprypin/find-latest-tag@v1
+        with:
+          repository: ${{ github.repository_owner }}/${{ github.event.repository.name }}
+          token: ${{ secrets.GKS_GH_ACCESS_TOKEN }}
+      -
+        name: Get version
+        id: version
+        run: |
+          TAG=$(echo "${{ steps.tag.outputs.tag }}")
+          TAG="${TAG:-v1.0.0}"
+          echo "version=$TAG" >> $GITHUB_OUTPUT

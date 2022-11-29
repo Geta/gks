@@ -1,0 +1,42 @@
+name: Add notification step
+inputs:
+  template_path:
+    required: true
+    type: string
+    description: Notification template file path
+  step:
+    required: true
+    type: string
+    description: Step to add
+  phase:
+    required: true
+    type: number
+    description: Step to replace
+  state:
+    required: true
+    type: string
+    description: Message state
+outputs:
+  state:
+    value: ${{ steps.template.outputs.state }}
+    description: Message state
+runs:
+  using: "composite"
+  steps:
+    -
+      name: Add step
+      id: template
+      shell: bash
+      run: |
+        STATE=$(echo "${{ inputs.state }}" | base64 -w 0 --decode)
+        echo $STATE
+        STEP=$(echo "${{ inputs.step }}")
+        STATE=$(jq ".phases[${{ inputs.phase }}] = \"$STEP\"" <<< $STATE)
+        MARKDOWN=$(jq '.phases | map(.) | join("\n")' <<< $STATE)
+        echo $MARKDOWN
+        TEMPLATE=$(cat "${{ inputs.template_path }}")
+        TEMPLATE=$(jq ".blocks[4].text.text = $MARKDOWN" <<< $TEMPLATE)
+        echo $TEMPLATE
+        echo $TEMPLATE > ${{ inputs.template_path }}
+        BASE64="$(echo $STATE | base64 -w 0)"
+        echo "state=$BASE64" >> $GITHUB_OUTPUT

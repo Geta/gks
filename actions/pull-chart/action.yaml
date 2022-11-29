@@ -6,7 +6,7 @@ inputs:
     required: true
   chart_version:
     required: false
-  repo_project:
+  repo_alias:
     required: false
   allow_prerelease:
     requred: false
@@ -21,13 +21,13 @@ runs:
         rm -rf ${{ inputs.chart_dir }}
         if [ -n "${{ inputs.chart_version }}" ]
         then
-          helm pull '${{ inputs.repo_project }}/${{ inputs.chart_name }}' --version ${{ inputs.chart_version }} --untar --untardir ${{ inputs.chart_dir }}
+          helm pull '${{ inputs.repo_alias }}/${{ inputs.chart_name }}' --version ${{ inputs.chart_version }} --untar --untardir ${{ inputs.chart_dir }}
         else
           if [ ${{ env.allow_prerelease }} ]
           then
-            helm pull '${{ inputs.repo_project }}/${{ inputs.chart_name }}' --devel --untar --untardir ${{ inputs.chart_dir }}
+            helm pull '${{ inputs.repo_alias }}/${{ inputs.chart_name }}' --devel --untar --untardir ${{ inputs.chart_dir }}
           else
-            helm pull '${{ inputs.repo_project }}/${{ inputs.chart_name }}' --untar --untardir ${{ inputs.chart_dir }}
+            helm pull '${{ inputs.repo_alias }}/${{ inputs.chart_name }}' --untar --untardir ${{ inputs.chart_dir }}
           fi
         fi
         mv ${{ inputs.chart_dir }}/${{ inputs.chart_name }}/* ${{ inputs.chart_dir }}

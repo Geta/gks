@@ -1,0 +1,32 @@
+name: Add Helm Repo
+inputs:
+  alias:
+    required: true
+    type: string
+    description: 'Helm repository alias'
+  user:
+    required: true
+    type: string
+    description: 'Helm repository user'
+  token:
+    required: true
+    type: string
+    description: 'Helm repository token'
+  url:
+    required: true
+    type: string
+    description: 'Helm repository url'
+runs:
+  using: "composite"
+  steps:
+    -
+      name: Add Helm repository
+      id: repo
+      shell: bash
+      run: |
+        helm repo add --username '${{ inputs.user }}' --password '${{ inputs.token }}' ${{ inputs.alias }} ${{ inputs.url }}
+        echo "alias=${{ inputs.alias }}" >> $GITHUB_OUTPUT
+    - 
+      name: Update HELM repository
+      shell: bash
+      run: helm repo update ${{ steps.repo.outputs.alias }}
