@@ -147,7 +147,6 @@ jobs:
             RELEASE_VERSION=${{ inputs.version }}
             ASSEMBLY_VERSION=${{ steps.info.outputs.version }}
             COMMIT_HASH=${{ github.sha }}
-            PACKAGES_URL=${{ fromJson(inputs.settings).artifacts.npm.repoUrl }}
             PACKAGES_USER=${{ secrets.GKS_GH_USER }}
             PACKAGES_PAT=${{ secrets.GKS_GH_ACCESS_TOKEN }}
             ${{ inputs.args }}

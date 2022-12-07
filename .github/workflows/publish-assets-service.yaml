@@ -46,6 +46,7 @@ jobs:
       slack_template_file: ${{ needs.setup.outputs.template_file }}
       slack_phase_state: ${{ needs.setup.outputs.phase_state }}
       args: |
+        PACKAGES_URL=${{ fromJson(inputs.settings).artifacts.nuget.repoUrl }}
         GENERATE_TS_CLIENT=${{ fromJson(inputs.settings).general.apps[inputs.app_index].publishClient }}
         PROVIDER_TYPE=${{ fromJson(inputs.settings).general.apps[inputs.app_index].provider }}
 
