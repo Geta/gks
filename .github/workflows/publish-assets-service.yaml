@@ -30,6 +30,7 @@ on:
         description: JSON settings string
 jobs:
   setup:
+    name: Set up notifications
     uses: Geta/gks/.github/workflows/configure-notifications.yaml@workflows/v2
     secrets: inherit
     with:
@@ -42,6 +43,7 @@ jobs:
         :grey_question: *Helm chart*
 
   publish-docker:
+    name: Publish Docker image
     needs: [ setup ]
     uses: Geta/gks/.github/workflows/publish-docker.yaml@workflows/xxx
     secrets: inherit
@@ -59,6 +61,7 @@ jobs:
       #!   PROVIDER_TYPE=${{ fromJson(inputs.args).arg }}
 
   publish-helm:
+    name: Publish Helm chart
     needs: [ setup, publish-docker ]
     uses: Geta/gks/.github/workflows/publish-helm.yaml@workflows/v2
     secrets: inherit
