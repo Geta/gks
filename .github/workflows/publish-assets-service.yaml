@@ -17,10 +17,12 @@ on:
       arg:
         required: false
         type: string
+        default: ''
         description: Build argument
       icon:
         required: false
         type: string
+        default: ''
         description: Icon
       settings:
         required: true
@@ -52,9 +54,9 @@ jobs:
       slack_artifact_name: ${{ needs.setup.outputs.artifact }}
       slack_template_file: ${{ needs.setup.outputs.template_file }}
       slack_phase_state: ${{ needs.setup.outputs.phase_state }}
-      args: |
-        GENERATE_TS_CLIENT=true
-        PROVIDER_TYPE=${{ fromJson(inputs.args).arg }}
+      #! args: |
+      #!   GENERATE_TS_CLIENT=true
+      #!   PROVIDER_TYPE=${{ fromJson(inputs.args).arg }}
 
   publish-helm:
     needs: [ setup, publish-docker ]
