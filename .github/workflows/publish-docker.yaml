@@ -22,6 +22,11 @@ on:
         required: true
         type: string
         description: Settings json string
+      args:
+        required: false
+        type: string
+        default: ''
+        description: Additional build arguments
       slack_artifact_name:
         required: false
         type: string
@@ -145,6 +150,7 @@ jobs:
             PACKAGES_URL=${{ fromJson(inputs.settings).artifacts.npm.repoUrl }}
             PACKAGES_USER=${{ secrets.GKS_GH_USER }}
             PACKAGES_PAT=${{ secrets.GKS_GH_ACCESS_TOKEN }}
+            ${{ inuputs.args }}
           tags: |
             ${{ steps.info.outputs.image_name }}:latest
             ${{ steps.info.outputs.image_name }}:${{ steps.info.outputs.image_tag }}

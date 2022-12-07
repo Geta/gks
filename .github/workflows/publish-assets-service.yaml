@@ -1,0 +1,74 @@
+name: Publish Service Assets
+on:
+  workflow_call:
+    inputs:
+      env:
+        required: true
+        type: string
+        description: Environment name
+      version:
+        required: true
+        type: string
+        description: Version number
+      app:
+        required: true
+        type: string
+        description: App identifier
+      arg:
+        required: false
+        type: string
+        description: Build argument
+      icon:
+        required: false
+        type: string
+        description: Icon
+      settings:
+        required: true
+        type: string
+        description: JSON settings string
+jobs:
+  setup:
+    uses: Geta/gks/.github/workflows/configure-notifications.yaml@workflows/v2
+    secrets: inherit
+    with:
+      app: ${{ inputs.app }}
+      icon: ${{ inputs.icon }}
+      version: ${{ inputs.version }}
+      settings: ${{ inputs.settings }}
+      initial_state: |
+        :hourglass: *Docker image*
+        :grey_question: *Helm chart*
+
+  publish-docker:
+    needs: [ setup ]
+    uses: Geta/gks/.github/workflows/publish-docker.yaml@workflows/v2
+    secrets: inherit
+    with:
+      phase: 0
+      app: ${{ inputs.app }}
+      env: ${{ inputs.env }}
+      version: ${{ inputs.version }}
+      settings: ${{ inputs.settings }}
+      slack_artifact_name: ${{ needs.setup.outputs.artifact }}
+      slack_template_file: ${{ needs.setup.outputs.template_file }}
+      slack_phase_state: ${{ needs.setup.outputs.phase_state }}
+      args: |
+        GENERATE_TS_CLIENT=true
+        PROVIDER_TYPE=${{ fromJson(inputs.args).arg }}
+
+  publish-helm:
+    needs: [ setup, publish-docker ]
+    uses: Geta/gks/.github/workflows/publish-helm.yaml@workflows/v2
+    secrets: inherit
+    with:
+      phase: 1
+      app: ${{ inputs.app }}
+      env: ${{ inputs.env }}
+      version: ${{ inputs.version }}
+      settings: ${{ inputs.settings }}
+      image_name: ${{ needs.publish-docker.outputs.image_name }}
+      image_tag: ${{ needs.publish-docker.outputs.image_tag }}
+      slack_artifact_name: ${{ needs.setup.outputs.artifact }}
+      slack_template_file: ${{ needs.setup.outputs.template_file }}
+      slack_phase_state: ${{ needs.publish-docker.outputs.slack_state }}
+      slack_message_id: ${{ needs.publish-docker.outputs.slack_message_id }}
