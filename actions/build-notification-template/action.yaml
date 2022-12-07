@@ -81,6 +81,7 @@ runs:
       shell: bash
       run: |
         ICON=$(echo "${{ github.workspace}}/${{ inputs.icon_url }}")
+        echo $ICON
         HASH=$(echo "${{ inputs.hash }}")
         HASH=$(echo "${HASH:0:10}")
         JSON=$(cat ${{ steps.file.outputs.file }})
