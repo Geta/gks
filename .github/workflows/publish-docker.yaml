@@ -150,7 +150,7 @@ jobs:
             PACKAGES_URL=${{ fromJson(inputs.settings).artifacts.npm.repoUrl }}
             PACKAGES_USER=${{ secrets.GKS_GH_USER }}
             PACKAGES_PAT=${{ secrets.GKS_GH_ACCESS_TOKEN }}
-            ${{ inuputs.args }}
+            ${{ inputs.args }}
           tags: |
             ${{ steps.info.outputs.image_name }}:latest
             ${{ steps.info.outputs.image_name }}:${{ steps.info.outputs.image_tag }}
