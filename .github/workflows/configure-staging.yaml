@@ -46,30 +46,42 @@ jobs:
         name: Check branch origin
         id: origin
         run: |
-          PARENT=$(git log --pretty=format:'%D' 'HEAD^' | grep 'origin/' | head -n1 | sed 's@origin/@@' | sed 's@,.*@@')
-          echo $PARENT
-          echo "parent=$PARENT" >> $GITHUB_OUTPUT
           PREFIX=$(echo '${{ github.ref_name }}' | cut -d '/' -f 1)
           echo $PREFIX
           echo "prefix=$PREFIX" >> $GITHUB_OUTPUT
       -
         name: Validate hotfix parent branch
-        if: steps.origin.outputs.prefix == 'hotfix' && steps.origin.outputs.parent != 'main' && steps.origin.outputs.parent != 'master'
+        if: steps.origin.outputs.prefix == 'hotfix'
         run: |
-          echo "Invalid parent branch '${{ steps.origin.outputs.parent }}', should be 'main' or 'master'"
-          exit 1
+          git checkout ${{ github.event.repository.default_branch }}
+          git checkout ${{ github.ref_name }}
+          PARENT=$(git show-branch -a | grep '\*' | grep -v `git rev-parse --abbrev-ref HEAD` | head -n1 | sed 's/.*\[\(.*\)\].*/\1/' | sed 's/[\^~].*//')
+          echo $PARENT
+          if [ $PARENT != '${{ github.event.repository.default_branch }}' ]
+          then
+            echo "Invalid parent branch '$PARENT', should be '${{ github.event.repository.default_branch }}'"
+            exit 2
+          fi
       -
         name: Validate release parent branch
-        if: steps.origin.outputs.prefix == 'release' && steps.origin.outputs.parent != 'develop'
+        if: steps.origin.outputs.prefix == 'release'
         run: |
-          echo "Invalid parent branch '${{ steps.origin.outputs.parent }}', should be 'develop'"
-          exit 1
+          BRANCH='develop'
+          git checkout $BRANCH
+          git checkout ${{ github.ref_name }}
+          PARENT=$(git show-branch -a | grep '\*' | grep -v `git rev-parse --abbrev-ref HEAD` | head -n1 | sed 's/.*\[\(.*\)\].*/\1/' | sed 's/[\^~].*//')
+          echo $PARENT
+          if [ $PARENT != $BRANCH ]
+          then
+            echo "Invalid parent branch '$PARENT', should be '$BRANCH'"
+            exit 3
+          fi
       - 
         name: Validate branch
         if: steps.origin.outputs.prefix == ''
         run: |
           echo "Error parsing branch name"
-          exit 1
+          exit 4
       -
         name: Get version
         id: version
@@ -89,7 +101,7 @@ jobs:
         if: steps.tag.outputs.exists == 'true'
         run: |
           echo "Release with tag '${{ steps.version.outputs.version }}' already exists"
-          exit 1
+          exit 5
       -
         uses: Geta/gks/actions/read-config-file@actions/v2
         id: settings

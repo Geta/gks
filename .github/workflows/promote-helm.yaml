@@ -113,8 +113,11 @@ jobs:
         id: chart
         run: |
           PREFIX=$([[ '${{ fromJson(inputs.settings).build.helm.chartNamePrefix }}' != '' ]] && echo '${{ fromJson(inputs.settings).build.helm.chartNamePrefix }}-' || echo '')
-          DST_NAME=$(echo "${{ inputs.app }}-${{ inputs.env }}")
-          SRC_NAME=$(echo "$DST_NAME-${{ inputs.env }}")
+          echo $PREFIX
+          DST_NAME=$(echo "${PREFIX}${{ inputs.app }}")
+          echo $DST_NAME
+          SRC_NAME=$(echo "${DST_NAME}-${{ inputs.env }}")
+          echo $SRC_NAME
           echo "src_chart=$SRC_NAME" >> $GITHUB_OUTPUT
           echo "dst_chart=$DST_NAME" >> $GITHUB_OUTPUT
       -
