@@ -80,7 +80,7 @@ runs:
       id: template
       shell: bash
       run: |
-        ICON=$([[ '${{ inputs.icon_url }}' != '' ]] && echo "${{ inputs.icon_url }}" || echo "https://www.getadigital.com/images/logo-white.png")
+        ICON=$(echo "${{ github.workspace}}/${{ inputs.icon_url }}")
         HASH=$(echo "${{ inputs.hash }}")
         HASH=$(echo "${HASH:0:10}")
         JSON=$(cat ${{ steps.file.outputs.file }})
