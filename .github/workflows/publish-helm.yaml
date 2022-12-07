@@ -6,10 +6,10 @@ on:
         required: true
         type: number
         description: Build phase index
-      app:
+      app_index:
         required: true
-        type: string
-        description: Application name
+        type: number
+        description: Application settings index
       env:
         required: true
         type: string
@@ -122,7 +122,7 @@ jobs:
         id: chart
         run: |
           PREFIX=$([[ '${{ fromJson(inputs.settings).build.helm.chartNamePrefix }}' != '' ]] && echo '${{ fromJson(inputs.settings).build.helm.chartNamePrefix }}-' || echo '')
-          NAME=$(echo ${{ inputs.app }}-${{ inputs.env }})
+          NAME=$(echo ${{ fromJson(inputs.settings).general.apps[inputs.app_index].name }}-${{ inputs.env }})
           CHART_NAME="$PREFIX$NAME"
           CHART_VERSION="${{ inputs.version }}-${{ github.run_number }}"
           echo "chart_name=$CHART_NAME" >> $GITHUB_OUTPUT
@@ -141,7 +141,7 @@ jobs:
         with:
           chart_dir: chart/${{ fromJson(inputs.settings).build.helm.templateChart.name }}
           chart_name: ${{ steps.chart.outputs.chart_name }}
-          chart_description: ${{ inputs.app }} chart
+          chart_description: ${{ fromJson(inputs.settings).general.apps[inputs.app_index].name }} chart
           chart_version: ${{ steps.chart.outputs.chart_version }}
           chart_app_version: ${{ steps.chart.outputs.chart_version }}
           docker_image_url: ${{ inputs.image_name }}

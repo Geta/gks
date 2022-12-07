@@ -10,7 +10,7 @@ on:
         required: true
         type: string
         description: Version number
-      index:
+      app_index:
         required: true
         type: number
         description: App settings index
@@ -21,11 +21,10 @@ on:
 jobs:
   setup:
     name: Set up notifications
-    uses: Geta/gks/.github/workflows/configure-notifications.yaml@workflows/v2
+    uses: Geta/gks/.github/workflows/configure-notifications.yaml@workflows/v3
     secrets: inherit
     with:
-      app: ${{ fromJson(inputs.settings).general.apps[inputs.index].name }}
-      icon: ${{ fromJson(inputs.settings).general.apps[inputs.index].icon }}
+      app_index: ${{ inputs.app_index }}
       version: ${{ inputs.version }}
       settings: ${{ inputs.settings }}
       initial_state: |
@@ -35,29 +34,29 @@ jobs:
   publish-docker:
     name: Publish Docker image
     needs: [ setup ]
-    uses: Geta/gks/.github/workflows/publish-docker.yaml@workflows/xxx
+    uses: Geta/gks/.github/workflows/publish-docker.yaml@workflows/v3
     secrets: inherit
     with:
       phase: 0
-      app: ${{ fromJson(inputs.settings).general.apps[inputs.index].name }}
+      app_index: ${{ inputs.app_index }}
       env: ${{ inputs.env }}
       version: ${{ inputs.version }}
       settings: ${{ inputs.settings }}
       slack_artifact_name: ${{ needs.setup.outputs.artifact }}
       slack_template_file: ${{ needs.setup.outputs.template_file }}
       slack_phase_state: ${{ needs.setup.outputs.phase_state }}
-      #! args: |
-      #!   GENERATE_TS_CLIENT=true
-      #!   PROVIDER_TYPE=${{ fromJson(inputs.args).arg }}
+      args: |
+        GENERATE_TS_CLIENT=${{ fromJson(inputs.settings).general.apps[inputs.app_index].publishClient }}
+        PROVIDER_TYPE=${{ fromJson(inputs.settings).general.apps[inputs.app_index].provider }}
 
   publish-helm:
     name: Publish Helm chart
     needs: [ setup, publish-docker ]
-    uses: Geta/gks/.github/workflows/publish-helm.yaml@workflows/v2
+    uses: Geta/gks/.github/workflows/publish-helm.yaml@workflows/v3
     secrets: inherit
     with:
       phase: 1
-      app: ${{ fromJson(inputs.settings).general.apps[inputs.index].name }}
+      app_index: ${{ inputs.app_index }}
       env: ${{ inputs.env }}
       version: ${{ inputs.version }}
       settings: ${{ inputs.settings }}

@@ -6,10 +6,10 @@ on:
         required: true
         type: number
         description: Build phase index
-      app:
+      app_index:
         required: true
-        type: string
-        description: Application name
+        type: number
+        description: Application settings index
       env:
         required: true
         type: string
@@ -114,7 +114,7 @@ jobs:
         name: Compose Docker build info
         id: info
         run: |
-          IMAGE_NAME=${{ fromJson(inputs.settings).artifacts.docker.repoUrl }}/${{ inputs.app }}/${{ inputs.env }}
+          IMAGE_NAME=${{ fromJson(inputs.settings).artifacts.docker.repoUrl }}/${{ fromJson(inputs.settings).general.apps[inputs.app_index].name }}/${{ inputs.env }}
           echo "image_name=$IMAGE_NAME" >> $GITHUB_OUTPUT
           IMAGE_TAG='${{ inputs.version }}.${{ github.run_number }}'
           echo "image_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT

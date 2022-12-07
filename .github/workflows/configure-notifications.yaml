@@ -2,15 +2,10 @@ name: Configure notifications
 on:
   workflow_call:
     inputs:
-      app:
+      app_index:
         required: true
-        type: string
-        description: Application name
-      icon:
-        required: false
-        type: string
-        default: ''
-        description: Application icon
+        type: number
+        description: Application settings index
       version:
         required: true
         type: string
@@ -49,8 +44,8 @@ jobs:
         with:
           title: ${{ github.workflow }}
           user: ${{ github.actor }}
-          app: ${{ inputs.app }}
-          icon_url: ${{ inputs.icon }}
+          app: ${{ fromJson(inputs.settings).general.apps[inputs.app_index].name }}
+          icon_url: ${{ fromJson(inputs.settings).general.apps[inputs.app_index].icon }}
           action_url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           version: ${{ inputs.version }}.${{ github.run_number }}
           hash: ${{ github.sha }}
