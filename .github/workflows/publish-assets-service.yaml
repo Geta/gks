@@ -41,7 +41,7 @@ jobs:
 
   publish-docker:
     needs: [ setup ]
-    uses: Geta/gks/.github/workflows/publish-docker.yaml@workflows/v2
+    uses: Geta/gks/.github/workflows/publish-docker.yaml@workflows/xxx
     secrets: inherit
     with:
       phase: 0
