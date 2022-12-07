@@ -10,20 +10,10 @@ on:
         required: true
         type: string
         description: Version number
-      app:
+      index:
         required: true
-        type: string
-        description: App identifier
-      test:
-        required: false
-        type: string
-        default: ''
-        description: Build argument
-      icon:
-        required: false
-        type: string
-        default: ''
-        description: Icon
+        type: number
+        description: App settings index
       settings:
         required: true
         type: string
@@ -34,8 +24,8 @@ jobs:
     uses: Geta/gks/.github/workflows/configure-notifications.yaml@workflows/v2
     secrets: inherit
     with:
-      app: ${{ inputs.app }}
-      icon: ${{ inputs.icon }}
+      app: ${{ fromJson(inputs.settings).general.apps[${{ inputs.index }}].name }}
+      icon: ${{ fromJson(inputs.settings).general.apps[${{ inputs.index }}].icon }}
       version: ${{ inputs.version }}
       settings: ${{ inputs.settings }}
       initial_state: |
@@ -49,7 +39,7 @@ jobs:
     secrets: inherit
     with:
       phase: 0
-      app: ${{ inputs.app }}
+      app: ${{ fromJson(inputs.settings).general.apps[${{ inputs.index }}].name }}
       env: ${{ inputs.env }}
       version: ${{ inputs.version }}
       settings: ${{ inputs.settings }}
@@ -67,7 +57,7 @@ jobs:
     secrets: inherit
     with:
       phase: 1
-      app: ${{ inputs.app }}
+      app: ${{ fromJson(inputs.settings).general.apps[${{ inputs.index }}].name }}
       env: ${{ inputs.env }}
       version: ${{ inputs.version }}
       settings: ${{ inputs.settings }}
