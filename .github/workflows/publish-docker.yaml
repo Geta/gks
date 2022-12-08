@@ -128,7 +128,7 @@ jobs:
           echo "build_image_tag=$BUILD_IMAGE_TAG" >> $GITHUB_OUTPUT
           RUNTIME_IMAGE_TAG=$([[ '${{ fromJson(inputs.settings).build.docker.baseImages.runtime }}' != '' ]] && echo "RUNTIME_IMAGE_TAG=${{ fromJson(inputs.settings).build.docker.baseImages.runtime }}" || echo "")
           echo "runtime_image_tag=$RUNTIME_IMAGE_TAG" >> $GITHUB_OUTPUT
-          DOCKERFILE=$([[ '${{ fromJson(inputs.settings).general.apps[inputs.app_index].build.dockerFile }}' != '' ]] && echo "${{ fromJson(inputs.settings).general.apps[inputs.app_index].docker.file }}" || echo "${{ fromJson(inputs.settings).build.docker.file }}")
+          DOCKERFILE=$([[ '${{ fromJson(inputs.settings).general.apps[inputs.app_index].build.dockerFile }}' != '' ]] && echo "${{ fromJson(inputs.settings).general.apps[inputs.app_index].build.dockerFile }}" || echo "${{ fromJson(inputs.settings).build.docker.file }}")
           echo "dockerfile=$DOCKERFILE" >> $GITHUB_OUTPUT
       - 
         name: Build Docker image
