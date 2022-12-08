@@ -128,6 +128,8 @@ jobs:
           echo "build_image_tag=$BUILD_IMAGE_TAG" >> $GITHUB_OUTPUT
           RUNTIME_IMAGE_TAG=$([[ '${{ fromJson(inputs.settings).build.docker.baseImages.runtime }}' != '' ]] && echo "RUNTIME_IMAGE_TAG=${{ fromJson(inputs.settings).build.docker.baseImages.runtime }}" || echo "")
           echo "runtime_image_tag=$RUNTIME_IMAGE_TAG" >> $GITHUB_OUTPUT
+          DOCKERFILE=$([[ '${{ fromJson(inputs.settings).general.apps[inputs.app_index].docker.file }}' != '' ]] && echo "${{ fromJson(inputs.settings).general.apps[inputs.app_index].docker.file }}" || echo "${{ fromJson(inputs.settings).build.docker.file }}")
+          echo "dockerfile=$DOCKERFILE" >> $GITHUB_OUTPUT
       - 
         name: Build Docker image
         uses: docker/build-push-action@v3
@@ -138,7 +140,7 @@ jobs:
           #cache-to: 'type=registry,mode=max,ref=${{ env.cache_image }}'
           push: true
           context: ${{ fromJson(inputs.settings).build.docker.context }}
-          file: ${{ fromJson(inputs.settings).build.docker.file }}
+          file: ${{ steps.info.outputs.dockerfile }}
           build-args: |
             ${{ steps.info.outputs.registry }}
             ${{ steps.info.outputs.build_image_tag }}
