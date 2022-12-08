@@ -151,6 +151,8 @@ jobs:
             COMMIT_HASH=${{ github.sha }}
             PACKAGES_USER=${{ secrets.GKS_GH_USER }}
             PACKAGES_PAT=${{ secrets.GKS_GH_ACCESS_TOKEN }}
+            ENVIRONMENT=CI
+            TEST_FILTER=${{ fromJson(inputs.settings).general.apps[inputs.app_index].tests.filter }}
             ${{ inputs.args }}
           tags: |
             ${{ steps.info.outputs.image_name }}:latest
