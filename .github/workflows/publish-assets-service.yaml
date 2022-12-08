@@ -47,7 +47,8 @@ jobs:
       slack_phase_state: ${{ needs.setup.outputs.phase_state }}
       args: |
         PACKAGES_URL=${{ fromJson(inputs.settings).artifacts.nuget.repoUrl }}/index.json
-        GENERATE_TS_CLIENT=${{ fromJson(inputs.settings).general.apps[inputs.app_index].publishClient }}
+        PUBLISH_CLIENT=${{ fromJson(inputs.settings).general.apps[inputs.app_index].publishClient }}
+        PUBLISH_MODELS=${{ fromJson(inputs.settings).general.apps[inputs.app_index].publishModels }}
         PROVIDER_TYPE=${{ fromJson(inputs.settings).general.apps[inputs.app_index].provider }}
 
   publish-helm:

@@ -128,7 +128,7 @@ jobs:
           echo "build_image_tag=$BUILD_IMAGE_TAG" >> $GITHUB_OUTPUT
           RUNTIME_IMAGE_TAG=$([[ '${{ fromJson(inputs.settings).build.docker.baseImages.runtime }}' != '' ]] && echo "RUNTIME_IMAGE_TAG=${{ fromJson(inputs.settings).build.docker.baseImages.runtime }}" || echo "")
           echo "runtime_image_tag=$RUNTIME_IMAGE_TAG" >> $GITHUB_OUTPUT
-          DOCKERFILE=$([[ '${{ fromJson(inputs.settings).general.apps[inputs.app_index].docker.file }}' != '' ]] && echo "${{ fromJson(inputs.settings).general.apps[inputs.app_index].docker.file }}" || echo "${{ fromJson(inputs.settings).build.docker.file }}")
+          DOCKERFILE=$([[ '${{ fromJson(inputs.settings).general.apps[inputs.app_index].build.dockerFile }}' != '' ]] && echo "${{ fromJson(inputs.settings).general.apps[inputs.app_index].docker.file }}" || echo "${{ fromJson(inputs.settings).build.docker.file }}")
           echo "dockerfile=$DOCKERFILE" >> $GITHUB_OUTPUT
       - 
         name: Build Docker image
@@ -152,6 +152,8 @@ jobs:
             PACKAGES_USER=${{ secrets.GKS_GH_USER }}
             PACKAGES_PAT=${{ secrets.GKS_GH_ACCESS_TOKEN }}
             ENVIRONMENT=CI
+            SOLUTION=${{ ${{ fromJson(inputs.settings).general.apps[inputs.app_index].build.solution }}
+            PROJECT=${{ ${{ fromJson(inputs.settings).general.apps[inputs.app_index].build.product }}
             TEST_FILTER=${{ fromJson(inputs.settings).general.apps[inputs.app_index].tests.filter }}
             ${{ inputs.args }}
           tags: |
