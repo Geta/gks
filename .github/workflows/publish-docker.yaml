@@ -152,8 +152,8 @@ jobs:
             PACKAGES_USER=${{ secrets.GKS_GH_USER }}
             PACKAGES_PAT=${{ secrets.GKS_GH_ACCESS_TOKEN }}
             ENVIRONMENT=CI
-            SOLUTION=${{ ${{ fromJson(inputs.settings).general.apps[inputs.app_index].build.solution }}
-            PROJECT=${{ ${{ fromJson(inputs.settings).general.apps[inputs.app_index].build.product }}
+            SOLUTION=${{ fromJson(inputs.settings).general.apps[inputs.app_index].build.solution }}
+            PROJECT=${{ fromJson(inputs.settings).general.apps[inputs.app_index].build.product }}
             TEST_FILTER=${{ fromJson(inputs.settings).general.apps[inputs.app_index].tests.filter }}
             ${{ inputs.args }}
           tags: |
