@@ -47,6 +47,7 @@ jobs:
       slack_phase_state: ${{ needs.setup.outputs.phase_state }}
       args: |
         PACKAGES_URL=${{ fromJson(inputs.settings).artifacts.npm.repoUrl }}
+        TENANT_NAME=${{ fromJson(inputs.settings).general.apps[inputs.app_index].tenant }}
 
   publish-helm:
     name: Publish Helm chart
