@@ -100,7 +100,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GKS_GH_ACCESS_TOKEN }}
       -
         name: Install Helm Push plugin
-        run: helm plugin install https://github.com/chartmuseum/helm-push.git
+        run: helm plugin install --version v0.10.3 https://github.com/chartmuseum/helm-push.git
       -
         name: Add main Helm repo
         uses: Geta/gks/actions/add-helm-repo@actions/v2
