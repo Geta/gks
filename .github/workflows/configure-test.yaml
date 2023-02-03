@@ -41,5 +41,5 @@ jobs:
         id: version
         run: |
           TAG=$(echo "${{ steps.tag.outputs.tag }}")
-          TAG="${TAG:-v0.1.0}"
+          TAG="${TAG:-v1.0.0}"
           echo "version=$TAG" >> $GITHUB_OUTPUT
