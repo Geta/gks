@@ -10,38 +10,34 @@ on:
         required: true
         type: string
         description: Version number
-      app:
+      app_index:
         required: true
-        type: string
-        description: App identifier
-      icon:
-        required: false
-        type: string
-        description: Icon
+        type: number
+        description: App settings index
       settings:
         required: true
         type: string
         description: JSON settings string
 jobs:
   setup:
-    uses: Geta/gks/.github/workflows/configure-notifications.yaml@workflows/v2
+    uses: Geta/gks/.github/workflows/configure-notifications.yaml@workflows/v3
     secrets: inherit
     with:
-      app: ${{ inputs.app }}
-      icon: ${{ inputs.icon }}
+      app_index: ${{ inputs.app_index }}
       version: ${{ inputs.version }}
       settings: ${{ inputs.settings }}
       initial_state: |
         :hourglass: *Docker image*
         :grey_question: *Helm chart*
 
-  publish-docker:
+  promote-docker:
+    name: Promote Docker image
     needs: [ setup ]
-    uses: Geta/gks/.github/workflows/promote-docker.yaml@workflows/v2
+    uses: Geta/gks/.github/workflows/promote-docker.yaml@workflows/v3
     secrets: inherit
     with:
       phase: 0
-      app: ${{ inputs.app }}
+      app_index: ${{ inputs.app_index }}
       env: ${{ inputs.env }}
       version: ${{ inputs.version }}
       settings: ${{ inputs.settings }}
@@ -49,19 +45,19 @@ jobs:
       slack_template_file: ${{ needs.setup.outputs.template_file }}
       slack_phase_state: ${{ needs.setup.outputs.phase_state }}
 
-  publish-helm:
-    needs: [ setup, publish-docker ]
-    uses: Geta/gks/.github/workflows/promote-helm.yaml@workflows/v2
+  promote-helm:
+    needs: [ setup, promote-docker ]
+    uses: Geta/gks/.github/workflows/promote-helm.yaml@workflows/v3
     secrets: inherit
     with:
       phase: 1
-      app: ${{ inputs.app }}
+      app_index: ${{ inputs.app_index }}
       env: ${{ inputs.env }}
       version: ${{ inputs.version }}
       settings: ${{ inputs.settings }}
-      image_name: ${{ needs.publish-docker.outputs.image_name }}
-      image_tag: ${{ needs.publish-docker.outputs.image_tag }}
+      image_name: ${{ needs.promote-docker.outputs.image_name }}
+      image_tag: ${{ needs.promote-docker.outputs.image_tag }}
       slack_artifact_name: ${{ needs.setup.outputs.artifact }}
       slack_template_file: ${{ needs.setup.outputs.template_file }}
-      slack_phase_state: ${{ needs.publish-docker.outputs.slack_state }}
-      slack_message_id: ${{ needs.publish-docker.outputs.slack_message_id }}
+      slack_phase_state: ${{ needs.promote-docker.outputs.slack_state }}
+      slack_message_id: ${{ needs.promote-docker.outputs.slack_message_id }}
