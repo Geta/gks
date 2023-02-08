@@ -53,8 +53,8 @@ jobs:
   docker:
     runs-on: ubuntu-latest
     outputs:
-      image_name: ${{ steps.info.outputs.image_name }}
-      image_tag: ${{ steps.info.outputs.image_tag }}
+      image_name: ${{ steps.push.outputs.image_name }}
+      image_tag: ${{ steps.push.outputs.image_tag }}
       slack_state: ${{ steps.after-build-template.outputs.state }}
       slack_message_id: ${{ steps.slack.outputs.ts }}
     env:
@@ -121,6 +121,7 @@ jobs:
           docker push "$IMAGE:latest"
           docker push "$IMAGE:${{ inputs.version }}"
           echo "image_name=$IMAGE" >> $GITHUB_OUTPUT
+          echo "image_tag=${{ inputs.version }}" >> $GITHUB_OUTPUT
       -
         name: Report Docker image
         run: |
