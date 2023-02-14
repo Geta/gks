@@ -20,7 +20,7 @@ on:
         description: JSON settings string
 jobs:
   setup:
-    uses: Geta/gks/.github/workflows/configure-notifications.yaml@workflows/v3
+    uses: Geta/gks/.github/workflows/configure-notifications.yaml@workflows/v4
     secrets: inherit
     with:
       app_index: ${{ inputs.app_index }}
@@ -33,7 +33,7 @@ jobs:
   promote-docker:
     name: Promote Docker image
     needs: [ setup ]
-    uses: Geta/gks/.github/workflows/promote-docker.yaml@workflows/v3
+    uses: Geta/gks/.github/workflows/promote-docker.yaml@workflows/v4
     secrets: inherit
     with:
       phase: 0
@@ -47,7 +47,7 @@ jobs:
 
   promote-helm:
     needs: [ setup, promote-docker ]
-    uses: Geta/gks/.github/workflows/promote-helm.yaml@workflows/v3
+    uses: Geta/gks/.github/workflows/promote-helm.yaml@workflows/v4
     secrets: inherit
     with:
       phase: 1
