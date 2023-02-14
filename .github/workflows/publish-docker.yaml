@@ -56,7 +56,7 @@ on:
         value: ${{ jobs.image.outputs.slack_message_id }}
 jobs:
   notify_start:
-    if: ${{ fromJson(needs.configure.outputs.settings).slack.channels }} != []
+    if: ${{ fromJson(needs.configure.outputs.settings).slack.channels.length }} > 0
     name: Notify channel (${{ matrix.channel }})
     strategy:
       matrix: 
