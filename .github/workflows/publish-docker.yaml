@@ -56,7 +56,7 @@ on:
         value: ${{ jobs.image.outputs.slack_message_id }}
 jobs:
   notify_start:
-    if: inputs.slack_artifact_name != ''
+    if: ${{ fromJson(needs.configure.outputs.settings).slack.channels }} == []
     name: Notify channel (${{ matrix.channel }})
     strategy:
       matrix: 
@@ -72,6 +72,7 @@ jobs:
       slack_template_file: ${{ inputs.slack_template_file }}
 
   image:
+    if: always()
     runs-on: ubuntu-latest
     needs: [ notify_start ]
     outputs:
@@ -151,7 +152,7 @@ jobs:
           echo ':whale: ${{ steps.info.outputs.image_name }}:${{ steps.info.outputs.image_tag }}' >> $GITHUB_STEP_SUMMARY
   
   notify_end:
-    if: always()
+    if: needs.notify_start.result == 'success'
     runs-on: ubuntu-latest
     needs: [ notify_start, image ]
     #! outputs:
@@ -161,20 +162,20 @@ jobs:
     steps:
       -
         name: Prepare success slack message
-        if: success()
+        if: needs.image.result == 'success'
         run: |
           echo $("${{ toJson(needs.notify_start) }}")
           STEP=$(echo ":white_check_mark: *Docker image*")
           echo "STATUS_STEP=$STEP" >> $GITHUB_ENV
       #! -
       #!   name: Prepare failure slack message
-      #!   if: failure()
+      #!   if: needs.image.result == 'failure'
       #!   run: |
       #!     STEP=$(echo ":x: *Docker image*")
       #!     echo "STATUS_STEP=$STEP" >> $GITHUB_ENV
       #! -
       #!   name: Prepare cancel slack message
-      #!   if: cancelled()
+      #!   if: needs.image.result == 'cancelled'
       #!   run: |
       #!     STEP=$(echo ":grey_exclamation: *Docker image*")
       #!     echo "STATUS_STEP=$STEP" >> $GITHUB_ENV
