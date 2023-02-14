@@ -28,7 +28,7 @@ jobs:
       version: ${{ inputs.version }}
       settings: ${{ inputs.settings }}
       initial_state: |
-        :hourglass: *Docker image*
+        :grey_question: *Docker image*
         :grey_question: *Helm chart*
 
   publish-docker:

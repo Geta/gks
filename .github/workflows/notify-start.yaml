@@ -1,41 +1,42 @@
 name: Notify start
-  workflow_call:
-    channel:
-      required: true
-      type: string
-      description: Slack channel
-    phase:
-      required: true
-      type: number
-      description: Build phase index
-    step:
-      required: true
-      type: string
-      description: Step notification step
-    slack_phase_state:
-      required: true
-      type: string
-      description: Slack notification state
-    slack_artifact_name:
-      required: true
-      type: string
-      description: Github artifact name containing slack template
-    slack_template_file:
-      required: true
-      type: string
-      description: Slack message template file name
-    slack_template_dir:
-      required: false
-      type: string
-      default: /tmp/slack
-      description: Template file directory
-  outputs:
-    slack_state:
-      value: ${{ jobs.notify.outputs.slack_state }}
-      description: Slack state
-    slack_message_id:
-      value: ${{ jobs.notify.outputs.slack_message_id }}
-      description: Slack message id
+  on:
+    workflow_call:
+      channel:
+        required: true
+        type: string
+        description: Slack channel
+      phase:
+        required: true
+        type: number
+        description: Build phase index
+      step:
+        required: true
+        type: string
+        description: Step notification step
+      slack_phase_state:
+        required: true
+        type: string
+        description: Slack notification state
+      slack_artifact_name:
+        required: true
+        type: string
+        description: Github artifact name containing slack template
+      slack_template_file:
+        required: true
+        type: string
+        description: Slack message template file name
+      slack_template_dir:
+        required: false
+        type: string
+        default: /tmp/slack
+        description: Template file directory
+    outputs:
+      slack_state:
+        value: ${{ jobs.notify.outputs.slack_state }}
+        description: Slack state
+      slack_message_id:
+        value: ${{ jobs.notify.outputs.slack_message_id }}
+        description: Slack message id
 jobs:
   notify:
     runs-on: ubuntu-latest
