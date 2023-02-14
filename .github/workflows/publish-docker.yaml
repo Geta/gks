@@ -44,55 +44,40 @@ on:
         description: Slack notification state
     outputs:
       image_name:
-        value: ${{ jobs.docker.outputs.image_name }}
+        value: ${{ jobs.image.outputs.image_name }}
         description: Docker image name
       image_tag:
-        value: ${{ jobs.docker.outputs.image_tag }}
+        value: ${{ jobs.image.outputs.image_tag }}
         description: Docker image tag
       slack_state:
-        value: ${{ jobs.docker.outputs.slack_state }}
+        value: ${{ jobs.image.outputs.slack_state }}
         description: Slack phase state
       slack_message_id:
-        value: ${{ jobs.docker.outputs.slack_message_id }}
+        value: ${{ jobs.image.outputs.slack_message_id }}
 jobs:
-  docker:
+  notify_start:
+    if: inputs.slack_artifact_name != ''
+    name: Notify channel (${{ matrix.channel }})
+    strategy:
+      matrix: 
+        channel: ${{ fromJson(needs.configure.outputs.settings).slack.channels }}
+    uses: Geta/gks/.github/workflows/notify-start.yaml@workflows/v4
+    secrets: inherit
+    with:
+      channel: ${{ matrix.channel }}
+      phase: ${{ inputs.phase }}
+      step: Docker image
+      slack_phase_state: ${{ inputs.slack_phase_state }}
+      slack_artifact_name: ${{ inputs.slack_artifact_name }}
+      slack_template_file: ${{ inputs.slack_template_file }}
+
+  image:
     runs-on: ubuntu-latest
+    needs: [ notify_start ]
     outputs:
       image_name: ${{ steps.info.outputs.image_name }}
       image_tag: ${{ steps.info.outputs.image_tag }}
-      slack_state: ${{ steps.after-build-template.outputs.state }}
-      slack_message_id: ${{ steps.slack.outputs.ts }}
-    env:
-      STATUS_STEP: ""
-      SLACK_TEMPLATE_DIR: /tmp/slack
-    steps:
-      -
-        name: Download notification template
-        if: inputs.slack_artifact_name != ''
-        uses: actions/download-artifact@v3
-        with:
-          name: ${{ inputs.slack_artifact_name }}
-          path: ${{ env.SLACK_TEMPLATE_DIR }}
-      -
-        name: Add build start notification step
-        if: inputs.slack_artifact_name != ''
-        id: slack-build-start
-        uses: Geta/gks/actions/add-notification-step@actions/v2
-        with:
-          template_path: ${{ env.SLACK_TEMPLATE_DIR }}/${{ inputs.slack_template_file }}
-          phase: ${{ inputs.phase }}
-          step: ":hourglass: *Docker image*"
-          state: ${{ inputs.slack_phase_state }}
-      -
-        name: Notify start
-        if: inputs.slack_artifact_name != ''
-        id: slack
-        uses: slackapi/slack-github-action@v1
-        with:
-          channel-id: ${{ fromJson(inputs.settings).general.slack.channel }}
-          payload-file-path: ${{ env.SLACK_TEMPLATE_DIR }}/${{ inputs.slack_template_file }}
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.GKS_GCC_SLACK_BOT_TOKEN }}
+    steps:   
       - 
         name: Checkout code
         uses: actions/checkout@v3
@@ -164,41 +149,52 @@ jobs:
         name: Report Docker image
         run: |
           echo ':whale: ${{ steps.info.outputs.image_name }}:${{ steps.info.outputs.image_tag }}' >> $GITHUB_STEP_SUMMARY
+  
+  notify_end:
+    if: always()
+    runs-on: ubuntu-latest
+    needs: [ notify_start, image ]
+    #! outputs:
+    #!   slack_state: ${{ steps.after-build-template.outputs.state }}
+    env:
+      STATUS_STEP: ""
+    steps:
       -
         name: Prepare success slack message
         if: success()
         run: |
+          echo $("${{ toJson(needs.notify_start) }}")
           STEP=$(echo ":white_check_mark: *Docker image*")
           echo "STATUS_STEP=$STEP" >> $GITHUB_ENV
-      -
-        name: Prepare failure slack message
-        if: failure()
-        run: |
-          STEP=$(echo ":x: *Docker image*")
-          echo "STATUS_STEP=$STEP" >> $GITHUB_ENV
-      -
-        name: Prepare cancel slack message
-        if: cancelled()
-        run: |
-          STEP=$(echo ":grey_exclamation: *Docker image*")
-          echo "STATUS_STEP=$STEP" >> $GITHUB_ENV
-      -
-        name: Add build status notification step
-        if: always() && steps.slack.conclusion == 'success' && inputs.slack_artifact_name != ''
-        id: after-build-template
-        uses: Geta/gks/actions/add-notification-step@actions/v2
-        with:
-          template_path: ${{ env.SLACK_TEMPLATE_DIR }}/${{ inputs.slack_template_file }}
-          phase: ${{ inputs.phase }}
-          step: ${{ env.STATUS_STEP }}
-          state: ${{ steps.slack-build-start.outputs.state }}
-      -
-        name: Notify status
-        if: always() && inputs.slack_artifact_name != ''
-        uses: slackapi/slack-github-action@v1
-        with:
-          update-ts: ${{ steps.slack.outputs.ts }}
-          channel-id: ${{ fromJson(inputs.settings).general.slack.channel }}
-          payload-file-path: ${{ env.SLACK_TEMPLATE_DIR }}/${{ inputs.slack_template_file }}
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.GKS_GCC_SLACK_BOT_TOKEN }}
+      #! -
+      #!   name: Prepare failure slack message
+      #!   if: failure()
+      #!   run: |
+      #!     STEP=$(echo ":x: *Docker image*")
+      #!     echo "STATUS_STEP=$STEP" >> $GITHUB_ENV
+      #! -
+      #!   name: Prepare cancel slack message
+      #!   if: cancelled()
+      #!   run: |
+      #!     STEP=$(echo ":grey_exclamation: *Docker image*")
+      #!     echo "STATUS_STEP=$STEP" >> $GITHUB_ENV
+      #! -
+      #!   name: Add build status notification step
+      #!   if: always() && steps.slack.conclusion == 'success' && inputs.slack_artifact_name != ''
+      #!   id: after-build-template
+      #!   uses: Geta/gks/actions/add-notification-step@actions/v2
+      #!   with:
+      #!     template_path: ${{ env.SLACK_TEMPLATE_DIR }}/${{ inputs.slack_template_file }}
+      #!     phase: ${{ inputs.phase }}
+      #!     step: ${{ env.STATUS_STEP }}
+      #!     state: ${{ steps.slack-build-start.outputs.state }}
+      #! -
+      #!   name: Notify status
+      #!   if: always() && inputs.slack_artifact_name != ''
+      #!   uses: slackapi/slack-github-action@v1
+      #!   with:
+      #!     update-ts: ${{ steps.slack.outputs.ts }}
+      #!     channel-id: ${{ fromJson(inputs.settings).slack.channels }}
+      #!     payload-file-path: ${{ env.SLACK_TEMPLATE_DIR }}/${{ inputs.slack_template_file }}
+      #!   env:
+      #!     SLACK_BOT_TOKEN: ${{ secrets.GKS_GCC_SLACK_BOT_TOKEN }}

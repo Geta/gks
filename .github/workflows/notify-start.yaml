@@ -1,0 +1,69 @@
+name: Notify start
+  workflow_call:
+    channel:
+      required: true
+      type: string
+      description: Slack channel
+    phase:
+      required: true
+      type: number
+      description: Build phase index
+    step:
+      required: true
+      type: string
+      description: Step notification step
+    slack_phase_state:
+      required: true
+      type: string
+      description: Slack notification state
+    slack_artifact_name:
+      required: true
+      type: string
+      description: Github artifact name containing slack template
+    slack_template_file:
+      required: true
+      type: string
+      description: Slack message template file name
+    slack_template_dir:
+      required: false
+      type: string
+      default: /tmp/slack
+      description: Template file directory
+  outputs:
+    slack_state:
+      value: ${{ jobs.notify.outputs.slack_state }}
+      description: Slack state
+    slack_message_id:
+      value: ${{ jobs.notify.outputs.slack_message_id }}
+      description: Slack message id
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    outputs:
+      slack_state: ${{ steps.notification.outputs.state }}
+      slack_message_id: ${{ steps.slack.outputs.ts }}
+    steps:
+      -
+        name: Download notification template
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ inputs.slack_artifact_name }}
+          path: ${{ inputs.slack_template_dir }}
+      -
+        name: Add start notification step
+        id: notification
+        uses: Geta/gks/actions/add-notification-step@actions/v2
+        with:
+          template_path: ${{ inputs.slack_template_dir }}/${{ inputs.slack_template_file }}
+          phase: ${{ inputs.phase }}
+          step: ":hourglass: *${{ inputs.step }}*"
+          state: ${{ inputs.slack_phase_state }}
+      -
+        name: Send slack notification
+        id: slack
+        uses: slackapi/slack-github-action@v1
+        with:
+          channel-id: ${{ inputs.channel }}
+          payload-file-path: ${{ inputs.slack_template_dir }}/${{ inputs.slack_template_file }}
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.GKS_GCC_SLACK_BOT_TOKEN }}
