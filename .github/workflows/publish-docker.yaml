@@ -56,11 +56,11 @@ on:
         value: ${{ jobs.image.outputs.slack_message_id }}
 jobs:
   notify_start:
-    if: fromJson(needs.configure.outputs.settings).slack.channels.length > 0
+    if: fromJson(inputs.settings).slack.channels.length != 0
     name: Notify channel (${{ matrix.channel }})
     strategy:
       matrix: 
-        channel: ${{ fromJson(needs.configure.outputs.settings).slack.channels }}
+        channel: ${{ fromJson(inputs.settings).slack.channels }}
     uses: Geta/gks/.github/workflows/notify-start.yaml@workflows/v4
     secrets: inherit
     with:
