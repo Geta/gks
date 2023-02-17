@@ -1,12 +1,6 @@
 name: Configure Test Workflow
 on:
   workflow_call:
-    inputs:
-      config_file:
-        required: false
-        type: string
-        default: .github/config.json
-        description: Config file path
     outputs:
       settings:
         value: ${{ jobs.configure.outputs.settings }}
@@ -22,10 +16,11 @@ jobs:
       version: ${{ steps.version.outputs.version }}
     steps:
       -
+        name: Read config file
         uses: Geta/gks/actions/read-config-file@actions/v2
         id: settings
         with:
-          file: ${{ inputs.config_file }}
+          file: ${{ vars.CONFIG_FILE }}
           ref: ${{ github.ref }}
           gh_token: ${{ secrets.GKS_GH_ACCESS_TOKEN }}
       -

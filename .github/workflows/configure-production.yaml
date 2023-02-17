@@ -1,12 +1,6 @@
 name: Configure Production Workflow
 on:
   workflow_call:
-    inputs:
-      config_file:
-        required: false
-        type: string         
-        default: .github/config.json
-        description: Config file path
     outputs:
       settings:
         value: ${{ jobs.configure.outputs.settings }}
@@ -55,9 +49,10 @@ jobs:
           echo "Release with tag '${{ steps.version.outputs.version }}' already exists"
           exit 1
       -
+        name: Read config file
         uses: Geta/gks/actions/read-config-file@actions/v2
         id: settings
         with:
-          file: ${{ inputs.config_file }}
+          file: ${{ vars.CONFIG_FILE }}
           ref: ${{ github.ref }}
           gh_token: ${{ secrets.GKS_GH_ACCESS_TOKEN }}

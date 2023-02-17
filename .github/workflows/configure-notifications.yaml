@@ -49,7 +49,7 @@ jobs:
           action_url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           version: ${{ inputs.version }}.${{ github.run_number }}
           hash: ${{ github.sha }}
-          revision: ${{ fromJson(inputs.settings).slack.templateRef }}
+          revision: ${{ fromJson(inputs.settings).notifications.slack.templateRef }}
           initial_state: ${{ inputs.initial_state }}
       -
         name: Store template in artifacts

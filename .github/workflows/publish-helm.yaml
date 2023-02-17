@@ -89,7 +89,7 @@ jobs:
         uses: slackapi/slack-github-action@v1
         with:
           update-ts: ${{ inputs.slack_message_id }}
-          channel-id: ${{ fromJson(inputs.settings).slack.channels }}
+          channel-id: ${{ fromJson(inputs.settings).notifications.slack.channels }}
           payload-file-path: ${{ env.SLACK_TEMPLATE_DIR }}/${{ inputs.slack_template_file }}
         env:
           SLACK_BOT_TOKEN: ${{ secrets.GKS_GCC_SLACK_BOT_TOKEN }}
@@ -131,15 +131,15 @@ jobs:
         name: Pull template chart
         uses: Geta/gks/actions/pull-chart@actions/v2
         with:
-          chart_dir: chart/${{ fromJson(inputs.settings).build.helm.templateChart.name }}
-          chart_name: ${{ fromJson(inputs.settings).build.helm.templateChart.name }}
-          chart_version: ${{ fromJson(inputs.settings).build.helm.templateChart.version }}
+          chart_dir: chart/${{ fromJson(inputs.settings).artifacts.helm.template.name }}
+          chart_name: ${{ fromJson(inputs.settings).artifacts.helm.template.name }}
+          chart_version: ${{ fromJson(inputs.settings).artifacts.helm.template.version }}
           repo_alias: ${{ env.TEMPLATE_REPO_ALIAS }}
       -
         name: Set chart info
         uses: Geta/gks/actions/set-chart-info@actions/v2
         with:
-          chart_dir: chart/${{ fromJson(inputs.settings).build.helm.templateChart.name }}
+          chart_dir: chart/${{ fromJson(inputs.settings).artifacts.helm.template.name }}
           chart_name: ${{ steps.chart.outputs.chart_name }}
           chart_description: ${{ fromJson(inputs.settings).general.apps[inputs.app_index].name }} chart
           chart_version: ${{ steps.chart.outputs.chart_version }}
@@ -150,17 +150,17 @@ jobs:
         name: Lint Helm Chart
         uses: Geta/gks/actions/lint-helm-chart@actions/v1
         with:
-          chart_dir: chart/${{ fromJson(inputs.settings).build.helm.templateChart.name }}
+          chart_dir: chart/${{ fromJson(inputs.settings).artifacts.helm.template.name }}
       -
         name: Generate README
         uses: Geta/gks/actions/generate-chart-readme@actions/v1
         with:
-          chart_dir: chart/${{ fromJson(inputs.settings).build.helm.templateChart.name }}
+          chart_dir: chart/${{ fromJson(inputs.settings).artifacts.helm.template.name }}
       -
         name: Push service Helm chart
         uses: Geta/gks/actions/package-helm-chart@actions/v2
         with:
-          chart_dir: chart/${{ fromJson(inputs.settings).build.helm.templateChart.name }}
+          chart_dir: chart/${{ fromJson(inputs.settings).artifacts.helm.template.name }}
           chart_name: ${{ steps.chart.outputs.chart_name }}
           chart_version: ${{ steps.chart.outputs.chart_version }}
           repo_alias: ${{ env.MAIN_REPO_ALIAS }}
@@ -203,7 +203,7 @@ jobs:
         uses: slackapi/slack-github-action@v1
         with:
           update-ts: ${{ inputs.slack_message_id }}
-          channel-id: ${{ fromJson(inputs.settings).slack.channels }}
+          channel-id: ${{ fromJson(inputs.settings).notifications.slack.channels }}
           payload-file-path: ${{ env.SLACK_TEMPLATE_DIR }}/${{ inputs.slack_template_file }}
         env:
           SLACK_BOT_TOKEN: ${{ secrets.GKS_GCC_SLACK_BOT_TOKEN }}

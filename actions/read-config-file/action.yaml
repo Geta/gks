@@ -30,11 +30,28 @@ runs:
         echo ':computer: ${{ github.ref }}' >> $GITHUB_STEP_SUMMARY
         echo ':link: ${{ github.sha }}' >> $GITHUB_STEP_SUMMARY
     -
-      name: Read JSON config
+      name: Download config yaml
+      id: yaml
+      shell: bash
+      run: 
+        URL=$(echo "https://raw.githubusercontent.com/Geta/gks-tenant-gcc/main/.github/configs/${{ inputs.file }}?token=${{ inputs.gh_token }}")
+        PATH=$(echo "./config.yaml")
+        wget -c $URL -O $PATH
+        echo "file=$PATH" >> $GITHUB_OUTPUT
+    - 
+      name: Convert YAML to JSON
+      uses: fabasoad/data-format-converter-action@main
+      id: yaml2json
+      with:
+        input: ${{ steps.yaml.outputs.file }}
+        from: 'yaml'
+        to: 'json'
+    -
+      name: Read YAML config
       id: json
       shell: bash
       run: |
-        SETTINGS=$(cat ${{ inputs.file }})
+        SETTINGS=$(cat ${{ steps.yaml2json.outputs.output }})
         SETTINGS="${SETTINGS//'%'/'%25'}"
         SETTINGS="${SETTINGS//$'\n'/}"
         SETTINGS="${SETTINGS//$'\r'/}"
