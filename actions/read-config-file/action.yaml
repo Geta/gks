@@ -36,7 +36,7 @@ runs:
       run: 
         URL=$(echo "https://raw.githubusercontent.com/Geta/gks-tenant-gcc/main/.github/configs/${{ inputs.file }}?token=${{ inputs.gh_token }}")
         PATH=$(echo "./config.yaml")
-        wget -c $URL -O $PATH
+        curl -L $URL > $PATH
         echo "file=$PATH" >> $GITHUB_OUTPUT
     - 
       name: Convert YAML to JSON
