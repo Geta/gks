@@ -33,7 +33,7 @@ runs:
       name: Download config yaml
       id: yaml
       shell: bash
-      run: 
+      run: |
         URL=$(echo "https://raw.githubusercontent.com/Geta/gks-tenant-gcc/main/.github/configs/${{ inputs.file }}?token=${{ inputs.gh_token }}")
         PATH=$(echo "./config.yaml")
         curl -L $URL > $PATH
