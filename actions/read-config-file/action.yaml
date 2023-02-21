@@ -56,3 +56,4 @@ runs:
         SETTINGS="${SETTINGS//$'\n'/}"
         SETTINGS="${SETTINGS//$'\r'/}"
         echo "settings=$SETTINGS" >> $GITHUB_OUTPUT
+        echo $SETTINGS
