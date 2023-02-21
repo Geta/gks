@@ -51,9 +51,9 @@ runs:
       id: json
       shell: bash
       run: |
-        SETTINGS=$(echo "${{ steps.yaml2json.outputs.output }}")
+        SETTINGS=$(echo ${{ steps.yaml2json.outputs.output }})
+        echo $SETTINGS
         SETTINGS="${SETTINGS//'%'/'%25'}"
         SETTINGS="${SETTINGS//$'\n'/}"
         SETTINGS="${SETTINGS//$'\r'/}"
         echo "settings=$SETTINGS" >> $GITHUB_OUTPUT
-        echo $SETTINGS
