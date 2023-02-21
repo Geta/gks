@@ -51,7 +51,7 @@ runs:
       id: json
       shell: bash
       run: |
-        SETTINGS=$(cat "${{ steps.yaml2json.outputs.output }}")
+        SETTINGS=$(echo "${{ steps.yaml2json.outputs.output }}")
         SETTINGS="${SETTINGS//'%'/'%25'}"
         SETTINGS="${SETTINGS//$'\n'/}"
         SETTINGS="${SETTINGS//$'\r'/}"
