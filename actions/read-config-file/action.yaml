@@ -34,10 +34,11 @@ runs:
       id: yaml
       shell: bash
       run: |
-        URL=$(echo "https://raw.githubusercontent.com/Geta/gks-tenant-gcc/main/.github/configs/${{ inputs.file }}?token=${{ inputs.gh_token }}")
+        URL=$(echo "https://{{ inputs.gh_token }}@raw.githubusercontent.com/Geta/gks-tenant-gcc/main/.github/configs/${{ inputs.file }}")
         FILE_PATH=$(echo "./config.yaml")
         curl -L $URL > $FILE_PATH
         echo "file=$FILE_PATH" >> $GITHUB_OUTPUT
+        cat $FILE_PATH
     - 
       name: Convert YAML to JSON
       uses: fabasoad/data-format-converter-action@main
