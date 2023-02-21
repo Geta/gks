@@ -34,7 +34,7 @@ runs:
       id: yaml
       shell: bash
       run: |
-        URL=$(echo "https://{{ inputs.gh_token }}@raw.githubusercontent.com/Geta/gks-tenant-gcc/main/.github/configs/${{ inputs.file }}")
+        URL=$(echo "https://${{ inputs.gh_token }}@raw.githubusercontent.com/Geta/gks-tenant-gcc/main/.github/configs/${{ inputs.file }}")
         FILE_PATH=$(echo "./config.yaml")
         curl -L $URL > $FILE_PATH
         echo "file=$FILE_PATH" >> $GITHUB_OUTPUT
