@@ -35,9 +35,9 @@ runs:
       shell: bash
       run: |
         URL=$(echo "https://raw.githubusercontent.com/Geta/gks-tenant-gcc/main/.github/configs/${{ inputs.file }}?token=${{ inputs.gh_token }}")
-        PATH=$(echo "./config.yaml")
-        curl -L $URL > $PATH
-        echo "file=$PATH" >> $GITHUB_OUTPUT
+        FILE_PATH=$(echo "./config.yaml")
+        curl -L $URL > $FILE_PATH
+        echo "file=$FILE_PATH" >> $GITHUB_OUTPUT
     - 
       name: Convert YAML to JSON
       uses: fabasoad/data-format-converter-action@main
