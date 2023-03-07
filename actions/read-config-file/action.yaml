@@ -52,7 +52,6 @@ runs:
       shell: bash
       run: |
         SETTINGS=$(echo '${{ steps.yaml2json.outputs.output }}')
-        echo $SETTINGS
         SETTINGS="${SETTINGS//'%'/'%25'}"
         SETTINGS="${SETTINGS//$'\n'/}"
         SETTINGS="${SETTINGS//$'\r'/}"
