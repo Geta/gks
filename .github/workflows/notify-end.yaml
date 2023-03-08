@@ -1,4 +1,4 @@
-name: Notify start
+name: Notify end
 on:
   workflow_call:
     inputs:
@@ -14,6 +14,10 @@ on:
         required: true
         type: string
         description: Step notification step
+      result:
+        required: true
+        type: string
+        description: Step result
       slack_phase_state:
         required: true
         type: string
@@ -43,10 +47,29 @@ jobs:
     name: Compose and send Slack message
     runs-on: ubuntu-latest
     outputs:
-      step: ${{ inputs.step }}
       slack_state: ${{ steps.notification.outputs.state }}
       slack_message_id: ${{ steps.slack.outputs.ts }}
+    env:
+      STATUS_STEP: ""
     steps:
+      -
+        name: Prepare success Slack message
+        if: inputs.result == 'success'
+        run: |
+          STEP=$(echo ":white_check_mark: *${{ inputs.step }}*")
+          echo "STATUS_STEP=$STEP" >> $GITHUB_ENV
+      -
+        name: Prepare failure Slack message
+        if: inputs.result == 'failure'
+        run: |
+          STEP=$(echo ":x: *${{ inputs.step }}*")
+          echo "STATUS_STEP=$STEP" >> $GITHUB_ENV
+      -
+        name: Prepare cancel Slack message
+        if: inputs.result == 'cancelled'
+        run: |
+          STEP=$(echo ":grey_exclamation: *${{ inputs.step }}*")
+          echo "STATUS_STEP=$STEP" >> $GITHUB_ENV
       -
         name: Download notification template
         uses: actions/download-artifact@v3
@@ -54,13 +77,13 @@ jobs:
           name: ${{ inputs.slack_artifact_name }}
           path: ${{ inputs.slack_template_dir }}
       -
-        name: Add start notification step
+        name: Add end notification step
         id: notification
         uses: Geta/gks/actions/add-notification-step@actions/v3
         with:
           template_path: ${{ inputs.slack_template_dir }}/${{ inputs.slack_template_file }}
           phase: ${{ inputs.phase }}
-          step: ":hourglass: *${{ inputs.step }}*"
+          step: ${{ env.STATUS_STEP }}
           state: ${{ inputs.slack_phase_state }}
       -
         name: Send Slack notification
