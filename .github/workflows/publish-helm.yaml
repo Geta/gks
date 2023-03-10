@@ -71,7 +71,7 @@ jobs:
       slack_template_file: ${{ inputs.slack_template_file }}
       settings: ${{ inputs.settings }}
 
-  helm:
+  chart:
     if: always()
     runs-on: ubuntu-latest
     needs: [ notify_start ]
