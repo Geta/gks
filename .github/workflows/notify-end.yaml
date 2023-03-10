@@ -35,6 +35,10 @@ on:
         type: string
         default: /tmp/slack
         description: Template file directory
+      settings:
+        required: true
+        type: string
+        description: Settings json
     outputs:
       slack_state:
         value: ${{ jobs.notify.outputs.slack_state }}

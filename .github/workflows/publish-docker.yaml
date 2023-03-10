@@ -69,6 +69,7 @@ jobs:
       slack_phase_state: ${{ inputs.slack_phase_state }}
       slack_artifact_name: ${{ inputs.slack_artifact_name }}
       slack_template_file: ${{ inputs.slack_template_file }}
+      settings: ${{ inputs.settings }}
 
   image:
     if: always()
@@ -168,3 +169,4 @@ jobs:
       slack_phase_state: ${{ inputs.slack_phase_state }}
       slack_artifact_name: ${{ inputs.slack_artifact_name }}
       slack_template_file: ${{ inputs.slack_template_file }}
+      settings: ${{ inputs.settings }}
