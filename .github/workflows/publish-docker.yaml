@@ -50,10 +50,10 @@ on:
         value: ${{ jobs.image.outputs.image_tag }}
         description: Docker image tag
       slack_state:
-        value: ${{ jobs.image.outputs.slack_state }}
+        value: ${{ jobs.notify_end.outputs.slack_state }}
         description: Slack phase state
       slack_message_id:
-        value: ${{ jobs.image.outputs.slack_message_id }}
+        value: ${{ jobs.notify_start.outputs.slack_message_id }}
 jobs:
   notify_start:
     name: Notify step started to channel ${{ matrix.channel.id }}
