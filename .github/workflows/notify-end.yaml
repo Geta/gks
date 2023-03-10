@@ -35,6 +35,10 @@ on:
         type: string
         default: /tmp/slack
         description: Template file directory
+      slack_message_id:
+        required: true
+        type: string
+        description: Message id
       settings:
         required: true
         type: string

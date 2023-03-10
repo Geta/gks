@@ -42,12 +42,14 @@ on:
       slack_message_id:
         value: ${{ jobs.notify.outputs.slack_message_id }}
         description: Slack message id
+      step:
+        value: ${{ inputs.step }}
+        description: Step name
 jobs:
   notify:
     name: Compose and send Slack message
     runs-on: ubuntu-latest
     outputs:
-      step: ${{ inputs.step }}
       slack_state: ${{ steps.notification.outputs.state }}
       slack_message_id: ${{ steps.slack.outputs.ts }}
     steps:

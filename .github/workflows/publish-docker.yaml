@@ -166,7 +166,8 @@ jobs:
       phase: ${{ inputs.phase }}
       step: ${{ needs.notify_start.outputs.step }}
       result: ${{ needs.image.result }}
-      slack_phase_state: ${{ inputs.slack_phase_state }}
+      slack_phase_state: ${{ needs.notify_start.outputs.slack_state }}
       slack_artifact_name: ${{ inputs.slack_artifact_name }}
       slack_template_file: ${{ inputs.slack_template_file }}
+      slack_message_id: ${{ needs.notify_start.outputs.slack_message_id }}
       settings: ${{ inputs.settings }}
