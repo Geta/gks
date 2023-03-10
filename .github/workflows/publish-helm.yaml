@@ -107,7 +107,7 @@ jobs:
           alias: ${{ env.TEMPLATE_REPO_ALIAS }}
           user: ${{ secrets.GKS_HELM_REGISTRY_USER }}
           token: ${{ secrets.GKS_HELM_REGISTRY_PASSWORD }}
-          url: ${{ fromJson(inputs.settings).artifacts.helm.templateRepoUrl }}
+          url: ${{ fromJson(inputs.settings).artifacts.helm.template.repoUrl }}
       -
         name: Compose Helm chart name
         id: chart
