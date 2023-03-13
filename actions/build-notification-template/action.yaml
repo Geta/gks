@@ -63,7 +63,7 @@ runs:
         PATH=$(readlink -f $STORE_IN_FILE)
         echo "file=$PATH" >> $GITHUB_OUTPUT
     -
-      name: Create build phases templatle file
+      name: Create build phases template file
       id: phases
       shell: bash
       run: |
