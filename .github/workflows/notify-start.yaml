@@ -48,8 +48,10 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    run: |
-      echo "test"
+    steps:
+      - name: test
+        run: |
+          echo "test"
 
   #! notify:
   #!   name: Compose and send Slack message
