@@ -16,6 +16,10 @@ inputs:
     required: true
     type: string
     description: Message state
+  mention:
+    required: false
+    type: boolean
+    description: Whether to mention user or not
 outputs:
   state:
     value: ${{ steps.template.outputs.state }}
@@ -35,7 +39,7 @@ runs:
         MARKDOWN=$(jq '.phases | map(.) | join("\n")' <<< $STATE)
         echo $MARKDOWN
         TEMPLATE=$(cat "${{ inputs.template_path }}")
-        TEMPLATE=$(jq ".blocks[4].text.text = $MARKDOWN" <<< $TEMPLATE)
+        TEMPLATE=$(jq ".blocks[4].text.text = $MARKDOWN" <<< $TEMPLATE)  
         echo $TEMPLATE
         echo $TEMPLATE > ${{ inputs.template_path }}
         BASE64="$(echo $STATE | base64 -w 0)"

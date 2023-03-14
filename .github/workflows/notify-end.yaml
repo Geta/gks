@@ -10,18 +10,10 @@ on:
         required: true
         type: number
         description: Build phase index
-      step:
-        required: true
-        type: string
-        description: Step notification step
       result:
         required: true
         type: string
         description: Step result
-      slack_phase_state:
-        required: true
-        type: string
-        description: Slack notification state
       slack_artifact_name:
         required: true
         type: string
@@ -35,14 +27,14 @@ on:
         type: string
         default: /tmp/slack
         description: Template file directory
-      slack_message_id:
-        required: true
-        type: string
-        description: Message id
       settings:
         required: true
         type: string
         description: Settings json
+      matrix_step_name:
+        required: true
+        type: string
+        description: Matrix step name
     outputs:
       slack_state:
         value: ${{ jobs.notify.outputs.slack_state }}
@@ -51,20 +43,33 @@ on:
         value: ${{ jobs.notify.outputs.slack_message_id }}
         description: Slack message id
 jobs:
+  read:
+    runs-on: ubuntu-latest
+    name: Read matrix outputs
+    outputs:
+      result: "${{ steps.read.outputs.result }}"
+    steps:
+      - uses: cloudposse/github-action-matrix-outputs-read@main
+        id: read
+        with:
+          matrix-step-name: ${{ inputs.matrix_step_name }}
+
   notify:
     name: Compose and send Slack message
     runs-on: ubuntu-latest
+    needs: [ read ]
     outputs:
       slack_state: ${{ steps.notification.outputs.state }}
       slack_message_id: ${{ steps.slack.outputs.ts }}
     env:
       STATUS_STEP: ""
+      MENTION_USER: false
     steps:
       -
         name: Prepare success Slack message
         if: inputs.result == 'success'
         run: |
-          STEP=$(echo ":white_check_mark: *${{ inputs.step }}*")
+          STEP=$(echo ":white_check_mark: *${{ fromJson(needs.read.outputs.result).step[fromJson(inputs.settings).notifications.slack.channels[inputs.channel_index].id] }}*")
           echo "STATUS_STEP=$STEP" >> $GITHUB_ENV
       -
         name: Prepare failure Slack message
@@ -72,6 +77,7 @@ jobs:
         run: |
           STEP=$(echo ":x: *${{ inputs.step }}*")
           echo "STATUS_STEP=$STEP" >> $GITHUB_ENV
+          echo "MENTION_USER=true" >> $GITHUB_ENV
       -
         name: Prepare cancel Slack message
         if: inputs.result == 'cancelled'
@@ -93,6 +99,7 @@ jobs:
           phase: ${{ inputs.phase }}
           step: ${{ env.STATUS_STEP }}
           state: ${{ inputs.slack_phase_state }}
+          mention: ${{ env.MENTION_USER }}
       -
         name: Send Slack notification
         id: slack

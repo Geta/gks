@@ -35,15 +35,23 @@ on:
         required: true
         type: string
         description: Settings json
+      matrix_step_name:
+        required: true
+        type: string
+        description: Matrix step name
+      matrix_key:
+        required: true
+        type: string
+        description: Matrix key
     outputs:
       slack_state:
-        value: ${{ jobs.notify.outputs.slack_state }}
+        value: ${{ jobs.write.outputs.slack_state }}
         description: Slack state
       slack_message_id:
-        value: ${{ jobs.notify.outputs.slack_message_id }}
+        value: ${{ jobs.write.outputs.slack_message_id }}
         description: Slack message id
       step:
-        value: ${{ inputs.step }}
+        value: ${{ jobs.write.outputs.step }}
         description: Step name
 jobs:
   notify:
@@ -77,3 +85,22 @@ jobs:
           payload-file-path: ${{ inputs.slack_template_dir }}/${{ inputs.slack_template_file }}
         env:
           SLACK_BOT_TOKEN: ${{ secrets.GKS_GCC_SLACK_BOT_TOKEN }}
+
+  write:
+    runs-on: ubuntu-latest
+    needs: [ notify ]
+    name: Write matrix outputs
+    outputs:
+      slack_state: ${{ fromJson(steps.out.outputs.result).slack_state }}
+      slack_message_id: ${{ fromJson(steps.out.outputs.result).slack_message_id }}
+      step: ${{ fromJson(steps.out.outputs.result).step }}
+    steps:        
+      - uses: cloudposse/github-action-matrix-outputs-write@main
+        id: out
+        with:
+          matrix-step-name: ${{ inputs.matrix_step_name }}
+          matrix-key: ${{ inputs.matrix_key }}
+          outputs: |-
+            slack_state: ${{ needs.notify.outputs.slack_state }}
+            slack_message_id: ${{ needs.notify.outputs.slack_message_id }}
+            step: ${{ inputs.step }}
