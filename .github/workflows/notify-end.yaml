@@ -98,14 +98,14 @@ jobs:
           template_path: ${{ inputs.slack_template_dir }}/${{ inputs.slack_template_file }}
           phase: ${{ inputs.phase }}
           step: ${{ env.STATUS_STEP }}
-          state: ${{ inputs.slack_phase_state }}
+          state: ${{ fromJson(needs.read.outputs.result).channel_id[inputs.channel_id].slack_phase_state }}
           mention: ${{ env.MENTION_USER }}
       -
         name: Send Slack notification
         id: slack
         uses: slackapi/slack-github-action@v1
         with:
-          channel-id: ${{ fromJson(inputs.settings).notifications.slack.channels[inputs.channel_index].id }}
+          channel-id: ${{ inputs.channel_id }}
           payload-file-path: ${{ inputs.slack_template_dir }}/${{ inputs.slack_template_file }}
         env:
           SLACK_BOT_TOKEN: ${{ secrets.GKS_GCC_SLACK_BOT_TOKEN }}
