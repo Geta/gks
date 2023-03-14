@@ -31,14 +31,10 @@ on:
         type: string
         default: /tmp/slack
         description: Template file directory
-      matrix_step_name:
+      matrix_job_name:
         required: true
         type: string
-        description: Matrix step name
-      matrix_key:
-        required: true
-        type: string
-        description: Matrix key
+        description: Matrix job name
     outputs:
       channel_id:
         value: ${{ jobs.write.outputs.channel_id }}
@@ -93,8 +89,8 @@ jobs:
       - uses: cloudposse/github-action-matrix-outputs-write@main
         id: out
         with:
-          matrix-step-name: ${{ inputs.matrix_step_name }}
-          matrix-key: ${{ inputs.matrix_key }}
+          matrix-step-name: ${{ inputs.matrix_job_name }}
+          matrix-key: ${{ inputs.channel_id }}
           outputs: |-
             channel_id: ${{ inputs.channel_id }}
             slack_state: ${{ needs.notify.outputs.slack_state }}

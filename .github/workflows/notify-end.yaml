@@ -31,10 +31,10 @@ on:
         type: string
         default: /tmp/slack
         description: Template file directory
-      matrix_step_name:
+      matrix_job_name:
         required: true
         type: string
-        description: Matrix step name
+        description: Matrix job name
     outputs:
       slack_state:
         value: ${{ jobs.notify.outputs.slack_state }}
@@ -52,7 +52,7 @@ jobs:
       - uses: cloudposse/github-action-matrix-outputs-read@main
         id: read
         with:
-          matrix-step-name: ${{ inputs.matrix_step_name }}
+          matrix-step-name: ${{ inputs.matrix_job_name }}
 
   notify:
     name: Compose and send Slack message
