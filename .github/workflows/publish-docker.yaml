@@ -170,3 +170,4 @@ jobs:
       slack_artifact_name: ${{ inputs.slack_artifact_name }}
       slack_template_file: ${{ inputs.slack_template_file }}
       settings: ${{ inputs.settings }}
+      matrix_step_name: notify_start
