@@ -172,7 +172,7 @@ jobs:
     uses: Geta/gks/.github/workflows/notify-end.yaml@workflows/v4
     secrets: inherit
     with:
-      channel_index: ${{ matrix.channel.id }}
+      channel_id: ${{ matrix.channel.id }}
       phase: ${{ inputs.phase }}
       result: ${{ needs.chart.result }}
       slack_artifact_name: ${{ inputs.slack_artifact_name }}
