@@ -83,6 +83,7 @@ jobs:
     needs: [ notify ]
     name: Write matrix outputs
     outputs:
+      channel_id: ${{ fromJson(steps.out.outputs.result).channel_id }}
       slack_state: ${{ fromJson(steps.out.outputs.result).slack_state }}
       slack_message_id: ${{ fromJson(steps.out.outputs.result).slack_message_id }}
     steps:        
