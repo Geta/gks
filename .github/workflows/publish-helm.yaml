@@ -50,6 +50,11 @@ on:
         type: string
         default: ''
         description: Slack message id
+      step:
+        required: false
+        type: string
+        default: Helm chart
+        description: Step name
     outputs:
       slack_state:
         value: ${{ jobs.helm.outputs.slack_state }}
@@ -65,7 +70,7 @@ jobs:
     with:
       channel_id: ${{ matrix.channel.id }}
       phase: ${{ inputs.phase }}
-      step: Helm chart
+      step: ${{ inputs.step }}
       slack_phase_state: ${{ inputs.slack_phase_state }}
       slack_artifact_name: ${{ inputs.slack_artifact_name }}
       slack_template_file: ${{ inputs.slack_template_file }}
@@ -175,6 +180,7 @@ jobs:
       channel_id: ${{ matrix.channel.id }}
       phase: ${{ inputs.phase }}
       result: ${{ needs.chart.result }}
+      step: ${{ inputs.step }}
       slack_artifact_name: ${{ inputs.slack_artifact_name }}
       slack_template_file: ${{ inputs.slack_template_file }}
       matrix_step_name: notify_start
