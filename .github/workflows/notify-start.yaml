@@ -46,37 +46,42 @@ on:
         value: ${{ jobs.write.outputs.slack_message_id }}
         description: Slack message id
 jobs:
-  notify:
-    name: Compose and send Slack message
+  test:
     runs-on: ubuntu-latest
-    outputs:
-      slack_state: ${{ steps.notification.outputs.state }}
-      slack_message_id: ${{ steps.slack.outputs.ts }}
-    steps:
-      -
-        name: Download notification template
-        uses: actions/download-artifact@v3
-        with:
-          name: ${{ inputs.slack_artifact_name }}
-          path: ${{ inputs.slack_template_dir }}
-      -
-        name: Add start notification step
-        id: notification
-        uses: Geta/gks/actions/add-notification-step@actions/v3
-        with:
-          template_path: ${{ inputs.slack_template_dir }}/${{ inputs.slack_template_file }}
-          phase: ${{ inputs.phase }}
-          step: ":hourglass: *${{ inputs.step }}*"
-          state: ${{ inputs.slack_phase_state }}
-      -
-        name: Send Slack notification
-        id: slack
-        uses: slackapi/slack-github-action@v1
-        with:
-          channel-id: ${{ inputs.channel_id }}
-          payload-file-path: ${{ inputs.slack_template_dir }}/${{ inputs.slack_template_file }}
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.GKS_GCC_SLACK_BOT_TOKEN }}
+    run: |
+      echo "test"
+
+  #! notify:
+  #!   name: Compose and send Slack message
+  #!   runs-on: ubuntu-latest
+  #!   outputs:
+  #!     slack_state: ${{ steps.notification.outputs.state }}
+  #!     slack_message_id: ${{ steps.slack.outputs.ts }}
+  #!   steps:
+  #!     -
+  #!       name: Download notification template
+  #!       uses: actions/download-artifact@v3
+  #!       with:
+  #!         name: ${{ inputs.slack_artifact_name }}
+  #!         path: ${{ inputs.slack_template_dir }}
+  #!     -
+  #!       name: Add start notification step
+  #!       id: notification
+  #!       uses: Geta/gks/actions/add-notification-step@actions/v3
+  #!       with:
+  #!         template_path: ${{ inputs.slack_template_dir }}/${{ inputs.slack_template_file }}
+  #!         phase: ${{ inputs.phase }}
+  #!         step: ":hourglass: *${{ inputs.step }}*"
+  #!         state: ${{ inputs.slack_phase_state }}
+  #!     -
+  #!       name: Send Slack notification
+  #!       id: slack
+  #!       uses: slackapi/slack-github-action@v1
+  #!       with:
+  #!         channel-id: ${{ inputs.channel_id }}
+  #!         payload-file-path: ${{ inputs.slack_template_dir }}/${{ inputs.slack_template_file }}
+  #!       env:
+  #!         SLACK_BOT_TOKEN: ${{ secrets.GKS_GCC_SLACK_BOT_TOKEN }}
 
   #! write:
   #!   runs-on: ubuntu-latest
