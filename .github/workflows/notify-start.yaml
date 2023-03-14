@@ -4,7 +4,7 @@ on:
     inputs:
       channel_id:
         required: true
-        type: number
+        type: string
         description: Slack channel id
       phase:
         required: true
@@ -46,59 +46,52 @@ on:
         value: ${{ jobs.write.outputs.slack_message_id }}
         description: Slack message id
 jobs:
-  test:
+  notify:
+    name: Compose and send Slack message
     runs-on: ubuntu-latest
+    outputs:
+      slack_state: ${{ steps.notification.outputs.state }}
+      slack_message_id: ${{ steps.slack.outputs.ts }}
     steps:
-      - name: test
-        run: |
-          echo "test"
+      -
+        name: Download notification template
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ inputs.slack_artifact_name }}
+          path: ${{ inputs.slack_template_dir }}
+      -
+        name: Add start notification step
+        id: notification
+        uses: Geta/gks/actions/add-notification-step@actions/v3
+        with:
+          template_path: ${{ inputs.slack_template_dir }}/${{ inputs.slack_template_file }}
+          phase: ${{ inputs.phase }}
+          step: ":hourglass: *${{ inputs.step }}*"
+          state: ${{ inputs.slack_phase_state }}
+      -
+        name: Send Slack notification
+        id: slack
+        uses: slackapi/slack-github-action@v1
+        with:
+          channel-id: ${{ inputs.channel_id }}
+          payload-file-path: ${{ inputs.slack_template_dir }}/${{ inputs.slack_template_file }}
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.GKS_GCC_SLACK_BOT_TOKEN }}
 
-  #! notify:
-  #!   name: Compose and send Slack message
-  #!   runs-on: ubuntu-latest
-  #!   outputs:
-  #!     slack_state: ${{ steps.notification.outputs.state }}
-  #!     slack_message_id: ${{ steps.slack.outputs.ts }}
-  #!   steps:
-  #!     -
-  #!       name: Download notification template
-  #!       uses: actions/download-artifact@v3
-  #!       with:
-  #!         name: ${{ inputs.slack_artifact_name }}
-  #!         path: ${{ inputs.slack_template_dir }}
-  #!     -
-  #!       name: Add start notification step
-  #!       id: notification
-  #!       uses: Geta/gks/actions/add-notification-step@actions/v3
-  #!       with:
-  #!         template_path: ${{ inputs.slack_template_dir }}/${{ inputs.slack_template_file }}
-  #!         phase: ${{ inputs.phase }}
-  #!         step: ":hourglass: *${{ inputs.step }}*"
-  #!         state: ${{ inputs.slack_phase_state }}
-  #!     -
-  #!       name: Send Slack notification
-  #!       id: slack
-  #!       uses: slackapi/slack-github-action@v1
-  #!       with:
-  #!         channel-id: ${{ inputs.channel_id }}
-  #!         payload-file-path: ${{ inputs.slack_template_dir }}/${{ inputs.slack_template_file }}
-  #!       env:
-  #!         SLACK_BOT_TOKEN: ${{ secrets.GKS_GCC_SLACK_BOT_TOKEN }}
-
-  #! write:
-  #!   runs-on: ubuntu-latest
-  #!   needs: [ notify ]
-  #!   name: Write matrix outputs
-  #!   outputs:
-  #!     slack_state: ${{ fromJson(steps.out.outputs.result).slack_state }}
-  #!     slack_message_id: ${{ fromJson(steps.out.outputs.result).slack_message_id }}
-  #!   steps:        
-  #!     - uses: cloudposse/github-action-matrix-outputs-write@main
-  #!       id: out
-  #!       with:
-  #!         matrix-step-name: ${{ inputs.matrix_job_name }}
-  #!         matrix-key: ${{ inputs.channel_id }}
-  #!         outputs: |-
-  #!           channel_id: ${{ inputs.channel_id }}
-  #!           slack_state: ${{ needs.notify.outputs.slack_state }}
-  #!           slack_message_id: ${{ needs.notify.outputs.slack_message_id }}
+  write:
+    runs-on: ubuntu-latest
+    needs: [ notify ]
+    name: Write matrix outputs
+    outputs:
+      slack_state: ${{ fromJson(steps.out.outputs.result).slack_state }}
+      slack_message_id: ${{ fromJson(steps.out.outputs.result).slack_message_id }}
+    steps:        
+      - uses: cloudposse/github-action-matrix-outputs-write@main
+        id: out
+        with:
+          matrix-step-name: ${{ inputs.matrix_job_name }}
+          matrix-key: ${{ inputs.channel_id }}
+          outputs: |-
+            channel_id: ${{ inputs.channel_id }}
+            slack_state: ${{ needs.notify.outputs.slack_state }}
+            slack_message_id: ${{ needs.notify.outputs.slack_message_id }}
