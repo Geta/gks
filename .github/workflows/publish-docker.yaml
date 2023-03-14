@@ -60,7 +60,16 @@ on:
       slack_message_id:
         value: ${{ jobs.notify_start.outputs.slack_message_id }}
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Test
+    steps:
+      - name: Test step
+        run: |
+          echo "Test"
+
   notify_start:
+    needs: [test]
     name: Notify step started to channel ${{ matrix.channel.id }}
     strategy:
       matrix: 
