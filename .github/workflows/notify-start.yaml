@@ -49,9 +49,6 @@ on:
       slack_message_id:
         value: ${{ jobs.write.outputs.slack_message_id }}
         description: Slack message id
-      step:
-        value: ${{ jobs.write.outputs.step }}
-        description: Step name
 jobs:
   notify:
     name: Compose and send Slack message
@@ -92,7 +89,6 @@ jobs:
     outputs:
       slack_state: ${{ fromJson(steps.out.outputs.result).slack_state }}
       slack_message_id: ${{ fromJson(steps.out.outputs.result).slack_message_id }}
-      step: ${{ fromJson(steps.out.outputs.result).step }}
     steps:        
       - uses: cloudposse/github-action-matrix-outputs-write@main
         id: out
@@ -103,4 +99,3 @@ jobs:
             channel_id: ${{ inputs.channel_id }}
             slack_state: ${{ needs.notify.outputs.slack_state }}
             slack_message_id: ${{ needs.notify.outputs.slack_message_id }}
-            step: ${{ inputs.step }}

@@ -42,6 +42,11 @@ on:
         type: string
         default: ''
         description: Slack notification state
+      step:
+        required: false
+        type: string
+        default: Docker image
+        description: Step name
     outputs:
       image_name:
         value: ${{ jobs.image.outputs.image_name }}
@@ -65,7 +70,7 @@ jobs:
     with:
       channel_id: ${{ matrix.channel.id }}
       phase: ${{ inputs.phase }}
-      step: Docker image
+      step: ${{ inputs.step }}
       slack_phase_state: ${{ inputs.slack_phase_state }}
       slack_artifact_name: ${{ inputs.slack_artifact_name }}
       slack_template_file: ${{ inputs.slack_template_file }}
@@ -165,6 +170,7 @@ jobs:
     with:
       channel_id: ${{ matrix.channel.id }}
       phase: ${{ inputs.phase }}
+      step: ${{ inputs.step }}
       result: ${{ needs.image.result }}
       slack_artifact_name: ${{ inputs.slack_artifact_name }}
       slack_template_file: ${{ inputs.slack_template_file }}

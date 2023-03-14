@@ -10,6 +10,10 @@ on:
         required: true
         type: number
         description: Build phase index
+      step:
+        required: true
+        type: string
+        description: Step notification step
       result:
         required: true
         type: string
@@ -65,7 +69,7 @@ jobs:
         name: Prepare success Slack message
         if: inputs.result == 'success'
         run: |
-          STEP=$(echo ":white_check_mark: *${{ fromJson(needs.read.outputs.result).step[inputs.channel_id] }}*")
+          STEP=$(echo ":white_check_mark: *${{ inputs.step }}*")
           echo "STATUS_STEP=$STEP" >> $GITHUB_ENV
       -
         name: Prepare failure Slack message
