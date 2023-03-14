@@ -2,7 +2,7 @@ name: Notify end
 on:
   workflow_call:
     inputs:
-      channel_index:
+      channel_id:
         required: true
         type: number
         description: Slack channel config index
@@ -27,10 +27,6 @@ on:
         type: string
         default: /tmp/slack
         description: Template file directory
-      settings:
-        required: true
-        type: string
-        description: Settings json
       matrix_step_name:
         required: true
         type: string
@@ -69,7 +65,7 @@ jobs:
         name: Prepare success Slack message
         if: inputs.result == 'success'
         run: |
-          STEP=$(echo ":white_check_mark: *${{ fromJson(needs.read.outputs.result).step[fromJson(inputs.settings).notifications.slack.channels[inputs.channel_index].id] }}*")
+          STEP=$(echo ":white_check_mark: *${{ fromJson(needs.read.outputs.result).step[inputs.channel_id] }}*")
           echo "STATUS_STEP=$STEP" >> $GITHUB_ENV
       -
         name: Prepare failure Slack message

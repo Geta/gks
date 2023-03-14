@@ -63,13 +63,12 @@ jobs:
     uses: Geta/gks/.github/workflows/notify-start.yaml@workflows/v4
     secrets: inherit
     with:
-      channel_index: ${{ strategy.job-index }}
+      channel_id: ${{ matrix.channel.id }}
       phase: ${{ inputs.phase }}
       step: Docker image
       slack_phase_state: ${{ inputs.slack_phase_state }}
       slack_artifact_name: ${{ inputs.slack_artifact_name }}
       slack_template_file: ${{ inputs.slack_template_file }}
-      settings: ${{ inputs.settings }}
       matrix_step_name: ${{ github.job }}
       matrix_key: ${{ matrix.channel }}
 
