@@ -92,7 +92,7 @@ jobs:
         with:
           matrix-step-name: ${{ inputs.matrix_job_name }}
           matrix-key: ${{ inputs.channel_id }}
-          outputs: |-
+          outputs: |
             channel_id: ${{ inputs.channel_id }}
             slack_state: ${{ needs.notify.outputs.slack_state }}
             slack_message_id: ${{ needs.notify.outputs.slack_message_id }}
