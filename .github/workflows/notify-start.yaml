@@ -33,10 +33,10 @@ on:
         description: Template file directory
     outputs:
       slack_state:
-        value: ${{ jobs.write.outputs.slack_state }}
+        value: ${{ jobs.notify.outputs.slack_state }}
         description: Slack state
       slack_message_id:
-        value: ${{ jobs.write.outputs.slack_message_id }}
+        value: ${{ jobs.notify.outputs.slack_message_id }}
         description: Slack message id
 jobs:
   notify:
