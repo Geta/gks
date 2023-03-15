@@ -59,6 +59,7 @@ on:
         description: Slack phase state
       slack_message_id:
         value: ${{ jobs.notify_end.outputs.slack_message_id }}
+        description: Slack message id
 jobs:
   notify_start:
     name: Notify step started to channel #${{ matrix.channel.id }}

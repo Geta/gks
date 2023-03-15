@@ -57,24 +57,26 @@ on:
         description: Step name
     outputs:
       slack_state:
-        value: ${{ jobs.helm.outputs.slack_state }}
+        value: ${{ jobs.notify_end.outputs.slack_state }}
         description: Slack phase state
+      slack_message_id:
+        value: ${{ jobs.notify_end.outputs.slack_message_id }}
+        description: Slack message id
 jobs:
   notify_start:
-    name: Notify step started to channel ${{ matrix.channel.id }}
-    strategy:
-      matrix: 
-        channel: ${{ fromJson(inputs.settings).notifications.slack.channels }}
+    name: Notify step started to channel #${{ matrix.channel.id }}
+    #! strategy:
+    #!   matrix: 
+    #!     channel: ${{ fromJson(inputs.settings).notifications.slack.channels }}
     uses: Geta/gks/.github/workflows/notify-start.yaml@workflows/v4
     secrets: inherit
     with:
-      channel_id: ${{ matrix.channel.id }}
+      channel_id: ${{ fromJson(inputs.settings).notifications.slack.channels[0] }}
       phase: ${{ inputs.phase }}
       step: ${{ inputs.step }}
       slack_phase_state: ${{ inputs.slack_phase_state }}
       slack_artifact_name: ${{ inputs.slack_artifact_name }}
       slack_template_file: ${{ inputs.slack_template_file }}
-      matrix_job_name: ${{ github.job }}
 
   chart:
     if: always()
@@ -169,17 +171,18 @@ jobs:
   notify_end:
     needs: [ notify_start, chart ]
     if: needs.notify_start.result == 'success'
-    name: Notify step finished to channel ${{ matrix.channel.id }}
-    strategy:
-      matrix: 
-        channel: ${{ fromJson(inputs.settings).notifications.slack.channels }}
+    name: Notify step finished to channel #${{ matrix.channel.id }}
+    #! strategy:
+    #!   matrix: 
+    #!     channel: ${{ fromJson(inputs.settings).notifications.slack.channels }}
     uses: Geta/gks/.github/workflows/notify-end.yaml@workflows/v4
     secrets: inherit
     with:
-      channel_id: ${{ matrix.channel.id }}
+      channel_id: ${{ fromJson(inputs.settings).notifications.slack.channels[0] }}
+      message_id: ${{ needs.notify_start.outputs.slack_message_id }}
+      slack_state: ${{ needs.notify_start.outputs.slack_state }}
       phase: ${{ inputs.phase }}
       result: ${{ needs.chart.result }}
       step: ${{ inputs.step }}
       slack_artifact_name: ${{ inputs.slack_artifact_name }}
       slack_template_file: ${{ inputs.slack_template_file }}
-      matrix_job_name: notify_start
