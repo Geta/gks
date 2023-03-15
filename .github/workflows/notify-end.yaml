@@ -6,6 +6,14 @@ on:
         required: true
         type: string
         description: Slack channel config index
+      message_id:
+        required: true
+        type: string
+        description: Slack message id
+      slack_state:
+        required: true
+        type: string
+        description: Slack state
       phase:
         required: true
         type: number
@@ -31,10 +39,6 @@ on:
         type: string
         default: /tmp/slack
         description: Template file directory
-      matrix_job_name:
-        required: true
-        type: string
-        description: Matrix job name
     outputs:
       slack_state:
         value: ${{ jobs.notify.outputs.slack_state }}
@@ -43,17 +47,6 @@ on:
         value: ${{ jobs.notify.outputs.slack_message_id }}
         description: Slack message id
 jobs:
-  read:
-    runs-on: ubuntu-latest
-    name: Read matrix outputs
-    outputs:
-      result: "${{ steps.read.outputs.result }}"
-    steps:
-      - uses: cloudposse/github-action-matrix-outputs-read@main
-        id: read
-        with:
-          matrix-step-name: ${{ inputs.matrix_job_name }}
-
   notify:
     name: Compose and send Slack message
     runs-on: ubuntu-latest
@@ -98,7 +91,7 @@ jobs:
           template_path: ${{ inputs.slack_template_dir }}/${{ inputs.slack_template_file }}
           phase: ${{ inputs.phase }}
           step: ${{ env.STATUS_STEP }}
-          state: ${{ fromJson(needs.read.outputs.result).channel_id[inputs.channel_id].slack_phase_state }}
+          state: ${{ inputs.slack_state }}
           mention: ${{ env.MENTION_USER }}
       -
         name: Send Slack notification
@@ -106,6 +99,7 @@ jobs:
         uses: slackapi/slack-github-action@v1
         with:
           channel-id: ${{ inputs.channel_id }}
+          update-ts: ${{ inputs.message_id }}
           payload-file-path: ${{ inputs.slack_template_dir }}/${{ inputs.slack_template_file }}
         env:
           SLACK_BOT_TOKEN: ${{ secrets.GKS_GCC_SLACK_BOT_TOKEN }}
