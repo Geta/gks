@@ -6,6 +6,11 @@ on:
         required: true
         type: string
         description: Slack channel id
+      message_id:
+        required: false
+        type: string
+        default: ''
+        description: Slack message id
       phase:
         required: true
         type: number
@@ -67,6 +72,7 @@ jobs:
         uses: slackapi/slack-github-action@v1
         with:
           channel-id: ${{ inputs.channel_id }}
+          update-ts: ${{ inputs.message_id }}
           payload-file-path: ${{ inputs.slack_template_dir }}/${{ inputs.slack_template_file }}
         env:
           SLACK_BOT_TOKEN: ${{ secrets.GKS_GCC_SLACK_BOT_TOKEN }}
