@@ -72,6 +72,7 @@ jobs:
     secrets: inherit
     with:
       channel_id: ${{ fromJson(inputs.settings).notifications.slack.channels[0].id }}
+      message_id: ${{ inputs.slack_message_id }}
       phase: ${{ inputs.phase }}
       step: ${{ inputs.step }}
       slack_phase_state: ${{ inputs.slack_phase_state }}
