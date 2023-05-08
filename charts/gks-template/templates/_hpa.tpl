@@ -3,7 +3,7 @@
 */ -}}
 {{- define "gks.shared.hpa" -}}
 {{- if .Values.autoscaling.enabled }}
-apiVersion: autoscaling/v2beta1
+apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: {{ include "gks.shared.fullname" . }}
