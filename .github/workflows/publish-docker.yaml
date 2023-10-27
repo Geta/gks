@@ -130,6 +130,7 @@ jobs:
         with:
           #cache-from: 'type=registry,ref=${{ env.cache_image }}'
           #cache-to: 'type=registry,mode=max,ref=${{ env.cache_image }}'
+          allow: 'network.host'
           push: true
           context: ${{ fromJson(inputs.settings).build.docker.context }}
           file: ${{ steps.info.outputs.dockerfile }}
