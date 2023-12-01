@@ -45,7 +45,7 @@ jobs:
       slack_artifact_name: ${{ needs.setup.outputs.artifact }}
       slack_template_file: ${{ needs.setup.outputs.template_file }}
       slack_phase_state: ${{ needs.setup.outputs.phase_state }}
-      args: ${{ fromJson(inputs.settings).general.apps[inputs.app_index].doker.arguments }}
+      args: ${{ fromJson(inputs.settings).general.apps[inputs.app_index].docker.arguments }}
 
   publish-helm:
     name: Publish Helm chart
