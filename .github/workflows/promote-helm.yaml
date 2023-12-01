@@ -75,7 +75,7 @@ jobs:
         name: Add build start notifcation step
         if: inputs.slack_artifact_name != ''
         id: slack-build-start
-        uses: Geta/gks/actions/add-notification-step@actions/v2
+        uses: Geta/gks/actions/add-notification-step@v5
         with:
           template_path: ${{ env.SLACK_TEMPLATE_DIR }}/${{ inputs.slack_template_file }}
           phase: ${{ inputs.phase }}
@@ -102,7 +102,7 @@ jobs:
         run: helm plugin install https://github.com/chartmuseum/helm-push.git
       -
         name: Add main Helm repo
-        uses: Geta/gks/actions/add-helm-repo@actions/v2
+        uses: Geta/gks/actions/add-helm-repo@v5
         with:
           alias: ${{ env.MAIN_REPO_ALIAS }}
           user: ${{ secrets.GKS_HELM_REGISTRY_USER }}
@@ -122,7 +122,7 @@ jobs:
           echo "dst_chart=$DST_NAME" >> $GITHUB_OUTPUT
       -
         name: Pull chart
-        uses: Geta/gks/actions/pull-chart@actions/v2
+        uses: Geta/gks/actions/pull-chart@v5
         with:
           chart_dir: chart/${{ steps.chart.outputs.dst_chart }}
           chart_name: ${{ steps.chart.outputs.src_chart }}
@@ -130,7 +130,7 @@ jobs:
           repo_alias: ${{ env.MAIN_REPO_ALIAS }}
       -
         name: Set chart info
-        uses: Geta/gks/actions/set-chart-info@actions/v2
+        uses: Geta/gks/actions/set-chart-info@v5
         with:
           chart_dir: chart/${{ steps.chart.outputs.dst_chart }}
           chart_name: ${{ steps.chart.outputs.dst_chart }}
@@ -141,17 +141,17 @@ jobs:
           docker_image_tag: ${{ inputs.image_tag }}
       -
         name: Lint Helm Chart
-        uses: Geta/gks/actions/lint-helm-chart@actions/v1
+        uses: Geta/gks/actions/lint-helm-chart@v5
         with:
           chart_dir: chart/${{ steps.chart.outputs.dst_chart }}
       -
         name: Generate README
-        uses: Geta/gks/actions/generate-chart-readme@actions/v1
+        uses: Geta/gks/actions/generate-chart-readme@v5
         with:
           chart_dir: chart/${{ steps.chart.outputs.dst_chart }}
       -
         name: Push service Helm chart
-        uses: Geta/gks/actions/package-helm-chart@actions/v2
+        uses: Geta/gks/actions/package-helm-chart@v5
         with:
           chart_dir: chart/${{ steps.chart.outputs.dst_chart }}
           chart_name: ${{ steps.chart.outputs.dst_chart }}
@@ -184,7 +184,7 @@ jobs:
         name: Add build status notifcation step
         if: always() && steps.slack.conclusion == 'success' && inputs.slack_artifact_name != ''
         id: after-build-template
-        uses: Geta/gks/actions/add-notification-step@actions/v2
+        uses: Geta/gks/actions/add-notification-step@v5
         with:
           template_path: ${{ env.SLACK_TEMPLATE_DIR }}/${{ inputs.slack_template_file }}
           phase: ${{ inputs.phase }}
