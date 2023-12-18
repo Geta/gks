@@ -2,6 +2,7 @@
     Generate Service
 */ -}}
 {{- define "gks.shared.service" -}}
+{{- if eq .Values.type "Deployment" }}
 apiVersion: v1
 kind: Service
 metadata:
