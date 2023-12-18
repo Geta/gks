@@ -2,6 +2,7 @@
     Generate Deployment
 */ -}}
 {{- define "gks.shared.deployment" -}}
+{{- if eq .Values.type "Deployment" }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -102,4 +103,5 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+{{- end -}}
 {{- end -}}
