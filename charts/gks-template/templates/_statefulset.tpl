@@ -1,10 +1,10 @@
 {{- /*
-    Generate Deployment
+    Generate StatefulSet
 */ -}}
-{{- define "gks.shared.deployment" -}}
-{{- if eq .Values.type "Deployment" }}
+{{- define "gks.shared.statefulset" -}}
+{{- if eq .Values.type "StatefulSet" }}
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: {{ include "gks.shared.fullname" . }}
   labels:
@@ -18,6 +18,7 @@ spec:
   selector:
     matchLabels:
       {{- include "gks.shared.selectorLabels" . | nindent 6 }}
+  serviceName: {{ include "gks.shared.fullname" . }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}

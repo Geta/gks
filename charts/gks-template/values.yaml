@@ -11,11 +11,13 @@ autoscaling:
   maxReplicas: 100
   # -- Target CPU utilization percentage
   targetCPUUtilizationPercentage: 80
+# -- Type of kuberenetes deployment (Deployment, StatefulSet)
+type: Deployment
 # -- Image configuration. [Documentation](https://kubernetes.io/docs/concepts/containers/images/).
 # @default -- `{}`
 image:
   # -- Image repository.
-  repository: harbor.teamgeta.net/cervera/giftshop-web/test
+  repository: ''
   # -- Image pull policy.
   pullPolicy: IfNotPresent
   # -- Image tag.
@@ -63,7 +65,7 @@ podLabels: {}
 # -- Pod lifecycle rules
 # @default -- `{}`
 podLifecycle: {}
-# -- Deployment level annotations.
+# -- Deployment (or StatefulSet) level annotations.
 deploymentAnnotations: []
 # -- Service level annotations.
 serviceAnnotations: []
