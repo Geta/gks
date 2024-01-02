@@ -55,7 +55,7 @@ jobs:
         name: Store template in artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.ARTIFACT }}
+          name: ${{ env.ARTIFACT }}-${{ github.run_number }}
           path: ${{ steps.template.outputs.template_file }}
           if-no-files-found: error
           retention-days: 5
