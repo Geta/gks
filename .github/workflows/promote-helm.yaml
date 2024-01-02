@@ -69,7 +69,7 @@ jobs:
         if: inputs.slack_artifact_name != ''
         uses: actions/download-artifact@v4
         with:
-          name: ${{ inputs.slack_artifact_name }}-${{ github.run_id }}
+          name: ${{ inputs.slack_artifact_name }}-${{ inputs.app_index }}-${{ github.run_id }}
           path: ${{ env.SLACK_TEMPLATE_DIR }}
       -
         name: Add build start notifcation step
