@@ -55,7 +55,7 @@ jobs:
         name: Download notification template
         uses: actions/download-artifact@v4
         with:
-          name: ${{ inputs.slack_artifact_name }}
+          name: ${{ inputs.slack_artifact_name }}-${{ github.run_id }}
           path: ${{ inputs.slack_template_dir }}
       -
         name: Add start notification step
