@@ -71,6 +71,7 @@ jobs:
     uses: Geta/gks/.github/workflows/notify-start.yaml@v5
     secrets: inherit
     with:
+      app_index: ${{ inputs.app_index }}
       channel_id: ${{ fromJson(inputs.settings).notifications.slack.channels[0].id }}
       message_id: ${{ inputs.slack_message_id }}
       phase: ${{ inputs.phase }}
@@ -179,6 +180,7 @@ jobs:
     uses: Geta/gks/.github/workflows/notify-end.yaml@v5
     secrets: inherit
     with:
+      app_index: ${{ inputs.app_index }}
       channel_id: ${{ fromJson(inputs.settings).notifications.slack.channels[0].id }}
       message_id: ${{ needs.notify_start.outputs.slack_message_id }}
       slack_state: ${{ needs.notify_start.outputs.slack_state }}
