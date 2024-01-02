@@ -88,7 +88,7 @@ jobs:
         uses: slackapi/slack-github-action@v1
         with:
           update-ts: ${{ inputs.slack_message_id }}
-          channel-id: ${{ fromJson(inputs.settings).notifications.slack.channels }}
+          channel-id: ${{ fromJson(inputs.settings).notifications.slack.channels[0].id }}
           payload-file-path: ${{ env.SLACK_TEMPLATE_DIR }}/${{ inputs.slack_template_file }}
         env:
           SLACK_BOT_TOKEN: ${{ secrets.GKS_GCC_SLACK_BOT_TOKEN }}
@@ -196,7 +196,7 @@ jobs:
         uses: slackapi/slack-github-action@v1
         with:
           update-ts: ${{ inputs.slack_message_id }}
-          channel-id: ${{ fromJson(inputs.settings).notifications.slack.channels }}
+          channel-id: ${{ fromJson(inputs.settings).notifications.slack.channels[0].id }}
           payload-file-path: ${{ env.SLACK_TEMPLATE_DIR }}/${{ inputs.slack_template_file }}
         env:
           SLACK_BOT_TOKEN: ${{ secrets.GKS_GCC_SLACK_BOT_TOKEN }}
