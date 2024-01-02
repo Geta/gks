@@ -50,7 +50,7 @@ jobs:
           exit 1
       -
         name: Read config file
-        uses: Geta/gks/actions/read-config-file@actions/v3
+        uses: Geta/gks/actions/read-config-file@v5
         id: settings
         with:
           file: ${{ vars.CONFIG_FILE }}

@@ -1,32 +1,43 @@
 name: 'Publish NPM Package'
+description: 'Publishes NPM package to GitHub Packages'
 inputs:
   repository_name:
     required: true
+    description: 'Name of the repository'
   service_name:
     required: true
+    description: 'Name of the service'
   version:
     required: true
+    description: 'Version of the package'
   build_number:
     required: true
+    description: 'Build number'
   env:
     required: true
+    description: 'Environment'
   template_revision:
     required: true
+    description: 'Revision of the template'
   src_files_dir:
     required: true
+    description: 'Path to the source files'
   node_version:
     required: false
     default: '16'
+    description: 'Node version'
   gh_token:
     required: true
+    description: 'GitHub token'
   packages_url:
     required: true
+    description: 'URL to GitHub Packages'
 runs:
   using: "composite"
   steps:
     - 
       name: Install Node
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ inputs.node_version }}
     -
@@ -38,6 +49,7 @@ runs:
         package_path: /tmp/npm
         out_path: /tmp/npm/output
       run: |
+        SRC_PATH=$(echo "$(pwd)/${{ inputs.src_files_dir }}")
         REVISION=$(echo '${{ inputs.template_revision }}' | sed 's/\/\\//g')
         URL=$(echo "https://github.com/Geta/gks/raw/$REVISION/assets/npm-template/${{ env.package_name }}")
         mkdir ${{ env.package_path }}
@@ -45,7 +57,7 @@ runs:
         mkdir ${{ env.out_path }}
         tar -xzf ${{ env.package_path }}/${{ env.package_name }} -C ${{ env.out_path }}
         cd ${{ env.out_path }}
-        cp -r ${{ inputs.src_files_dir }}/. ./src
+        cp -v $SRC_PATH/index.ts ./src/index.ts
         echo "out_path=${{ env.out_path }}" >> $GITHUB_OUTPUT
     -
       name: Format version number
@@ -59,7 +71,6 @@ runs:
       shell: bash
       run: |
         cd ${{ steps.fetch.outputs.out_path }}
-        echo "REPO NAME IS ${{ inputs.repository_name }}"
         node ./scripts/setup repositoryName=${{ inputs.repository_name }} serviceName=${{ inputs.service_name }} version=${{ steps.version.outputs.version }} buildNumber=${{ inputs.build_number }} environment=${{ inputs.env }}
     -
       name: Update README
@@ -81,6 +92,7 @@ runs:
       shell: bash
       env:
         NPM_GETA_PAT: ${{ inputs.gh_token }}
+        NPM_AUTH_TOKEN: ${{ inputs.gh_token }}
         NPM_GETA_URL: ${{ inputs.packages_url }}
       run: |
         cd ${{ steps.fetch.outputs.out_path }}
@@ -90,7 +102,8 @@ runs:
       shell: bash
       env:
         NPM_GETA_PAT: ${{ inputs.gh_token }}
+        NPM_AUTH_TOKEN: ${{ inputs.gh_token }}
         NPM_GETA_URL: ${{ inputs.packages_url }}
       run: |
         cd ${{ steps.fetch.outputs.out_path }}
-        node ./scripts/publish 
+        node ./scripts/publish

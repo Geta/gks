@@ -1,4 +1,4 @@
-name: Publish NPM client 
+name: Publish NPM client package 
 on:
   workflow_call:
     inputs:
@@ -15,7 +15,7 @@ on:
         type: string
         description: Settings json string
 jobs:
-  publish-npm:
+  publish:
     name: Publish NPM client
     runs-on: ubuntu-latest
     steps:
@@ -25,10 +25,10 @@ jobs:
         with:
           ref: ${{ github.ref }}
           token: ${{ secrets.GKS_GH_ACCESS_TOKEN }}
-          submodules: ${{ fromJson(inputs.settings).source.submodules }}
+          submodules: false
       - 
         name: Publish NPM client
-        uses: ./.github/actions/publish-npm-client@v5
+        uses: Geta/gks/actions/publish-npm-package@v5
         with:
           repository_name: ${{ fromJson(inputs.settings).clients.npm.repositoryName }}
           service_name: ${{ fromJson(inputs.settings).clients.npm.serviceName }}
@@ -38,5 +38,5 @@ jobs:
           template_revision: ${{ fromJson(inputs.settings).clients.npm.packageTemplateRevision }}
           src_files_dir: ${{ fromJson(inputs.settings).clients.npm.srcFilesDir }}
           node_version: ${{ fromJson(inputs.settings).clients.npm.nodeVersion }}
-          gh_roken: ${{ secrets.GKS_GH_ACCESS_TOKEN }}
+          gh_token: ${{ secrets.GKS_GH_ACCESS_TOKEN }}
           packages_url: ${{ fromJson(inputs.settings).artifacts.npm.registryUrl }}

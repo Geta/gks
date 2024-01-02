@@ -30,7 +30,7 @@ jobs:
           exit 1
       - 
         name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.ref }}
           token: ${{ secrets.GKS_GH_ACCESS_TOKEN }}
@@ -99,7 +99,7 @@ jobs:
       # TODO: check if hotfix or release with such version is already created
       -
         name: Read config file
-        uses: Geta/gks/actions/read-config-file@actions/v3
+        uses: Geta/gks/actions/read-config-file@v5
         id: settings
         with:
           file: ${{ vars.CONFIG_FILE }}

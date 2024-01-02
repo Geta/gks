@@ -1,4 +1,4 @@
-name: Publish NuGet package
+name: Publish NuGet client package 
 on:
   workflow_call:
     inputs:
@@ -15,22 +15,14 @@ on:
         type: string
         description: Settings json string
 jobs:
-  publish-npm:
-    if: ${{ fromJson(inputs.settings).clients.publish.npm }}
-    name: Publish NPM package
-    uses: Geta/gks/.github/workflows/publish-npm.yaml@v5
-    secrets: inherit
-    with:
-      env: ${{ inputs.env }}
-      version: ${{ inputs.version }}
-      settings: ${{ inputs.settings }}
-
-  publish-nuget:
-    if: ${{ fromJson(inputs.settings).clients.publish.nuget }}
-    name: Publish NuGet package
-    uses: Geta/gks/.github/workflows/publish-nuget.yaml@v5
-    secrets: inherit
-    with:
-      env: ${{ inputs.env }}
-      version: ${{ inputs.version }}
-      settings: ${{ inputs.settings }}
+  publish:
+    name: Publish Nuget client
+    runs-on: ubuntu-latest
+    steps:
+      - 
+        name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          token: ${{ secrets.GKS_GH_ACCESS_TOKEN }}
+          submodules: false
