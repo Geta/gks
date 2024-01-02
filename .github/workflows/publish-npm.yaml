@@ -1,0 +1,42 @@
+name: Publish NPM client 
+on:
+  workflow_call:
+    inputs:
+      env:
+        required: true
+        type: string
+        description: Environment name
+      version:
+        required: true
+        type: string
+        description: Version number
+      settings:
+        required: true
+        type: string
+        description: Settings json string
+jobs:
+  publish-npm:
+    name: Publish NPM client
+    runs-on: ubuntu-latest
+    steps:
+      - 
+        name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          token: ${{ secrets.GKS_GH_ACCESS_TOKEN }}
+          submodules: ${{ fromJson(inputs.settings).source.submodules }}
+      - 
+        name: Publish NPM client
+        uses: ./.github/actions/publish-npm-client@v5
+        with:
+          repository_name: ${{ fromJson(inputs.settings).clients.npm.repositoryName }}
+          service_name: ${{ fromJson(inputs.settings).clients.npm.serviceName }}
+          version: ${{ inputs.version }}
+          build_number: ${{ github.run_number }}
+          env: ${{ inputs.env }}
+          template_revision: ${{ fromJson(inputs.settings).clients.npm.packageTemplateRevision }}
+          src_files_dir: ${{ fromJson(inputs.settings).clients.npm.srcFilesDir }}
+          node_version: ${{ fromJson(inputs.settings).clients.npm.nodeVersion }}
+          gh_roken: ${{ secrets.GKS_GH_ACCESS_TOKEN }}
+          packages_url: ${{ fromJson(inputs.settings).artifacts.npm.registryUrl }}

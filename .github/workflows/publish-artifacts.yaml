@@ -1,4 +1,4 @@
-name: Publish Assets
+name: Publish Artifacts
 on:
   workflow_call:
     inputs:

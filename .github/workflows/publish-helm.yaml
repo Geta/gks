@@ -68,7 +68,7 @@ jobs:
     #! strategy:
     #!   matrix: 
     #!     channel: ${{ fromJson(inputs.settings).notifications.slack.channels }}
-    uses: Geta/gks/.github/workflows/notify-start.yaml@workflows/v4
+    uses: Geta/gks/.github/workflows/notify-start.yaml@v5
     secrets: inherit
     with:
       channel_id: ${{ fromJson(inputs.settings).notifications.slack.channels[0].id }}
@@ -99,10 +99,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GKS_GH_ACCESS_TOKEN }}
       -
         name: Install Helm Push plugin
-        run: helm plugin install --version v0.10.3 https://github.com/chartmuseum/helm-push.git
+        run: helm plugin install --version v0.10.4 https://github.com/chartmuseum/helm-push.git
       -
         name: Add main Helm repo
-        uses: Geta/gks/actions/add-helm-repo@actions/v2
+        uses: Geta/gks/actions/add-helm-repo@v5
         with:
           alias: ${{ env.MAIN_REPO_ALIAS }}
           user: ${{ secrets.GKS_HELM_REGISTRY_USER }}
@@ -110,7 +110,7 @@ jobs:
           url: ${{ fromJson(inputs.settings).artifacts.helm.repoUrl }}
       -
         name: Add template Helm repo
-        uses: Geta/gks/actions/add-helm-repo@actions/v2
+        uses: Geta/gks/actions/add-helm-repo@v5
         with:
           alias: ${{ env.TEMPLATE_REPO_ALIAS }}
           user: ${{ secrets.GKS_HELM_REGISTRY_USER }}
@@ -128,7 +128,7 @@ jobs:
           echo "chart_version=$CHART_VERSION" >> $GITHUB_OUTPUT
       -
         name: Pull template chart
-        uses: Geta/gks/actions/pull-chart@actions/v2
+        uses: Geta/gks/actions/pull-chart@v5
         with:
           chart_dir: chart/${{ fromJson(inputs.settings).artifacts.helm.template.name }}
           chart_name: ${{ fromJson(inputs.settings).artifacts.helm.template.name }}
@@ -136,7 +136,7 @@ jobs:
           repo_alias: ${{ env.TEMPLATE_REPO_ALIAS }}
       -
         name: Set chart info
-        uses: Geta/gks/actions/set-chart-info@actions/v2
+        uses: Geta/gks/actions/set-chart-info@v5
         with:
           chart_dir: chart/${{ fromJson(inputs.settings).artifacts.helm.template.name }}
           chart_name: ${{ steps.chart.outputs.chart_name }}
@@ -147,17 +147,17 @@ jobs:
           docker_image_tag: ${{ inputs.image_tag }}
       -
         name: Lint Helm Chart
-        uses: Geta/gks/actions/lint-helm-chart@actions/v1
+        uses: Geta/gks/actions/lint-helm-chart@v5
         with:
           chart_dir: chart/${{ fromJson(inputs.settings).artifacts.helm.template.name }}
       -
         name: Generate README
-        uses: Geta/gks/actions/generate-chart-readme@actions/v1
+        uses: Geta/gks/actions/generate-chart-readme@v5
         with:
           chart_dir: chart/${{ fromJson(inputs.settings).artifacts.helm.template.name }}
       -
         name: Push service Helm chart
-        uses: Geta/gks/actions/package-helm-chart@actions/v2
+        uses: Geta/gks/actions/package-helm-chart@v5
         with:
           chart_dir: chart/${{ fromJson(inputs.settings).artifacts.helm.template.name }}
           chart_name: ${{ steps.chart.outputs.chart_name }}
@@ -176,7 +176,7 @@ jobs:
     #! strategy:
     #!   matrix: 
     #!     channel: ${{ fromJson(inputs.settings).notifications.slack.channels }}
-    uses: Geta/gks/.github/workflows/notify-end.yaml@workflows/v4
+    uses: Geta/gks/.github/workflows/notify-end.yaml@v5
     secrets: inherit
     with:
       channel_id: ${{ fromJson(inputs.settings).notifications.slack.channels[0].id }}
