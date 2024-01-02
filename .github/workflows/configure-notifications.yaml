@@ -53,7 +53,7 @@ jobs:
           initial_state: ${{ inputs.initial_state }}
       -
         name: Store template in artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.ARTIFACT }}-${{ github.run_id }}
           path: ${{ steps.template.outputs.template_file }}
