@@ -64,7 +64,7 @@ jobs:
       -
         name: Download notification template
         if: inputs.slack_artifact_name != ''
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: ${{ inputs.slack_artifact_name }}
           path: ${{ env.SLACK_TEMPLATE_DIR }}
@@ -72,7 +72,7 @@ jobs:
         name: Add build start notification step
         if: inputs.slack_artifact_name != ''
         id: slack-build-start
-        uses: Geta/gks/actions/add-notification-step@actions/v2
+        uses: Geta/gks/actions/add-notification-step@v5
         with:
           template_path: ${{ env.SLACK_TEMPLATE_DIR }}/${{ inputs.slack_template_file }}
           phase: ${{ inputs.phase }}
@@ -90,14 +90,14 @@ jobs:
           SLACK_BOT_TOKEN: ${{ secrets.GKS_GCC_SLACK_BOT_TOKEN }}
       - 
         name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.ref }}
           token: ${{ secrets.GKS_GH_ACCESS_TOKEN }}
           submodules: ${{ fromJson(inputs.settings).source.submodules }}
       - 
         name: Log in to Docker registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ${{ fromJson(inputs.settings).artifacts.docker.repoUrl }}
           username: ${{ secrets.GKS_DOCKER_REGISTRY_USER }}
@@ -148,7 +148,7 @@ jobs:
         name: Add build status notification step
         if: always() && steps.slack.conclusion == 'success' && inputs.slack_artifact_name != ''
         id: after-build-template
-        uses: Geta/gks/actions/add-notification-step@actions/v2
+        uses: Geta/gks/actions/add-notification-step@v5
         with:
           template_path: ${{ env.SLACK_TEMPLATE_DIR }}/${{ inputs.slack_template_file }}
           phase: ${{ inputs.phase }}

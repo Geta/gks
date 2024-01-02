@@ -67,7 +67,7 @@ jobs:
       -
         name: Download notification template
         if: inputs.slack_artifact_name != ''
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: ${{ inputs.slack_artifact_name }}
           path: ${{ env.SLACK_TEMPLATE_DIR }}

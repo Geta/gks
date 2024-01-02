@@ -40,7 +40,7 @@ jobs:
       -
         name: Get notification template
         id: template
-        uses: Geta/gks/actions/build-notification-template@actions/v2
+        uses: Geta/gks/actions/build-notification-template@v5
         with:
           title: ${{ github.workflow }}
           user: ${{ github.actor }}
@@ -53,7 +53,7 @@ jobs:
           initial_state: ${{ inputs.initial_state }}
       -
         name: Store template in artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.ARTIFACT }}
           path: ${{ steps.template.outputs.template_file }}

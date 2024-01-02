@@ -53,14 +53,14 @@ jobs:
     steps:
       -
         name: Download notification template
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: ${{ inputs.slack_artifact_name }}
           path: ${{ inputs.slack_template_dir }}
       -
         name: Add start notification step
         id: notification
-        uses: Geta/gks/actions/add-notification-step@actions/v3
+        uses: Geta/gks/actions/add-notification-step@v5
         with:
           template_path: ${{ inputs.slack_template_dir }}/${{ inputs.slack_template_file }}
           phase: ${{ inputs.phase }}
