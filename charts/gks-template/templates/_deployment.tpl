@@ -59,7 +59,7 @@ spec:
           ports:
             - containerPort: {{ .Values.service.targetPortNumber }}
               protocol: TCP
-              name: http
+              name: {{ .Values.service.targetPort }}
           {{- range .Values.service.extraPorts }}
             - containerPort: {{ .port }}
               protocol: TCP
