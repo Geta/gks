@@ -57,7 +57,7 @@ spec:
           volumeMounts:
             {{- toYaml .Values.volumeMounts | nindent 12 }}
           ports:
-            - containerPort: {{ .Values.service.port }}
+            - containerPort: {{ .Values.service.targetPortNumber }}
               protocol: TCP
               name: http
           {{- range .Values.service.extraPorts }}
