@@ -135,6 +135,7 @@ jobs:
           #cache-to: 'type=registry,mode=max,ref=${{ env.cache_image }}'
           allow: 'network.host'
           push: true
+          platforms: ${{ fromJson(inputs.settings).general.apps[inputs.app_index].docker.platforms }}
           context: ${{ steps.info.outputs.docker_context }}
           file: ${{ steps.info.outputs.dockerfile }}
           build-args: |
