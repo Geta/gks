@@ -26,6 +26,12 @@ jobs:
           ref: ${{ github.ref }}
           token: ${{ secrets.GKS_GH_ACCESS_TOKEN }}
           submodules: false
+      -
+        name: Install NSwag
+        run: npm install -g nswag
+      -
+        name: Generate NSwag client
+        run: nswag run "${{ fromJson(inputs.settings).clients.npm.srcFilesDir }}/nswag.json"
       - 
         name: Publish NPM client
         uses: Geta/gks/actions/publish-npm-package@v5
@@ -36,7 +42,7 @@ jobs:
           build_number: ${{ github.run_number }}
           env: ${{ inputs.env }}
           template_revision: ${{ fromJson(inputs.settings).clients.npm.packageTemplateRevision }}
-          src_files_dir: ${{ fromJson(inputs.settings).clients.npm.srcFilesDir }}
+          src_files_dir: "${{ fromJson(inputs.settings).clients.npm.srcFilesDir }}/output"
           node_version: ${{ fromJson(inputs.settings).clients.npm.nodeVersion }}
           gh_token: ${{ secrets.GKS_GH_ACCESS_TOKEN }}
           packages_url: ${{ fromJson(inputs.settings).artifacts.npm.registryUrl }}
