@@ -50,7 +50,7 @@ jobs:
         shell: bash
         run: |
           OUTPUT_PATH=$(echo "${{ fromJson(inputs.settings).clients.npm.srcFilesDir }}/output")
-          nswag run "${{ steps.config.outputs.file }}" /variables:Configuration=Release,Environment=CI,Runtime=Net80PathToSwaggerJson=${{ fromJson(inputs.settings).clients.npm.srcFilesDir }}/swagger.json,OutputPath=$OUTPUT_PATH
+          nswag run "${{ steps.config.outputs.file }}" /variables:Configuration=Release,Environment=CI,Runtime=Net80,PathToSwaggerJson=${{ fromJson(inputs.settings).clients.npm.srcFilesDir }}/swagger.json,OutputPath=$OUTPUT_PATH
           echo "path=$OUTPUT_PATH" >> $GITHUB_OUTPUT
       - 
         name: Publish NPM client
@@ -62,7 +62,7 @@ jobs:
           build_number: ${{ github.run_number }}
           env: ${{ inputs.env }}
           template_revision: ${{ fromJson(inputs.settings).clients.npm.packageTemplateRevision }}
-          src_files_dir: ${{ steps.client.outputs.path }}
+          src_files_dir: ${{ steps.client.outputs.p }}
           node_version: ${{ fromJson(inputs.settings).clients.npm.nodeVersion }}
           gh_token: ${{ secrets.GKS_GH_ACCESS_TOKEN }}
           packages_url: ${{ fromJson(inputs.settings).artifacts.npm.registryUrl }}
