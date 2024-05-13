@@ -62,7 +62,7 @@ jobs:
           build_number: ${{ github.run_number }}
           env: ${{ inputs.env }}
           template_revision: ${{ fromJson(inputs.settings).clients.npm.packageTemplateRevision }}
-          src_files_dir: ${{ steps.client.outputs.p }}
+          src_files_dir: ${{ steps.client.outputs.path }}
           node_version: ${{ fromJson(inputs.settings).clients.npm.nodeVersion }}
           gh_token: ${{ secrets.GKS_GH_ACCESS_TOKEN }}
           packages_url: ${{ fromJson(inputs.settings).artifacts.npm.registryUrl }}
