@@ -40,7 +40,7 @@ jobs:
         id: config
         shell: bash
         run: |
-          URL=$(echo "https://${{ inputs.gh_token }}@raw.githubusercontent.com/Geta/gks/${{ fromJson(inputs.settings).clients.npm.packageTemplateRevision }}/.github/configs/${{ inputs.nswag_config }}")
+          URL=$(echo "https://${{ secrets.GKS_GH_ACCESS_TOKEN }}@raw.githubusercontent.com/Geta/gks/${{ fromJson(inputs.settings).clients.npm.packageTemplateRevision }}/.github/configs/${{ inputs.nswag_config }}")
           FILE_PATH=$(echo "./nswag.json")
           curl -L $URL > $FILE_PATH
           echo "file=$FILE_PATH" >> $GITHUB_OUTPUT
