@@ -16,7 +16,7 @@ on:
         description: Settings json string
       nswag_config:
         required: false
-        default: npm.json
+        default: typescript.json
         type: string
         description: NSwag config file path
 jobs:
@@ -40,7 +40,7 @@ jobs:
         id: config
         shell: bash
         run: |
-          URL=$(echo "https://${{ secrets.GKS_GH_ACCESS_TOKEN }}@raw.githubusercontent.com/Geta/gks/${{ fromJson(inputs.settings).clients.npm.packageTemplateRevision }}/.github/configs/${{ inputs.nswag_config }}")
+          URL=$(echo "https://${{ secrets.GKS_GH_ACCESS_TOKEN }}@raw.githubusercontent.com/Geta/gks/${{ fromJson(inputs.settings).clients.npm.packageTemplateRevision }}/assets/nswag/${{ inputs.nswag_config }}")
           FILE_PATH=$(echo "./nswag.json")
           curl -L $URL > $FILE_PATH
           echo "file=$FILE_PATH" >> $GITHUB_OUTPUT
