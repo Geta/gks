@@ -14,6 +14,11 @@ on:
         required: true
         type: string
         description: Settings json string
+      nswag_config:
+        required: false
+        default: npm.json
+        type: string
+        description: NSwag config file path
 jobs:
   publish:
     name: Publish NPM client
@@ -28,10 +33,25 @@ jobs:
           submodules: false
       -
         name: Install NSwag
+        shell: bash
         run: npm install -g nswag
       -
+        name: Download NSwag config
+        id: config
+        shell: bash
+        run: |
+          URL=$(echo "https://${{ inputs.gh_token }}@raw.githubusercontent.com/Geta/gks/${{ fromJson(inputs.settings).clients.npm.packageTemplateRevision }}/.github/configs/${{ inputs.nswag_config }}")
+          FILE_PATH=$(echo "./config.yaml")
+          curl -L $URL > $FILE_PATH
+          echo "file=$FILE_PATH" >> $GITHUB_OUTPUT
+      -
         name: Generate NSwag client
-        run: nswag run "${{ fromJson(inputs.settings).clients.npm.srcFilesDir }}/nswag.json"
+        id: client
+        shell: bash
+        run: |
+          OUTPUT_PATH=$(echo "${{ fromJson(inputs.settings).clients.npm.srcFilesDir }}/output")
+          nswag run "${{ steps.config.outputs.file }}" /variables:Configuration=Release,Environment=CI,Runtime=Net80;PathToSwaggerJson=${{ fromJson(inputs.settings).clients.npm.srcFilesDir }}/swagger.json,OutputPath=$OUTPUT_PATH
+          echo "path=$OUTPUT_PATH" >> $GITHUB_OUTPUT
       - 
         name: Publish NPM client
         uses: Geta/gks/actions/publish-npm-package@v5
@@ -42,7 +62,7 @@ jobs:
           build_number: ${{ github.run_number }}
           env: ${{ inputs.env }}
           template_revision: ${{ fromJson(inputs.settings).clients.npm.packageTemplateRevision }}
-          src_files_dir: "${{ fromJson(inputs.settings).clients.npm.srcFilesDir }}/output"
+          src_files_dir: ${{ steps.config.outputs.file }}
           node_version: ${{ fromJson(inputs.settings).clients.npm.nodeVersion }}
           gh_token: ${{ secrets.GKS_GH_ACCESS_TOKEN }}
           packages_url: ${{ fromJson(inputs.settings).artifacts.npm.registryUrl }}
