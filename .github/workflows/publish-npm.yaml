@@ -45,12 +45,12 @@ jobs:
           curl -L $URL > $FILE_PATH
           echo "file=$FILE_PATH" >> $GITHUB_OUTPUT
       -
-        name: Generate NSwag client
+        name: Generate Typecript client
         id: client
         shell: bash
         run: |
           OUTPUT_PATH=$(echo "${{ fromJson(inputs.settings).clients.npm.srcFilesDir }}/output/")
-          nswag run "${{ steps.config.outputs.file }}" /variables:Configuration=Release,Environment=CI,Runtime=Net80,PathToSwaggerJson=${{ fromJson(inputs.settings).clients.npm.srcFilesDir }}/swagger.json,OutputPath=$OUTPUT_PATH
+          nswag run "${{ steps.config.outputs.file }}" /variables:Configuration=Release,Environment=CI,Runtime=Net80,PathToSwaggerJson=${{ fromJson(inputs.settings).clients.npm.swaggerFile }},OutputPath=$OUTPUT_PATH
           echo "path=$OUTPUT_PATH" >> $GITHUB_OUTPUT
       - 
         name: Publish NPM client
