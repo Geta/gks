@@ -57,7 +57,7 @@ runs:
         mkdir ${{ env.out_path }}
         tar -xzf ${{ env.package_path }}/${{ env.package_name }} -C ${{ env.out_path }}
         cd ${{ env.out_path }}
-        cp -v $($SRC_PATH)index.ts ./src/index.ts
+        cp -v "$(echo $SRC_PATH)index.ts" ./src/index.ts
         echo "out_path=${{ env.out_path }}" >> $GITHUB_OUTPUT
     -
       name: Format version number
