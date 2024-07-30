@@ -53,6 +53,14 @@ jobs:
           NSWAG_RUNTIME=$(echo "${{ fromJson(inputs.settings).clients.npm.nswagRuntime }}")
           nswag run "${{ steps.config.outputs.file }}" /variables:Configuration=Release,Environment=CI,Runtime=$NSWAG_RUNTIME,PathToSwaggerJson=${{ fromJson(inputs.settings).clients.npm.swaggerFile }},OutputPath=$OUTPUT_PATH
           echo "path=$OUTPUT_PATH" >> $GITHUB_OUTPUT
+      -
+        name: Upload client as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: TypeScript client
+          path: ${{ steps.client.outputs.path }}
+          if-no-files-found: error
+          retention-days: 1
       - 
         name: Publish NPM client
         uses: Geta/gks/actions/publish-npm-package@v5
