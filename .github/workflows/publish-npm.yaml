@@ -50,7 +50,8 @@ jobs:
         shell: bash
         run: |
           OUTPUT_PATH=$(echo "${{ fromJson(inputs.settings).clients.npm.srcFilesDir }}/output/")
-          nswag run "${{ steps.config.outputs.file }}" /variables:Configuration=Release,Environment=CI,Runtime=Net80,PathToSwaggerJson=${{ fromJson(inputs.settings).clients.npm.swaggerFile }},OutputPath=$OUTPUT_PATH
+          NSWAG_RUNTIME=$(echo "${{ fromJson(inputs.settings).clients.npm.nswagRuntime }}")
+          nswag run "${{ steps.config.outputs.file }}" /variables:Configuration=Release,Environment=CI,Runtime=$NSWAG_RUNTIME,PathToSwaggerJson=${{ fromJson(inputs.settings).clients.npm.swaggerFile }},OutputPath=$OUTPUT_PATH
           echo "path=$OUTPUT_PATH" >> $GITHUB_OUTPUT
       - 
         name: Publish NPM client
