@@ -87,7 +87,7 @@ jobs:
         with:
           java-version: ${{ inputs.java_version }}
       -
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         name: Checkout code
         with:
           ref: ${{ inputs.git_ref }}
@@ -116,7 +116,7 @@ jobs:
     steps:
       - 
         name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ inputs.git_ref }}
           fetch-depth: 0
