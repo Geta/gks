@@ -60,7 +60,7 @@
         "inlineNamedDictionaries": false,
         "inlineNamedAny": false,
         "includeHttpContext": false,
-        "templateDirectory": null,
+        "templateDirectory": "$(TemplatePath)",
         "typeNameGeneratorType": null,
         "propertyNameGeneratorType": null,
         "enumNameGeneratorType": null,

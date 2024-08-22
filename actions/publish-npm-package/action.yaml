@@ -49,7 +49,7 @@ runs:
         package_path: /tmp/npm
         out_path: /tmp/npm/output
       run: |
-        SRC_PATH=$(echo "$(pwd)/${{ inputs.src_files_dir }}")
+        SRC_PATH=$(echo "${{ inputs.src_files_dir }}")
         REVISION=$(echo '${{ inputs.template_revision }}' | sed 's/\/\\//g')
         URL=$(echo "https://github.com/Geta/gks/raw/$REVISION/assets/npm-template/${{ env.package_name }}")
         mkdir ${{ env.package_path }}
