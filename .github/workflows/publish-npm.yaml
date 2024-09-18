@@ -59,7 +59,7 @@ jobs:
           echo "path=$OUTPUT_PATH" >> $GITHUB_OUTPUT
       -
         name: Upload client as artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: TypeScript client
           path: ${{ steps.client.outputs.path }}
