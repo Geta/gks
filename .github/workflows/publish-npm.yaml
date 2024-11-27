@@ -35,6 +35,7 @@ jobs:
         name: Install NSwag
         shell: bash
         run: |
+          npm update -g
           npm install -g nswag
           nswag version /runtime:${{ fromJson(inputs.settings).clients.npm.nswagRuntime }}
       -
