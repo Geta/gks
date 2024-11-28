@@ -56,7 +56,7 @@ on:
         description: Slack phase state
 jobs:
   helm:
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJson(inputs.settings).general.runOn || 'ubuntu-latest' }}
     env:
       MAIN_REPO_ALIAS: main
       STATUS_STEP: ""

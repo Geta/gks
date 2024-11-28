@@ -51,7 +51,7 @@ on:
         value: ${{ jobs.docker.outputs.slack_message_id }}
 jobs:
   docker:
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJson(inputs.settings).general.runOn || 'ubuntu-latest' }}
     outputs:
       image_name: ${{ steps.push.outputs.image_name }}
       image_tag: ${{ steps.push.outputs.image_tag }}

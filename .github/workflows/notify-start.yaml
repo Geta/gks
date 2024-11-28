@@ -40,6 +40,11 @@ on:
         type: string
         default: /tmp/slack
         description: Template file directory
+      runs_on:
+        required: false
+        type: string
+        default: ubuntu-latest
+        description: Runner type
     outputs:
       slack_state:
         value: ${{ jobs.notify.outputs.slack_state }}
@@ -50,7 +55,7 @@ on:
 jobs:
   notify:
     name: Compose and send Slack message
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.runs_on }}
     outputs:
       slack_state: ${{ steps.notification.outputs.state }}
       slack_message_id: ${{ steps.slack.outputs.ts }}

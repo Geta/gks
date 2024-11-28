@@ -79,19 +79,17 @@ jobs:
       slack_phase_state: ${{ inputs.slack_phase_state }}
       slack_artifact_name: ${{ inputs.slack_artifact_name }}
       slack_template_file: ${{ inputs.slack_template_file }}
+      runs_on: ${{ fromJson(inputs.settings).general.runOn }}
 
   chart:
     if: always()
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJson(inputs.settings).general.runOn || 'ubuntu-latest' }}
+    timeout-minutes: 30
     needs: [ notify_start ]
     name: Package and push helm chart
     env:
       MAIN_REPO_ALIAS: main
       TEMPLATE_REPO_ALIAS: template
-      STATUS_STEP: ""
-      SLACK_TEMPLATE_DIR: /tmp/slack
-    outputs:
-      slack_state: ${{ steps.after-build-template.outputs.state }}
     steps:
       -
         name: Install Helm
@@ -185,7 +183,8 @@ jobs:
       message_id: ${{ needs.notify_start.outputs.slack_message_id }}
       slack_state: ${{ needs.notify_start.outputs.slack_state }}
       phase: ${{ inputs.phase }}
-      result: ${{ needs.chart.result }}
       step: ${{ inputs.step }}
+      result: ${{ needs.chart.result }}
       slack_artifact_name: ${{ inputs.slack_artifact_name }}
       slack_template_file: ${{ inputs.slack_template_file }}
+      runs_on: ${{ fromJson(inputs.settings).general.runOn }}

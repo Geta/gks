@@ -13,7 +13,7 @@ on:
 jobs:
   release:
     name: Create release
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJson(inputs.settings).general.runOn || 'ubuntu-latest' }}
     steps:
       -
         uses: actions/checkout@v4

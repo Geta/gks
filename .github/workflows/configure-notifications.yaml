@@ -29,7 +29,8 @@ on:
         value: ${{ jobs.configure.outputs.phase_state }}
 jobs:
   configure:
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJson(inputs.settings).general.runOn || 'ubuntu-latest' }}
+    timeout-minutes: 10
     outputs:
       artifact: ${{ steps.artifact.outputs.name }}
       file: ${{ steps.artifact.outputs.template_file }}
