@@ -76,7 +76,7 @@ jobs:
       slack_phase_state: ${{ inputs.slack_phase_state }}
       slack_artifact_name: ${{ inputs.slack_artifact_name }}
       slack_template_file: ${{ inputs.slack_template_file }}
-      runs_on: ${{ fromJson(inputs.settings).general.runOn }}
+      runs_on: ${{ fromJson(inputs.settings).general.runOn || 'ubuntu-latest' }}
 
   image:
     if: always()
@@ -179,4 +179,4 @@ jobs:
       result: ${{ needs.image.result }}
       slack_artifact_name: ${{ inputs.slack_artifact_name }}
       slack_template_file: ${{ inputs.slack_template_file }}
-      runs_on: ${{ fromJson(inputs.settings).general.runOn }}
+      runs_on: ${{ fromJson(inputs.settings).general.runOn || 'ubuntu-latest' }}
