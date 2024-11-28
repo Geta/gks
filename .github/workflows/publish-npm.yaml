@@ -32,6 +32,11 @@ jobs:
           token: ${{ secrets.GKS_GH_ACCESS_TOKEN }}
           submodules: false
       -
+        name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+      -
         name: Install NSwag
         shell: bash
         run: |
