@@ -63,7 +63,7 @@ jobs:
           OUTPUT_PATH=$(echo "$(pwd)/${{ fromJson(inputs.settings).clients.npm.srcFilesDir }}/output/")
           NSWAG_RUNTIME=$(echo "${{ fromJson(inputs.settings).clients.npm.nswagRuntime }}")
           cd ${{ steps.config.outputs.dir }}
-          nswag run /variables:Configuration=Release,Environment=CI,Runtime=$NSWAG_RUNTIME,PathToSwaggerJson=${{ fromJson(inputs.settings).clients.npm.swaggerFile }},TemplatePath=${{ steps.config.outputs.templates }},OutputPath=$OUTPUT_PATH
+          nswag run /runtime:$NSWAG_RUNTIME /variables:Configuration=Release,Environment=CI,Runtime=$NSWAG_RUNTIME,PathToSwaggerJson=${{ fromJson(inputs.settings).clients.npm.swaggerFile }},TemplatePath=${{ steps.config.outputs.templates }},OutputPath=$OUTPUT_PATH
           echo "path=$OUTPUT_PATH" >> $GITHUB_OUTPUT
       -
         name: Upload client as artifact
