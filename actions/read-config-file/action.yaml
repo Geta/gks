@@ -40,13 +40,12 @@ runs:
         echo "file=$FILE_PATH" >> $GITHUB_OUTPUT
     - 
       name: Convert YAML to JSON
-      uses: fabasoad/data-format-converter-action@main
+      uses: fabasoad/data-format-converter-action@v0.3.0
       id: yaml2json
       with:
-        source-pattern: ${{ steps.yaml.outputs.file }}
+        input: ${{ steps.yaml.outputs.file }}
         from: 'yaml'
         to: 'json'
-        github-token: ${{ inputs.gh_token }}
     -
       name: Read YAML config
       id: json
