@@ -43,9 +43,10 @@ runs:
       uses: fabasoad/data-format-converter-action@main
       id: yaml2json
       with:
-        input: ${{ steps.yaml.outputs.file }}
+        source-pattern: ${{ steps.yaml.outputs.file }}
         from: 'yaml'
         to: 'json'
+        github-token: ${{ inputs.gh_token }}
     -
       name: Read YAML config
       id: json
