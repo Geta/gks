@@ -90,6 +90,7 @@ jobs:
           SLACK_BOT_TOKEN: ${{ secrets.GKS_GCC_SLACK_BOT_TOKEN }}
       - 
         name: Checkout code
+        if: always()
         uses: actions/checkout@v4
         with:
           ref: ${{ github.ref }}

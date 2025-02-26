@@ -111,3 +111,7 @@ jobs:
           payload-file-path: ${{ inputs.slack_template_dir }}/${{ inputs.slack_template_file }}
         env:
           SLACK_BOT_TOKEN: ${{ secrets.GKS_GCC_SLACK_BOT_TOKEN }}
+      -
+        name: Ignore failure
+        if: always()
+        run: exit 0
