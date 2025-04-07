@@ -1,4 +1,4 @@
-name: Publish NuGet client package 
+name: Publish NuGet client package
 on:
   workflow_call:
     inputs:
@@ -19,10 +19,28 @@ jobs:
     name: Publish Nuget client
     runs-on: ${{ fromJson(inputs.settings).general.runOn || 'ubuntu-latest' }}
     steps:
-      - 
+      -
         name: Checkout
         uses: actions/checkout@v4
         with:
           ref: ${{ github.ref }}
           token: ${{ secrets.GKS_GH_ACCESS_TOKEN }}
           submodules: false
+      -
+        name: Release
+        run: |
+          echo "${env:VERSION}"
+          dotnet build --configuration Release /p:Version=${{ inputs.version }}
+      -
+        name: Test
+        run: dotnet test --configuration Release /p:Version=${{ inputs.version }} --no-build
+      -
+        name: Pack
+        run: dotnet pack --configuration Release /p:Version=${{ inputs.version }} --no-build --output .
+      -
+        name: Push
+        run: |
+          dotnet nuget push Geta.Cloud.Localization.Client.${{ inputs.version }}.nupkg --source https://nuget.pkg.github.com/Geta/index.json --api-key ${{env.GITHUB_TOKEN}}
+          dotnet nuget push Geta.Cloud.Localization.Client.Private.${{ inputs.version }}.nupkg --source https://nuget.pkg.github.com/Geta/index.json --api-key ${{env.GITHUB_TOKEN}}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GKS_GH_ACCESS_TOKEN }}
