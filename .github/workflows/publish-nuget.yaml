@@ -41,6 +41,10 @@ jobs:
           VERSION=$(echo ${{ inputs.version }} | sed 's/v//g')
           echo "version=$VERSION" >> $GITHUB_OUTPUT
       -
+        name: Add GitHub NuGet source
+        run: |
+          dotnet nuget add source ${{ fromJson(inputs.settings).clients.nuget.packagesUrl }} -n github -u ${{ secrets.GKS_GH_USER }} -p ${{ secrets.GKS_GH_ACCESS_TOKEN }} --store-password-in-clear-text
+      -
         name: Release
         run: |
           echo "${env:VERSION}"
@@ -53,6 +57,7 @@ jobs:
         run: dotnet pack --configuration Release /p:Version=${{ steps.version.outputs.version }} --no-build --output .
       -
         name: Push
+        continue-on-error: true
         run: |
-          dotnet nuget push Geta.Cloud.Localization.Client.${{ steps.version.outputs.version }}.nupkg --source https://nuget.pkg.github.com/Geta/index.json --api-key ${{secrets.GKS_GH_ACCESS_TOKEN}}
-          dotnet nuget push Geta.Cloud.Localization.Client.Private.${{ steps.version.outputs.version }}.nupkg --source https://nuget.pkg.github.com/Geta/index.json --api-key ${{secrets.GKS_GH_ACCESS_TOKEN}}
+          dotnet nuget push Geta.Cloud.Localization.Client.${{ steps.version.outputs.version }}.nupkg --source ${{ fromJson(inputs.settings).clients.nuget.packagesUrl }} --api-key ${{ secrets.GKS_GH_ACCESS_TOKEN }}
+          dotnet nuget push Geta.Cloud.Localization.Client.Private.${{ steps.version.outputs.version }}.nupkg --source ${{ fromJson(inputs.settings).clients.nuget.packagesUrl }} --api-key ${{ secrets.GKS_GH_ACCESS_TOKEN }}
