@@ -34,18 +34,25 @@ jobs:
             8.0.x
             9.0.x
       -
+        name: Format version number
+        id: version
+        shell: bash
+        run: |
+          VERSION=$(echo ${{ inputs.version }} | sed 's/v//g')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+      -
         name: Release
         run: |
           echo "${env:VERSION}"
-          dotnet build --configuration Release /p:Version=${{ inputs.version }}
+          dotnet build --configuration Release /p:Version=${{ steps.version.outputs.version }}
       -
         name: Test
-        run: dotnet test --configuration Release /p:Version=${{ inputs.version }} --no-build
+        run: dotnet test --configuration Release /p:Version=${{ steps.version.outputs.version }} --no-build
       -
         name: Pack
-        run: dotnet pack --configuration Release /p:Version=${{ inputs.version }} --no-build --output .
+        run: dotnet pack --configuration Release /p:Version=${{ steps.version.outputs.version }} --no-build --output .
       -
         name: Push
         run: |
-          dotnet nuget push Geta.Cloud.Localization.Client.${{ inputs.version }}.nupkg --source https://nuget.pkg.github.com/Geta/index.json --api-key ${{secrets.GKS_GH_ACCESS_TOKEN}}
-          dotnet nuget push Geta.Cloud.Localization.Client.Private.${{ inputs.version }}.nupkg --source https://nuget.pkg.github.com/Geta/index.json --api-key ${{secrets.GKS_GH_ACCESS_TOKEN}}
+          dotnet nuget push Geta.Cloud.Localization.Client.${{ steps.version.outputs.version }}.nupkg --source https://nuget.pkg.github.com/Geta/index.json --api-key ${{secrets.GKS_GH_ACCESS_TOKEN}}
+          dotnet nuget push Geta.Cloud.Localization.Client.Private.${{ steps.version.outputs.version }}.nupkg --source https://nuget.pkg.github.com/Geta/index.json --api-key ${{secrets.GKS_GH_ACCESS_TOKEN}}
