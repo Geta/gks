@@ -10,10 +10,18 @@ on:
         required: true
         type: string
         description: Version number
+      build_number:
+        required: true
+        type: string
+        description: Build number
       settings:
         required: true
         type: string
         description: Settings json string
+      projects:
+        required: true
+        type: array
+        description: List of projects to push to NuGet
 jobs:
   publish:
     name: Publish Nuget client
@@ -38,7 +46,7 @@ jobs:
         id: version
         shell: bash
         run: |
-          VERSION=$(echo ${{ inputs.version }} | sed 's/v//g')
+          VERSION=$(echo ${{ inputs.version }} | sed 's/v//g')-alpha.${{ inputs.build_number }}
           echo "version=$VERSION" >> $GITHUB_OUTPUT
       -
         name: Add GitHub NuGet source
@@ -59,5 +67,6 @@ jobs:
         name: Push
         continue-on-error: true
         run: |
-          dotnet nuget push Geta.Cloud.Localization.Client.${{ steps.version.outputs.version }}.nupkg --source ${{ fromJson(inputs.settings).clients.nuget.packagesUrl }} --api-key ${{ secrets.GKS_GH_ACCESS_TOKEN }} --skip-duplicate
-          dotnet nuget push Geta.Cloud.Localization.Client.Private.${{ steps.version.outputs.version }}.nupkg --source ${{ fromJson(inputs.settings).clients.nuget.packagesUrl }} --api-key ${{ secrets.GKS_GH_ACCESS_TOKEN }} --skip-duplicate
+          for project in "${{ inputs.projects[@] }}"; do
+            dotnet nuget push $project.${{ steps.version.outputs.version }}.nupkg --source ${{ fromJson(inputs.settings).clients.nuget.packagesUrl }} --api-key ${{ secrets.GKS_GH_ACCESS_TOKEN }} --skip-duplicate
+          done
