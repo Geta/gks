@@ -20,8 +20,8 @@ on:
         description: Settings json string
       projects:
         required: true
-        type: array
-        description: List of projects to push to NuGet
+        type: string
+        description: Comma-separated list of projects to push to NuGet
 jobs:
   publish:
     name: Publish Nuget client
@@ -67,6 +67,7 @@ jobs:
         name: Push
         continue-on-error: true
         run: |
-          for project in "${{ inputs.projects[@] }}"; do
+          IFS=',' read -ra PROJECTS <<< "${{ inputs.projects }}"
+          for project in "${PROJECTS[@]}"; do
             dotnet nuget push $project.${{ steps.version.outputs.version }}.nupkg --source ${{ fromJson(inputs.settings).clients.nuget.packagesUrl }} --api-key ${{ secrets.GKS_GH_ACCESS_TOKEN }} --skip-duplicate
           done
