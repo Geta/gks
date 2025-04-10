@@ -11,7 +11,7 @@ on:
         type: string
         description: Version number
       build_number:
-        required: true
+        required: false
         type: string
         description: Build number
       settings:
