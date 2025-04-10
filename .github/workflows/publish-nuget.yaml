@@ -19,7 +19,7 @@ on:
         type: string
         description: Settings json string
       projects:
-        required: true
+        required: false
         type: string
         description: Comma-separated list of projects to push to NuGet
 jobs:
