@@ -62,7 +62,12 @@ jobs:
         run: dotnet test --configuration Release /p:Version=${{ steps.version.outputs.version }} --no-build
       -
         name: Pack
-        run: dotnet pack --configuration Release /p:Version=${{ steps.version.outputs.version }} --no-build --output .
+        run: |
+          IFS=',' read -ra PROJECTS <<< "${{ inputs.projects }}"
+          for project in "${PROJECTS[@]}"; do
+            echo "Packing project: ${project}"
+            dotnet pack "${project}" --configuration Release /p:Version=${{ steps.version.outputs.version }} --no-build --output .
+          done
       -
         name: Push
         continue-on-error: true
