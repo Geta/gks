@@ -1,0 +1,31 @@
+global:
+  customer: geta
+  environment: test
+  tenant: demo
+
+enabled: true
+name: cms
+provider: sanity
+
+daprSidecar:
+  enabled: false
+
+istioMesh:
+  enabled: false
+
+api:
+  #nameOverride: cms-sanity-api
+  fullnameOverride: cms-sanity-api
+  serviceAccount:
+    create: true
+  autoscaling:
+    enabled: true
+
+infisicalSecret:
+  create: true
+  #name: test
+  projectSlug: demo
+  secretsPath: /
+
+tests:
+  enabled: false

@@ -1,0 +1,39 @@
+namespace:
+  create: true
+  name: ""
+
+maestro:
+  enabled: false
+cms-api:
+  enabled: false
+catalog-api:
+  enabled: false
+cart-api:
+  enabled: false
+customer-api:
+  enabled: false
+identity-api:
+  enabled: false
+search-catalog-api:
+  enabled: false
+store-api:
+  enabled: false
+notification-api:
+  enabled: false
+localization-api:
+  enabled: false
+url-rewriter-api:
+  enabled: false
+state-api:
+  enabled: false
+wishlist-api:
+  enabled: false
+customer-private-api:
+  enabled: false
+consent-api:
+  enabled: false
+inventory-api:
+  enabled: false
+  
+# tests:
+#   enabled: false

@@ -1,0 +1,218 @@
+global:
+  # -- Name of the customer
+  customer: ''
+  # -- Environment name (i.e. `test`, `staging`, `production`).
+  environment: ''
+  # -- GCC tenant name (i.e. `demo`, `demob2b`, `northwind`).
+  tenant: ''
+
+# -- Whether to deploy api or not.
+enabled: false
+# -- Name of the api (i.e. `store`, `catalog`, `cart`).
+name: ''
+# -- Api provider type (i.e. `omnium`, `sanity`, `geta`).
+provider: ''
+
+# -- DAPR sidecar configuration. [Documentation](https://docs.dapr.io).
+daprSidecar:
+  # -- Whether to enable DAPR sidecar or not.
+  enabled: false
+  pubsubs: []
+  subscriptions: []
+  resiliency: {}
+  configuration: {}
+
+# -- Istio service mesh configuration. [Documentation](https://istio.io/latest).
+istioMesh:
+  # -- Whether to enable Istio service mesh or not.
+  enabled: false
+
+# -- GCC API configuration.
+api:
+  # -- Name override.
+  nameOverride: ''
+  # -- FullName override.
+  fullnameOverride: ''
+  # -- Image configuration. [Documentation](https://kubernetes.io/docs/concepts/containers/images/).
+  image:
+    # -- Image repository.
+    repository: ''
+    # -- Image pull policy.
+    pullPolicy: IfNotPresent
+    # -- Image tag. Defaults to .Chart.AppVersion.
+    tag: ''
+  # -- Deployment configuration
+  deployment:
+    # -- Deployment labels.
+    labels: {}
+    # -- Deployment annotations.
+    annotations: {}
+  # -- List of the secret names to use for image pulling.
+  imagePullSecrets: []
+  # -- Number of replicas to run.
+  replicas: 1
+  # -- Autoscaling configuration. [Documentation](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/).
+  autoscaling:
+    # -- Whether to enable HPA or not
+    enabled: false
+    # -- Min amount of replicas
+    minReplicas: 1
+    # -- Max amount of replicas
+    maxReplicas: 3
+    # -- Target CPU utilization percentage
+    targetCPUUtilizationPercentage: 80
+    # -- Target memory utilization percentage
+    # targetMemoryUtilizationPercentage: 80
+  # -- Service account configuration. [Documentation](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/).
+  serviceAccount:
+    # -- Whether to create service account or not.
+    create: false
+    # -- Service account name. Defaults to {{ .name }}-{{ .provider }}-api.
+    name: ''
+    # -- Service account annotations. Example: `{ foo/bar: "Some annotation" }`.
+    annotations: {}
+  # -- Pod security context. [Documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/).
+  podSecurityContext: {}
+  # -- Container security context. [Documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/).
+  securityContext: {}
+  # -- Service configuration. [Documentation](https://kubernetes.io/docs/concepts/services-networking/service/).
+  service:
+    # -- Service type
+    type: ClusterIP
+    # -- Service ports
+    ports:
+      - name: http
+        # -- Service port to expose
+        port: 80
+        # -- service target
+        target:
+          # -- Target port name on a pod
+          name: http
+          # -- Target port on a container.
+          port: 8080
+        # -- Protocol
+        protocol: TCP
+    # -- Service level annotations.
+    annotations: {}
+  # -- Environment variables. [Documentation](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/).
+  env: []
+  # -- Environment variables mapping. [Documentation](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/).
+  envFrom: []
+  # -- Pod level annotations.
+  podAnnotations: {}
+  # -- Additional pod labels
+  podLabels: {}
+  # -- Pod lifecycle rules
+  podLifecycle: {}
+  # -- Volumes configuration. [Documentation](https://kubernetes.io/docs/concepts/storage/volumes/).
+  volumes: []
+  # -- Volume mounts configuration. [Documentation](https://kubernetes.io/docs/concepts/storage/volumes/).
+  volumeMounts: []
+  # -- Resources configuration. [Documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/).
+  resources:
+    # -- CPU/Memory resource requests and limits. [Documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/).
+    limits:
+      # -- CPU limit
+      cpu: 1000m
+      # -- Memory limit
+      memory: 512M
+    # -- CPU/Memory resource requests and limits. [Documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/).
+    requests:
+      # -- CPU request
+      cpu: 10m
+      # -- Memory request
+      memory: 128M
+  # -- Probes configuration. [Documentation](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/).
+  probes:
+    # -- Liveness probe configuration.
+    liveness:
+      # -- Whether to enable liveness probe or not.
+      enabled: true
+      # -- liveness probe configuration.
+      httpGet:
+        #-- Path to check.
+        path: /health
+        #-- Port to check. Defaults to .service.ports[0].port. or 
+        port: 80
+      # -- initial delay seconds.
+      initialDelaySeconds: 10
+      # -- timeout seconds.
+      timeoutSeconds: 10
+      # -- period seconds.
+      periodSeconds: 10
+      # -- failure threshold.
+      failureThreshold: 3
+    # -- Startup probe configuration.
+    startup:
+      # -- Whether to enable startup probe or not.
+      enabled: false
+    # -- Readiness probe configuration.
+    readiness:
+      # -- Whether to enable readiness probe or not.
+      enabled: true
+      # -- readiness probe configuration.
+      httpGet:
+        #-- Path to check.
+        path: /ready
+        #-- Port to check.
+        port: 80
+      # -- initial delay seconds.
+      initialDelaySeconds: 15
+      # -- timeout seconds.
+      timeoutSeconds: 10
+      # -- period seconds.
+      periodSeconds: 10
+      # -- failure threshold.
+      failureThreshold: 3
+  # -- Node selector configuration. [Documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/).
+  nodeSelector: {}
+  # -- Tolerations configuration. [Documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/).
+  tolerations: []
+  # -- Affinity configuration. [Documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
+  affinity: {}
+  # -- Pod sidecars. [Documentation](https://kubernetes.io/docs/concepts/workloads/pods/)
+  sidecars: []
+  # -- Pod termination grace period seconds. [Documentation] (https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/)
+  terminationGracePeriodSeconds: 30
+
+# -- Infisical secret configuration.
+infisicalSecret:
+  # -- Whether to create Infisical secret or not.
+  create: false
+  # -- Infisical secret name.
+  name: ''
+  # -- Infisical secret annotations.
+  annotations: {}
+  # -- Infisical host api url
+  hostAPI: https://infisical.gks.zone/api
+  # -- Secret resync interval in seconds.
+  resyncInterval: 60
+  # -- Infisical project slug.
+  projectSlug: ''
+  # -- Infisical environment slug. Defaults to global.environment.
+  envSlug: ''
+  # -- Infisical secret path.
+  secretsPath: ''
+  # -- Whether to use recursive secret path or not.
+  recursive: false
+  # -- Infisical credentials secret configuration.
+  credentialsSecret:
+    # -- Infisical credentials secret name. Defaults to infisical-auth-secret.
+    name: ''
+    # -- Infisical credentials secret namespace. Defaults to tenant root namespace.
+    namespace: ''
+  # -- Managed secret configuration.
+  managedSecret:
+    # -- Managed secret type
+    type: Opaque
+    # -- Managed secret name. Defaults to infisical secret name.
+    name: ''
+    # -- Managed secret namespace. Defaults to release namespace.
+    namespace: ''
+    # -- Managed secret creation policy. Defaults to Orphan.
+    creationPolicy: ''
+
+# -- Tests configuration.
+tests:
+  # -- Whether to enable tests or not.
+  enabled: false

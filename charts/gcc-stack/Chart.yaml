@@ -1,0 +1,99 @@
+apiVersion: v2
+description: Deploy GCC API services stack
+name: gcc-stack
+type: application
+appVersion: 2025.04.0
+version: 2025.04.0
+dependencies:
+  - 
+    name: gcc-api
+    version: 0.0.2
+    repository: https://harbor.teamgeta.net/chartrepo/gcc
+    alias: cms-api
+    condition: cms-api.enabled
+  - 
+    name: gcc-api
+    version: 0.0.2
+    repository: https://harbor.teamgeta.net/chartrepo/gcc
+    alias: catalog-api
+    condition: catalog-api.enabled
+  - 
+    name: gcc-api
+    version: 0.0.2
+    repository: https://harbor.teamgeta.net/chartrepo/gcc
+    alias: cart-api
+    condition: cart-api.enabled
+  - 
+    name: gcc-api
+    version: 0.0.2
+    repository: https://harbor.teamgeta.net/chartrepo/gcc
+    alias: customer-api
+    condition: customer-api.enabled
+  - 
+    name: gcc-api
+    version: 0.0.2
+    repository: https://harbor.teamgeta.net/chartrepo/gcc
+    alias: identity-api
+    condition: identity-api.enabled
+  - 
+    name: gcc-api
+    version: 0.0.2
+    repository: https://harbor.teamgeta.net/chartrepo/gcc
+    alias: search-catalog-api
+    condition: search-catalog-api.enabled
+  - 
+    name: gcc-api
+    version: 0.0.2
+    repository: https://harbor.teamgeta.net/chartrepo/gcc
+    alias: store-api
+    condition: store-api.enabled
+  - 
+    name: gcc-api
+    version: 0.0.2
+    repository: https://harbor.teamgeta.net/chartrepo/gcc
+    alias: notification-api
+    condition: notification-api.enabled
+  - 
+    name: gcc-api
+    version: 0.0.2
+    repository: https://harbor.teamgeta.net/chartrepo/gcc
+    alias: localization-api
+    condition: localization-api.enabled
+  - 
+    name: gcc-api
+    version: 0.0.2
+    repository: https://harbor.teamgeta.net/chartrepo/gcc
+    alias: url-rewriter-api
+    condition: url-rewriter-api.enabled
+  - 
+    name: gcc-api
+    version: 0.0.2
+    repository: https://harbor.teamgeta.net/chartrepo/gcc
+    alias: state-api
+    condition: state-api.enabled
+  - 
+    name: gcc-api
+    version: 0.0.2
+    repository: https://harbor.teamgeta.net/chartrepo/gcc
+    alias: wishlist-api
+    condition: wishlist-api.enabled
+
+  # legacy APIs
+  - 
+    name: gcc-api
+    version: 0.0.2
+    repository: https://harbor.teamgeta.net/chartrepo/gcc
+    alias: customer-private-api
+    condition: customer-private-api.enabled
+  - 
+    name: gcc-api
+    version: 0.0.2
+    repository: https://harbor.teamgeta.net/chartrepo/gcc
+    alias: consent-api
+    condition: consent-api.enabled
+  - 
+    name: gcc-api
+    version: 0.0.2
+    repository: https://harbor.teamgeta.net/chartrepo/gcc
+    alias: inventory-api
+    condition: inventory-api.enabled

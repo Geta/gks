@@ -1,0 +1,55 @@
+global:
+  customer: geta
+  environment: test
+  tenant: demo
+
+namespace:
+  create: true
+  #name: 2025-04-0
+
+cms-api:
+  enabled: true
+  name: cms
+  provider: sanity
+
+catalog-api:
+  enabled: true
+  name: catalog
+  provider: omnium
+
+cart-api:
+  enabled: true
+  name: cart
+  provider: omnium
+
+customer-api:
+  enabled: true
+  name: cart
+  provider: omnium
+
+identity-api:
+  enabled: false
+search-catalog-api:
+  enabled: false
+store-api:
+  enabled: false
+notification-api:
+  enabled: false
+localization-api:
+  enabled: false
+url-rewriter-api:
+  enabled: false
+state-api:
+  enabled: false
+wishlist-api:
+  enabled: false
+
+customer-private-api:
+  enabled: false
+consent-api:
+  enabled: false
+inventory-api:
+  enabled: false
+
+#     tests:
+#       enabled: false

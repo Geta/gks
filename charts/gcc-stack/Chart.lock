@@ -1,0 +1,39 @@
+dependencies:
+- name: gcc-api
+  repository: https://harbor.teamgeta.net/chartrepo/gcc
+  version: 0.0.2
+- name: gcc-api
+  repository: https://harbor.teamgeta.net/chartrepo/gcc
+  version: 0.0.2
+- name: gcc-api
+  repository: https://harbor.teamgeta.net/chartrepo/gcc
+  version: 0.0.2
+- name: gcc-api
+  repository: https://harbor.teamgeta.net/chartrepo/gcc
+  version: 0.0.2
+- name: gcc-api
+  repository: https://harbor.teamgeta.net/chartrepo/gcc
+  version: 0.0.2
+- name: gcc-api
+  repository: https://harbor.teamgeta.net/chartrepo/gcc
+  version: 0.0.2
+- name: gcc-api
+  repository: https://harbor.teamgeta.net/chartrepo/gcc
+  version: 0.0.2
+- name: gcc-api
+  repository: https://harbor.teamgeta.net/chartrepo/gcc
+  version: 0.0.2
+- name: gcc-api
+  repository: https://harbor.teamgeta.net/chartrepo/gcc
+  version: 0.0.2
+- name: gcc-api
+  repository: https://harbor.teamgeta.net/chartrepo/gcc
+  version: 0.0.2
+- name: gcc-api
+  repository: https://harbor.teamgeta.net/chartrepo/gcc
+  version: 0.0.2
+- name: gcc-api
+  repository: https://harbor.teamgeta.net/chartrepo/gcc
+  version: 0.0.2
+digest: sha256:6001d479cca728f6ded913d0e4710a5efe3499dca38a11237f42a00473023169
+generated: "2025-06-12T12:58:14.765705+03:00"

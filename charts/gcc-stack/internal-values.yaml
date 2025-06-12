@@ -1,0 +1,27 @@
+isStack: true
+providers:
+  cms: [sanity]
+  catalog: [omnium, tillbuddy]
+  search-catalog: [omnium, tillbuddy, typesense]
+  cart: [omnium]
+  customer: [omnium]
+  identity: [cognito]
+  store: [omnium, tillbuddy]
+  notification: [geta]
+  localization: [geta]
+  url-rewriter: [geta]
+  wishlist: [geta]
+  state: [geta]
+
+testing:
+  defaults:
+    timeout: 60s
+  connectivity:
+    http:
+      -
+        enabled: true
+        source: customer
+        target: identity
+        
+    grpc: []
+    pubsub: []
