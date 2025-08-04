@@ -42,7 +42,12 @@ jobs:
         name: Install NSwag
         shell: bash
         run: |
-          npm install -g nswag
+          VERSION=$(echo "${{ fromJson(inputs.settings).clients.npm.nswagVersion }}")
+          if [ -n "$VERSION" ]; then
+            npm install -g nswag@$VERSION
+          else
+            npm install -g nswag
+          fi
           nswag version
       -
         name: Download NSwag config
