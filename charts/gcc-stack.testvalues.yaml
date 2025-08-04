@@ -1,50 +1,86 @@
 global:
   customer: geta
-  environment: test
-  tenant: demo
+  environment: production
+  tenant: northwind
+  stack:
+    enabled: true
+    version: v2025.4.0
+  imageRegistry:
+    basePath: harbor.teamgeta.net/gcc/
+    pullSecrets: 
+      - name: geta-harbor-docker-credentials
+  otel:
+    enabled: true
+  infisical:
+    hostAPI: https://infisical.gks.zone/api
+    credentialsRef:
+      secretName: infisical-auth-secret
+      secretNamespace: tenant-geta
 
-namespace:
-  create: true
-  #name: 2025-04-0
+maestro:
+  enabled: false
 
 cms-api:
   enabled: true
   name: cms
   provider: sanity
+  infisicalSecret:
+    enabled: true
+    envSlug: test
+    projectSlug: geta-es-vh
+    secretsPath: /projects/northwind/apps/gcc/cms-api/
 
-catalog-api:
-  enabled: true
-  name: catalog
-  provider: omnium
+# catalog-api:
+#   enabled: true
+#   name: catalog
+#   provider: omnium
+# cart-api:
+#   enabled: true
+#   name: cart
+#   provider: omnium
+# customer-api:
+#   enabled: true
+#   name: customer
+#   provider: omnium
+# identity-api:
+#   enabled: true
+#   name: identity
+#   provider: cognito
+# search-catalog-api:
+#   enabled: true
+#   name: search-catalog
+#   provider: omnium
+# store-api:
+#   enabled: true
+#   name: store
+#   provider: omnium
+# notification-api:
+#   enabled: true
+#   name: notification
+#   provider: geta
+# localization-api:
+#   enabled: true
+#   name: localization
+#   provider: geta
+# url-rewriter-api:
+#   enabled: true
+#   name: url-rewriter
+#   provider: geta
+# state-api:
+#   enabled: true
+#   name: state
+#   provider: geta
+# wishlist-api:
+#   enabled: true
+#   name: wishlist
+#   provider: geta
 
-cart-api:
-  enabled: true
-  name: cart
-  provider: omnium
-
-customer-api:
-  enabled: true
-  name: cart
-  provider: omnium
-
-identity-api:
-  enabled: false
-search-catalog-api:
-  enabled: false
-store-api:
-  enabled: false
-notification-api:
-  enabled: false
-localization-api:
-  enabled: false
-url-rewriter-api:
-  enabled: false
-state-api:
-  enabled: false
-wishlist-api:
+custom-api:
   enabled: false
 
 customer-private-api:
+  enabled: false
+customer-business-api:
   enabled: false
 consent-api:
   enabled: false

@@ -1,3 +1,4 @@
+# -- Global configuration
 global:
   # -- Name of the customer
   customer: ''
@@ -5,6 +6,69 @@ global:
   environment: ''
   # -- GCC tenant name (i.e. `demo`, `demob2b`, `northwind`).
   tenant: ''
+  # -- Stach chart settings (DO NOT CHANGE)
+  stack:
+    # -- whether stack is enabled or not
+    enabled: false
+    # -- stack chart version
+    version: ''
+  # -- ASP.NET environments
+  aspnet:
+    # ASPNETCORE_ENVIRONMENT. Defaults to .global.environment with first letter capitalized
+    environment: ''
+    # ASPNETCORE_FORWARDEDHEADERS_ENABLED. Defaults to true
+    forwardedHeaders: true
+    # DOTNET_USE_POLLING_FILE_WATCHER. Defaults to true.
+    pollingFileWatcher: true
+  # -- Docker image registry configuration.
+  imageRegistry:
+    # -- Image pull secrets 
+    pullSecrets: []
+    # -- Image repository base path.
+    basePath: ''
+  # -- Global OTEL settings
+  otel:
+    # -- Whether OTEL is enabled
+    enabled: true
+    # -- OTEL protocol
+    protocol: grpc
+    # -- Is OTEL commuinication is secure or not
+    insecure: true
+    # -- OTEL endpoint settings
+    endpoint: {}
+      # -- OTEL collector host
+      # host: ''
+      # -- OTEL collector credentials
+      # credentials: ''
+  # -- Global Infisical settings
+  infisical:
+    # -- Infisical host api url
+    hostAPI: ''
+    # -- Infisical credentials secret reference
+    credentialsRef:
+      # -- Infisical auth secret name
+      secretName: ''
+      # -- Infisical auth secret namespace
+      secretNamespace: ''
+  # -- Global DAPR settings
+  dapr:
+    # -- mTLS settings
+    mtls:
+      # -- Whether to enable mtls or not
+      enabled: false
+      # -- Control plane trust domain
+      trustDomain: cluster.local
+      # -- DAPR sentry address. Defaults to 'dapr-sentry.infra-dapr.svc.clister.local:443'
+      sentryAddress: ''
+    # -- Tracing OTEL configuration
+    otel:
+      # -- Whether transport is secure
+      isSecure: false
+      # -- OTEL endpoint
+      endpoint: ''
+      # -- OTEL transport protocol
+      protocol: grpc
+
 
 # -- Whether to deploy api or not.
 enabled: false
@@ -13,19 +77,142 @@ name: ''
 # -- Api provider type (i.e. `omnium`, `sanity`, `geta`).
 provider: ''
 
-# -- DAPR sidecar configuration. [Documentation](https://docs.dapr.io).
-daprSidecar:
-  # -- Whether to enable DAPR sidecar or not.
-  enabled: false
-  pubsubs: []
-  subscriptions: []
-  resiliency: {}
-  configuration: {}
+# -- OpenTelemetry settings
+otel:
+  # -- OpenTelemetry logs settings
+  logs:
+    # -- Whether to send logs to otel collector or not. Defaults to true
+    enabled: true
+  # -- OpenTelemetry traces settings
+  traces:
+    # -- Whether to send traces to otel collector or not. Defaults to true
+    enabled: true
+    # -- Tracing sampler name
+    sampler: parentbased_traceidratio
+    # -- Tracing sampling rate
+    samplingRate: "1.0"
+  # -- OpenTelemetry metrics settings
+  metrics:
+    # -- Whether to send metrics to otel collector or not. Defaults to true
+    enabled: true
 
-# -- Istio service mesh configuration. [Documentation](https://istio.io/latest).
-istioMesh:
-  # -- Whether to enable Istio service mesh or not.
+# -- Infisical secret settings.
+infisicalSecret:
+  # -- Whether infisical secret should be created or not
   enabled: false
+  # -- Secret annotations
+  annotations: {}
+  # -- Infisical and native secret name
+  name: ''
+  # -- Infisical project slug
+  projectSlug: ''
+  # -- Infisical environment slug
+  envSlug: ''
+  # -- Infisical secrets path
+  secretsPath: ''
+  # -- Whether secret is recursive or not
+  recursive: false
+  # -- Native secret type. Defaults to Opaque
+  secretType: Opaque
+  # -- Infisical secret creation policy. Defaults to Orphan
+  creationPolicy: Orphan
+  # -- Secret resync interval. Defaults to 120 seconds
+  resyncInterval: 120
+ 
+# -- API DAPR settings
+dapr:
+  # -- Global API DAPR switch to disable all DAPR components
+  enabled: false
+  # -- DAPR components scope. Defaults to api name
+  scope: ''
+  # -- DAPR Configuration
+  configuration:
+    # -- Whether to render Configuration manifest
+    enabled: false
+    metrics:
+      enabled: false
+      rules: []
+    logging:
+      enabled: false
+      obfuscateURLs: false
+      omitHealthChecks: true
+    tracing:
+      samplingRate: "1"
+      stdout: true
+
+    # -- mTLS settings
+    mtls:
+      # -- Whether to enable mtls or not
+      enabled: false
+      # -- Control plane trust domain
+      trustDomain: cluster.local
+      # -- DAPR sentry address. Defaults to 'dapr-sentry.{{$.Release.Namespace}}.svc.clister.local:443'
+      sentryAdress: ''
+    # -- DAPR feature toggles 
+    features:
+      - name: HotReload
+        enabled: true
+      - name: SchedulerReminders
+        enabled: false
+  # -- DAPR Resiliency
+  resiliency:
+    # -- Whether to render Resilienct manifest
+    enabled: false
+    # -- Retry settings
+    retry:
+      # -- Whether retry is enabled
+      enabled: true
+      # -- Retry policy
+      policy: constant
+      # -- Retry duration
+      duration: 1m
+      # -- Retry max tries
+      maxRetries: 5
+  # -- DAPR Components
+  component:
+    # -- Whether component is enabled
+    enabled: false
+    # -- Component name
+    name: ''
+    # -- Component type
+    type: pubsub.rabbitmq
+    # -- Component version
+    version: v1
+    # -- Component metadata
+    metadata:
+      # -- Component connection string settings
+      connectionString:
+        # -- Whether to take connection string from infisical secret
+        fromInfisicalSecret: true
+        # -- Connection string secret key
+        secretKey: RABBITMQ_CONNECTION_STRING
+        # -- Fallback when secret is disable
+        plainTextValue: ''
+      consumerId: "{appID}"
+      clientName: "{appID}"
+      durable: true
+      deleteWhenUnused: false
+      autoACK: false
+      deliveryMode: 0
+      requeueInFailure: false
+      prefetchCount: 10
+      publisherConfirm: true
+      reconnectWait: 0
+      concurrencyMode: parallel
+      enableDeadLetter: true
+      maxLen: 1000
+      maxLenBytes: 1048576
+      exchangeKind: topic
+      saslExternal: false
+      heartBeat: 10s
+  # -- DAPR Subscriptions
+  subscriptions: []
+    # enabled: false
+    # name: ''
+    # topic: ''
+    # deadLetterTopic: ''
+    # route: ''
+    # routingKey: ''
 
 # -- GCC API configuration.
 api:
@@ -47,8 +234,6 @@ api:
     labels: {}
     # -- Deployment annotations.
     annotations: {}
-  # -- List of the secret names to use for image pulling.
-  imagePullSecrets: []
   # -- Number of replicas to run.
   replicas: 1
   # -- Autoscaling configuration. [Documentation](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/).
@@ -66,7 +251,7 @@ api:
   # -- Service account configuration. [Documentation](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/).
   serviceAccount:
     # -- Whether to create service account or not.
-    create: false
+    create: true
     # -- Service account name. Defaults to {{ .name }}-{{ .provider }}-api.
     name: ''
     # -- Service account annotations. Example: `{ foo/bar: "Some annotation" }`.
@@ -174,43 +359,6 @@ api:
   sidecars: []
   # -- Pod termination grace period seconds. [Documentation] (https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/)
   terminationGracePeriodSeconds: 30
-
-# -- Infisical secret configuration.
-infisicalSecret:
-  # -- Whether to create Infisical secret or not.
-  create: false
-  # -- Infisical secret name.
-  name: ''
-  # -- Infisical secret annotations.
-  annotations: {}
-  # -- Infisical host api url
-  hostAPI: https://infisical.gks.zone/api
-  # -- Secret resync interval in seconds.
-  resyncInterval: 60
-  # -- Infisical project slug.
-  projectSlug: ''
-  # -- Infisical environment slug. Defaults to global.environment.
-  envSlug: ''
-  # -- Infisical secret path.
-  secretsPath: ''
-  # -- Whether to use recursive secret path or not.
-  recursive: false
-  # -- Infisical credentials secret configuration.
-  credentialsSecret:
-    # -- Infisical credentials secret name. Defaults to infisical-auth-secret.
-    name: ''
-    # -- Infisical credentials secret namespace. Defaults to tenant root namespace.
-    namespace: ''
-  # -- Managed secret configuration.
-  managedSecret:
-    # -- Managed secret type
-    type: Opaque
-    # -- Managed secret name. Defaults to infisical secret name.
-    name: ''
-    # -- Managed secret namespace. Defaults to release namespace.
-    namespace: ''
-    # -- Managed secret creation policy. Defaults to Orphan.
-    creationPolicy: ''
 
 # -- Tests configuration.
 tests:

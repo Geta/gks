@@ -18,8 +18,7 @@ spec:
   type: {{ .type | default "ClusterIP" }}
   ports:
   {{- range .ports }}
-    -
-      name: {{ .name | required "Service port name is required" }}
+    - name: {{ .name | required "Service port name is required" }}
       port: {{ .port | required "Service port is required" }}
       targetPort: {{ .target.name | required "Service target port or name is required" }}
       protocol: {{ .protocol | default "TCP" }}

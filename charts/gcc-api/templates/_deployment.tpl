@@ -10,17 +10,15 @@ metadata:
   namespace: {{ $.Release.Namespace }}
   labels:
     {{- include "gcc.api.labels" $ | nindent 4 }}
-    {{- with .deployment }}
-    {{- if .labels }}
-    {{- toYaml .labels | nindent 4 }}
+    {{- with .deployment.labels }}
+    {{- toYaml . | nindent 4 }}
     {{- end }}
-    {{- if .annotations }}
+  {{- with .deployment.annotations }}
   annotations:
-    {{- toYaml .annotations | nindent 4 }}
-    {{- end }}
-    {{- end }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
-  replicas: {{ .replicas }}
+  replicas: {{ .replicas | default 1  }}
   selector:
     matchLabels:
       {{- include "gcc.api.selectorLabels" $ | nindent 6 }}
@@ -35,12 +33,12 @@ spec:
         {{- toYaml .podLabels | nindent 8 }}
         {{- end }}
         app: {{ include "gcc.api.fullname" $ }}
-        version: {{ $.Chart.Version }}
+        version: {{ include "gcc.api.platformVersion" $ }}
         {{- include "gcc.api.selectorLabels" $ | nindent 8 }}
     spec:
-      {{- if .imagePullSecrets }}
+      {{- with ($.Values.global.imageRegistry | required "Image registry configuration not provided") }}
       imagePullSecrets:
-        {{- toYaml .imagePullSecrets | nindent 8 }}
+        {{- toYaml .pullSecrets | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "gcc.api.serviceAccountName" $ }}
       securityContext:
@@ -51,12 +49,70 @@ spec:
       containers:
         - name: {{ $.Chart.Name }}
           env:
+            {{- with $.Values.global.aspnet }}
+            - name: ASPNETCORE_ENVIRONMENT
+              value: {{ .environment | default (include "gcc.api.envToCaptital" $) | quote }}
+            - name: ASPNETCORE_FORWARDEDHEADERS_ENABLED
+              value: {{ .forwardedHeaders | quote }}
+            - name: DOTNET_USE_POLLING_FILE_WATCHER
+              value: {{ .pollingFileWatcher | quote }}
+            - name: GCC_SERVICE_NAME
+              value: {{ $.Values.name | required "API name is required" | quote }}
+            - name: GCC_SERVICE_PROVIDER
+              value: {{ $.Values.provider | required "API provider is required" | quote }}
+            {{- end }}
+            {{- with $.Values.global.otel }}
+            {{- if .enabled }}
+            - name: OTEL_SERVICE_NAME
+              value:  {{ (include "gcc.api.apiName" $) | quote }}
+            - name: OTEL_EXPORTER_OTLP_PROTOCOL
+              value: {{ .protocol | quote }}
+            - name: OTEL_EXPORTER_OTLP_INSECURE
+              value: {{ .insecure | quote }}
+            {{- with .endpoint }}
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: {{ .host | required "OTEL endpoint host not provided" | quote }}
+            {{- if .credentials }}
+            - name: OTEL_EXPORTER_OTLP_HEADERS
+              value: "Authorization=Basic {{ .credentials }}"
+            {{- end }}
+            {{- end }}
+            {{- with $.Values.otel }}
+            {{- if .logs.enabled }}
+            - name: GCC_OTEL_LOGS
+              value: "otlp"
+            {{- end }}
+            {{- if .traces.enabled }}
+            - name: GCC_OTEL_TRACES
+              value: "otlp"
+            - name: OTEL_TRACES_SAMPLER
+              value: {{ .traces.sampler | quote }}
+            - name: OTEL_TRACES_SAMPLER_ARG
+              value: {{ .traces.samplingRate | quote }}
+            {{- end }}
+            {{- if .metrics.enabled }}
+            - name: GCC_OTEL_METRICS
+              value: "otlp"
+            {{- end }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+            {{- if .env }}
             {{- toYaml .env | nindent 12 }}
+            {{- end }}
           envFrom:
+            {{- with $.Values.infisicalSecret }}
+            {{- if .enabled }}
+            - secretRef:
+                name: {{ .name | default (include "gcc.infisical.secretName" $) }}
+            {{- end }}
+            {{- end }}
+            {{- if .envFrom }}
             {{- toYaml .envFrom | nindent 12 }}
+            {{- end }}
           securityContext:
             {{- toYaml .securityContext | nindent 12 }}
-          image: "{{ include "harbor.repository" $ }}:{{ .image.tag | default $.Chart.AppVersion }}"
+          image: "{{ include "harbor.image" $ }}:{{ .image.tag | default (include "gcc.api.platformVersion" $) }}"
           imagePullPolicy: {{ .image.pullPolicy | default "IfNotPresent" }}
           lifecycle:
             {{- toYaml .podLifecycle | nindent 12 }}
@@ -67,8 +123,7 @@ spec:
           {{- if .service.ports }}
           {{- $probePort = (index .service.ports 0).target.port }}
           {{- range $index, $item := .service.ports }}
-            - 
-              name: {{ $item.target.name | required "Target port name not provided" }}
+            - name: {{ $item.target.name | required "Target port name not provided" }}
               containerPort: {{ $item.target.port | required "Target port not provided" }}
               protocol: {{ $item.protocol | default "TCP" }}
           {{- end }}
@@ -109,8 +164,7 @@ spec:
           imagePullPolicy: {{ .pullPolicy | default "IfNotPresent" }}
           ports:
           {{- range $index, $item := .ports }}
-            - 
-              name: {{ $item.target.name | required "Target port name not provided" }}
+            - name: {{ $item.target.name | required "Target port name not provided" }}
               containerPort: {{ $item.target.port | required "Target port not provided" }}
               protocol: {{ $item.protocol | default "TCP" }}
           {{- end }}

@@ -1,6 +1,6 @@
 apiVersion: v2
-appVersion: 0.0.1
-description: Deploy GCC API application
+appVersion: v1.0.0
+description: Deploy GCC API
 name: gcc-api
 type: application
-version: 0.0.1
+version: v1.0.0

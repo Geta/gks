@@ -1,31 +1,45 @@
 global:
   customer: geta
-  environment: test
+  environment: production
   tenant: demo
+  imageRegistry:
+    pullSecrets:
+      - name: test
+    basePath: harbor.teamgeta.net/gcc/
+  otel:
+    enabled: true
+    endpoint:
+      host: otel.test.com
+      credentials: 1234567890=
+  infisical:
+    hostAPI: https://infisical.gks.zone/api
+    credentialsRef:
+      secretName: infisical-auth-secret
+      secretNamespace: infisical-secrets-operator
 
 enabled: true
 name: cms
 provider: sanity
 
-daprSidecar:
-  enabled: false
-
-istioMesh:
-  enabled: false
-
 api:
-  #nameOverride: cms-sanity-api
-  fullnameOverride: cms-sanity-api
-  serviceAccount:
-    create: true
-  autoscaling:
+  image:
+    tag: v2.0.0
+
+dapr:
+  enabled: true
+  configuration:
+    enabled: true
+  component:
+    enabled: true
+  resiliency:
     enabled: true
 
 infisicalSecret:
-  create: true
-  #name: test
-  projectSlug: demo
-  secretsPath: /
+  enabled: true
+  name: cms-api-secrets
+  projectSlug: gcc-g9-aw
+  envSlug: test
+  secretsPath: /services/test
 
 tests:
   enabled: false

@@ -1,39 +1,38 @@
 {{- /*
-    Generate Inifisical Secret
+    Generate Infisical Secret
 */ -}}
 {{- define "gcc.api.infisicalSecret" -}}
 {{- with .Values.infisicalSecret -}}
-{{- if .create }}
+{{- if .enabled }}
+{{- $secretName := .name | default (include "gcc.infisical.secretName" $) }}
 apiVersion: secrets.infisical.com/v1alpha1
 kind: InfisicalSecret
 metadata:
-  {{- $secretName := (printf "%s-secrets" (include "gcc.api.fullname" $)) }}
-  name: {{ .name | default $secretName }}
+  name: {{ $secretName }}
   namespace: {{ $.Release.Namespace }}
   annotations:
     {{- toYaml .annotations | nindent 4 }}
 spec:
-  hostAPI: {{ .hostAPI | required "Infisical host API is required" }}
-  resyncInterval: {{ .resyncInterval | default 60 }}
-  authentication:
+  hostAPI: {{ $.Values.global.infisical.hostAPI | required "Infisical host api is not provided" | quote }}
+  resyncInterval: {{ .resyncInterval | default 120 }}
+  authentication: 
     universalAuth:
       secretsScope:
-        projectSlug: {{ .projectSlug | required "Infisical project slug is required" }}
-        envSlug: {{ .envSlug | default $.Values.global.environment | required "Infisical environment slug is required" }}
-        secretsPath: {{ .secretsPath | required "Infisical secrets path is required" }}
+        projectSlug: {{ .projectSlug | required "Infisical project slug is required" | quote }}
+        envSlug: {{ .envSlug | required "Infisical environment slug is required" | quote }}
+        secretsPath: {{ .secretsPath | required "Infisical secrets path is required" | quote }}
         recursive: {{ .recursive | default false }}
-      {{- with .credentialsSecret }}
+      {{- with ($.Values.global.infisical.credentialsRef | required "Infisical credentials reference is not provided") }}
       credentialsRef:
-        secretName: {{ .name | default "infisical-auth-secret" }}
-        secretNamespace: {{ .namespace | default (include "gks.tenantRootNamespace" $) }}
+        secretName: {{ .secretName | required "Infisical secret name not provided" }}
+        secretNamespace: {{ .secretNamespace | required "Infisical secret namespace not provided" }}
       {{- end }}
-  {{- with .managedSecret }}
-  managedSecretReference:
-    secretType: {{ .type | default "Opaque" }}
-    secretName: {{ .name | default $secretName }}
-    secretNamespace: {{ .namespace | default $.Release.Namespace }}
-    creationPolicy: {{ .creationPolicy | default "Orphan" }}
-  {{- end }}
+  managedKubeSecretReferences:
+    -
+      secretType: {{ .secretType | default "Opaque" }}
+      secretName: {{ $secretName }}
+      secretNamespace: {{ $.Release.Namespace }}
+      creationPolicy: {{ .creationPolicy | default "Orphan" }}
 {{- end }}
 {{- end }}
 {{- end }}

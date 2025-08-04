@@ -1,9 +1,79 @@
-namespace:
-  create: true
-  name: ""
+# -- Global configuration
+global:
+  # -- Name of the customer
+  customer: ""
+  # -- Environment name (i.e. `test`, `staging`, `production`).
+  environment: ""
+  # -- GCC tenant name (i.e. `demo`, `demob2b`, `northwind`).
+  tenant: ""
+  # -- Stack chart settings (DO NOT CHANGE)
+  stack:
+    # -- whether stack is enabled or not
+    enabled: true
+    # -- stack chart version (automatically set by template)
+    version: v2025.4.0
+  # -- ASP.NET environments
+  aspnet:
+    # ASPNETCORE_ENVIRONMENT. Defaults to .global.environment with first letter capitalized
+    environment: ""
+    # ASPNETCORE_FORWARDEDHEADERS_ENABLED. Defaults to true
+    forwardedHeaders: true
+    # DOTNET_USE_POLLING_FILE_WATCHER. Defaults to true.
+    pollingFileWatcher: true
+  # -- OTEL global settings
+  otel:
+    # -- Whether OTEL is enabled
+    enabled: true
+    # -- OTEL protocol
+    protocol: grpc
+    # -- Is OTEL commuinication is secure or not
+    insecure: true
+    # -- OTEL endpoint settings
+    endpoint: {}
+      # -- OTEL collector host
+      # host: ""
+      # -- OTEL collector credentials
+      # credentials: ""
+  # -- Docker image registry configuration.
+  imageRegistry:
+    # -- Image pull secrets
+    pullSecrets: []
+    # -- Image repository base path.
+    basePath: ""
+  # -- Global Infisical settings
+  infisical:
+    # -- Infisical host api url
+    hostAPI: ""
+    # -- Infisical credentials secret reference
+    credentialsRef:
+      # -- Infisical auth secret name
+      secretName: ""
+      # -- Infisical auth secret namespace
+      secretNamespace: ""
+  # -- Global DAPR settings
+  dapr:
+    # -- mTLS settings
+    mtls:
+      # -- Whether to enable mtls or not
+      enabled: false
+      # -- Control plane trust domain
+      trustDomain: cluster.local
+      # -- DAPR sentry address. Defaults to 'dapr-sentry.infra-dapr.svc.clister.local:443'
+      sentryAddress: ""
+    # -- Tracing OTEL configuration
+    otel:
+      # -- Whether transport is secure
+      isSecure: false
+      # -- OTEL endpoint
+      endpoint: ""
+      # -- OTEL transport protocol
+      protocol: grpc
 
+# backoffice
 maestro:
   enabled: false
+
+# core APIs
 cms-api:
   enabled: false
 catalog-api:
@@ -28,12 +98,21 @@ state-api:
   enabled: false
 wishlist-api:
   enabled: false
+admin-api:
+  enabled: false
+
+# custom APIs
+custom-api:
+  enabled: false
+
+# deprecated APIs
 customer-private-api:
+  enabled: false
+customer-business-api:
   enabled: false
 consent-api:
   enabled: false
 inventory-api:
   enabled: false
-  
 # tests:
 #   enabled: false
