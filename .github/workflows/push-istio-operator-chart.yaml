@@ -25,10 +25,12 @@ jobs:
          # rm ./istio-${{ env.VERSION }}/manifests/charts/istio-operator/templates/namespace.yaml
       -
         name: Install Helm
-        uses: azure/setup-helm@v3
+        uses: azure/setup-helm@v4
+        with: 
+          version: v3.19.2
       -
         name: Install Helm Push plugin
-        run: helm plugin install --version v0.10.4 --verify=false https://github.com/chartmuseum/helm-push.git
+        run: helm plugin install --version v0.10.4 https://github.com/chartmuseum/helm-push.git
       -
         name: Add Helm repository
         run: |
