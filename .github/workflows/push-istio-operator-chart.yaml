@@ -28,7 +28,7 @@ jobs:
         uses: azure/setup-helm@v3
       -
         name: Install Helm Push plugin
-        run: helm plugin install https://github.com/chartmuseum/helm-push.git
+        run: helm plugin install --version v0.10.4 --verify=false https://github.com/chartmuseum/helm-push.git
       -
         name: Add Helm repository
         run: |
