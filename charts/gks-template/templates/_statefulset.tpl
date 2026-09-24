@@ -100,6 +100,11 @@ spec:
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- $topologySpread := include "gks.shared.topologySpreadConstraints" . }}
+      {{- if $topologySpread }}
+      topologySpreadConstraints:
+        {{- $topologySpread | trim | nindent 8 }}
+      {{- end }}
       {{- with .Values.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
