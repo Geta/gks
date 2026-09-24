@@ -97,3 +97,12 @@ affinity: {}
 sidecars: []
 # -- Pod termination grace period seconds. [Documentation] (https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/)
 terminationGracePeriodSeconds: 30
+# -- PodDisruptionBudget configuration. [Documentation](https://kubernetes.io/docs/tasks/run-application/configure-pdb/).
+# @default -- `{}`
+podDisruptionBudget:
+  # -- Whether to render a PodDisruptionBudget or not.
+  enabled: true
+  # -- Maximum pods that may be unavailable during a voluntary disruption. Inert on a single-replica workload, which keeps node drains unblocked.
+  maxUnavailable: 1
+  # -- Minimum pods that must stay available. Set it to switch semantics; it takes precedence over maxUnavailable.
+  minAvailable: ''
