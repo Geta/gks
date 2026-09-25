@@ -97,3 +97,27 @@ affinity: {}
 sidecars: []
 # -- Pod termination grace period seconds. [Documentation] (https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/)
 terminationGracePeriodSeconds: 30
+# -- PodDisruptionBudget configuration. [Documentation](https://kubernetes.io/docs/tasks/run-application/configure-pdb/).
+# @default -- `{}`
+podDisruptionBudget:
+  # -- Whether to render a PodDisruptionBudget or not.
+  enabled: true
+  # -- Maximum pods that may be unavailable during a voluntary disruption. Inert on a single-replica workload, which keeps node drains unblocked.
+  maxUnavailable: 1
+  # -- Minimum pods that must stay available. Set it to switch semantics; it takes precedence over maxUnavailable.
+  minAvailable: ''
+# -- Topology spread defaults. Rendered unless topologySpreadConstraints below is set. [Documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/).
+# @default -- `{}`
+topologySpread:
+  # -- Whether to render the generated constraint or not.
+  enabled: true
+  # -- Maximum difference in pod count between two nodes.
+  maxSkew: 1
+  # -- Topology domain to spread over. Deliberately hostname, not zone: zone spread increases cross-AZ traffic.
+  topologyKey: kubernetes.io/hostname
+  # -- ScheduleAnyway keeps the constraint soft so a capacity crunch cannot produce Pending pods. Set DoNotSchedule to harden a tenant.
+  whenUnsatisfiable: ScheduleAnyway
+  # -- Honor makes tainted nodes the pod cannot tolerate stop counting as empty domains.
+  nodeTaintsPolicy: Honor
+# -- Raw topologySpreadConstraints list. When non-empty it replaces the generated block entirely.
+topologySpreadConstraints: []
