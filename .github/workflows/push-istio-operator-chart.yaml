@@ -30,7 +30,7 @@ jobs:
           version: v3.19.2
       -
         name: Install Helm Push plugin
-        run: helm plugin install --version v0.10.4 https://github.com/chartmuseum/helm-push.git
+        run: helm plugin install --version v0.11.1 https://github.com/chartmuseum/helm-push.git
       -
         name: Add Helm repository
         run: |
