@@ -10,6 +10,9 @@ metadata:
   labels:
     {{- include "gks.shared.labels" . | nindent 4 }}
 spec:
+  {{- with .Values.podDisruptionBudget.unhealthyPodEvictionPolicy }}
+  unhealthyPodEvictionPolicy: {{ . }}
+  {{- end }}
   {{- if .Values.podDisruptionBudget.minAvailable }}
   minAvailable: {{ .Values.podDisruptionBudget.minAvailable }}
   {{- else }}
