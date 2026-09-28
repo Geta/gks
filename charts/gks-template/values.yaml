@@ -106,6 +106,8 @@ podDisruptionBudget:
   maxUnavailable: 1
   # -- Minimum pods that must stay available. Set it to switch semantics; it takes precedence over maxUnavailable.
   minAvailable: ''
+  # -- Eviction policy for pods that are Running but not Ready. AlwaysAllow is deliberate: under the default IfHealthyBudget a single-replica workload has desiredHealthy 0, the unhealthy-pod bypass requires desiredHealthy > 0, and an unready pod then cannot be evicted at all - a crashlooping app would hold a node drain until Karpenter force-terminates.
+  unhealthyPodEvictionPolicy: AlwaysAllow
 # -- Topology spread defaults. Rendered unless topologySpreadConstraints below is set. [Documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/).
 # @default -- `{}`
 topologySpread:
