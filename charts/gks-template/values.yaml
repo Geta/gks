@@ -22,6 +22,12 @@ image:
   pullPolicy: IfNotPresent
   # -- Image tag.
   tag: ''
+# -- Container entrypoint override, e.g. `[dotnet, /app/worker/Worker.dll]`. Empty keeps the image ENTRYPOINT.
+command: []
+# -- Container arguments override. Empty keeps the image CMD.
+args: []
+# -- Container working directory override. Empty keeps the image WORKDIR.
+workingDir: ''
 # -- List of the secret names to use for image pulling.
 imagePullSecrets: []
 # -- Name override.
