@@ -1,5 +1,7 @@
 # -- Number of replicas to run.
 replicaCount: 1
+# -- Optional Deployment strategy. Empty preserves Kubernetes defaults. Recreate waits for old pods during controller-managed upgrades; it is not a consumer fence.
+deploymentStrategy: {}
 # -- Autoscaling configuration. [Documentation](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/).
 # @default -- `{}`
 autoscaling:
