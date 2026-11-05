@@ -33,4 +33,14 @@ runs:
         step: |
           name: Push Helm chart to registry
           shell: bash
-          run: helm cm-push --timeout 300 '${{ steps.package.outputs.CHART_PACKAGE }}' '${{ inputs.repo_alias }}'
+          env:
+            CHART_PACKAGE: ${{ steps.package.outputs.CHART_PACKAGE }}
+            REPO_ALIAS: ${{ inputs.repo_alias }}
+          run: |
+            set -e
+            helm cm-push --timeout 300 "$CHART_PACKAGE" "$REPO_ALIAS"
+            REPO_URL=$(helm repo list | awk -v a="$REPO_ALIAS" '$1==a {print $2}')
+            if [[ "$REPO_URL" == */chartrepo/* ]]; then
+              OCI_REF=$(printf '%s' "$REPO_URL" | sed -E 's#^https?://([^/]+)/chartrepo/([^/]+).*#oci://\1/\2/charts#')
+              helm push "$CHART_PACKAGE" "$OCI_REF"
+            fi
