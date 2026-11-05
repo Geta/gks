@@ -23,9 +23,18 @@ runs:
       name: Add Helm repository
       id: repo
       shell: bash
+      env:
+        HELM_ALIAS: ${{ inputs.alias }}
+        HELM_URL: ${{ inputs.url }}
+        HELM_USER: ${{ inputs.user }}
+        HELM_TOKEN: ${{ inputs.token }}
       run: |
-        helm repo add --username '${{ inputs.user }}' --password '${{ inputs.token }}' ${{ inputs.alias }} ${{ inputs.url }}
-        echo "alias=${{ inputs.alias }}" >> $GITHUB_OUTPUT
+        printf '%s' "$HELM_TOKEN" | helm repo add --username "$HELM_USER" --password-stdin "$HELM_ALIAS" "$HELM_URL"
+        if [[ "$HELM_URL" == */chartrepo/* ]]; then
+          REGISTRY=$(printf '%s' "$HELM_URL" | sed -E 's#^https?://([^/]+)/.*#\1#')
+          printf '%s' "$HELM_TOKEN" | helm registry login "$REGISTRY" --username "$HELM_USER" --password-stdin
+        fi
+        echo "alias=$HELM_ALIAS" >> $GITHUB_OUTPUT
     - 
       name: Update HELM repository
       shell: bash
