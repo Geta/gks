@@ -64,3 +64,12 @@ jobs:
           chart_version: ${{ env.VERSION }}
           helm_repository_project: ${{ env.HARBOR_PROJECT_NAME }}
           push: true
+      -
+        name: Push template Helm chart to OCI
+        env:
+          HARBOR_USER: ${{ secrets.GKS_HARBOR_USER }}
+          HARBOR_PASSWORD: ${{ secrets.GKS_HARBOR_PASSWORD }}
+          CHART_PACKAGE: '${{ env.HELM_CHART_PATH }}/${{ env.HELM_CHART_NAME }}/output/${{ env.HELM_CHART_NAME }}-${{ env.VERSION }}.tgz'
+        run: |
+          printf '%s' "$HARBOR_PASSWORD" | helm registry login "$GKS_HARBOR_ADDRESS" --username "$HARBOR_USER" --password-stdin
+          helm push "$CHART_PACKAGE" "oci://$GKS_HARBOR_ADDRESS/$HARBOR_PROJECT_NAME/charts"
