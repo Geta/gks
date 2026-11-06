@@ -27,12 +27,15 @@ runs:
         set -e
         rm -rf "${CHART_DIR:?}"
         REPO_URL=$(helm repo list | awk -v a="$REPO_ALIAS" '$1==a {print $2}')
-        if [[ "$REPO_URL" == */chartrepo/* && -n "$CHART_VERSION" && ! "$CHART_VERSION" =~ [\^~\<\>=*\ ,|] ]]
+        EXACT='^v?[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$'
+        if [[ "$REPO_URL" == */chartrepo/* && "$CHART_VERSION" =~ $EXACT ]]
         then
           OCI_REF=$(printf '%s' "$REPO_URL" | sed -E 's#^https?://([^/]+)/chartrepo/([^/]+).*#oci://\1/\2/charts#')
+          echo "pull-chart: $OCI_REF/$CHART_NAME:$CHART_VERSION"
           helm pull "$OCI_REF/$CHART_NAME" --version "$CHART_VERSION" --untar --untardir "$CHART_DIR"
         elif [ -n "$CHART_VERSION" ]
         then
+          echo "pull-chart: $REPO_URL $CHART_NAME $CHART_VERSION"
           helm pull "$REPO_ALIAS/$CHART_NAME" --version "$CHART_VERSION" --untar --untardir "$CHART_DIR"
         elif [ -n "$ALLOW_PRERELEASE" ]
         then
