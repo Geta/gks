@@ -17,18 +17,28 @@ runs:
     -
       name: Pull service helm chart template
       shell: bash
+      env:
+        CHART_DIR: ${{ inputs.chart_dir }}
+        CHART_NAME: ${{ inputs.chart_name }}
+        CHART_VERSION: ${{ inputs.chart_version }}
+        REPO_ALIAS: ${{ inputs.repo_alias }}
+        ALLOW_PRERELEASE: ${{ env.allow_prerelease }}
       run: |
-        rm -rf ${{ inputs.chart_dir }}
-        if [ -n "${{ inputs.chart_version }}" ]
+        set -e
+        rm -rf "${CHART_DIR:?}"
+        REPO_URL=$(helm repo list | awk -v a="$REPO_ALIAS" '$1==a {print $2}')
+        if [[ "$REPO_URL" == */chartrepo/* && -n "$CHART_VERSION" && ! "$CHART_VERSION" =~ [\^~\<\>=*\ ,|] ]]
         then
-          helm pull '${{ inputs.repo_alias }}/${{ inputs.chart_name }}' --version ${{ inputs.chart_version }} --untar --untardir ${{ inputs.chart_dir }}
+          OCI_REF=$(printf '%s' "$REPO_URL" | sed -E 's#^https?://([^/]+)/chartrepo/([^/]+).*#oci://\1/\2/charts#')
+          helm pull "$OCI_REF/$CHART_NAME" --version "$CHART_VERSION" --untar --untardir "$CHART_DIR"
+        elif [ -n "$CHART_VERSION" ]
+        then
+          helm pull "$REPO_ALIAS/$CHART_NAME" --version "$CHART_VERSION" --untar --untardir "$CHART_DIR"
+        elif [ -n "$ALLOW_PRERELEASE" ]
+        then
+          helm pull "$REPO_ALIAS/$CHART_NAME" --devel --untar --untardir "$CHART_DIR"
         else
-          if [ ${{ env.allow_prerelease }} ]
-          then
-            helm pull '${{ inputs.repo_alias }}/${{ inputs.chart_name }}' --devel --untar --untardir ${{ inputs.chart_dir }}
-          else
-            helm pull '${{ inputs.repo_alias }}/${{ inputs.chart_name }}' --untar --untardir ${{ inputs.chart_dir }}
-          fi
+          helm pull "$REPO_ALIAS/$CHART_NAME" --untar --untardir "$CHART_DIR"
         fi
-        mv ${{ inputs.chart_dir }}/${{ inputs.chart_name }}/* ${{ inputs.chart_dir }}
-        rm -rf ${{ inputs.chart_dir }}/${{ inputs.chart_name }}
+        mv "$CHART_DIR/$CHART_NAME"/* "$CHART_DIR"
+        rm -rf "${CHART_DIR:?}/${CHART_NAME:?}"
